@@ -1,0 +1,148 @@
+<section class="content">
+    <div class="content-block">
+        @for (breadscrum of breadscrums; track breadscrum) {
+        <div class="block-header">
+            <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
+            </app-breadcrumb>
+        </div>
+        }
+
+        @if (!isLoading) {
+        <div class="row">
+            <!-- Left Column: Role List -->
+            <div class="col-xl-3 col-lg-4 col-md-12 col-sm-12">
+                <mat-card class="card-box">
+                    <div class="header d-flex justify-content-between align-items-center">
+                        <h2><strong>Roles</strong></h2>
+                        <button mat-icon-button color="primary" (click)="addRole()" matTooltip="Add New Role">
+                            <mat-icon>add_circle</mat-icon>
+                        </button>
+                    </div>
+                    <div class="body">
+                        <div class="role-list">
+                            @for (role of roles; track role.id) {
+                            <div class="role-item p-3 border-bottom cursor-pointer transition"
+                                [class.active-role]="selectedRole?.id === role.id" (click)="selectRole(role)">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0 font-weight-bold">{{role.roleName}}</h5>
+                                    <span class="badge" [class.badge-solid-green]="role.status === 'Active'"
+                                        [class.badge-solid-red]="role.status === 'Inactive'">{{role.status}}</span>
+                                </div>
+                                <p class="text-muted mb-0 small text-truncate">{{role.description}}</p>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </mat-card>
+            </div>
+
+            <!-- Right Column: Role Details & Matrix -->
+            <div class="col-xl-9 col-lg-8 col-md-12 col-sm-12">
+                @if (selectedRole) {
+                <form [formGroup]="roleForm" (ngSubmit)="saveRole()">
+                    <!-- Basic Info Card -->
+                    <mat-card class="card-box mb-4">
+                        <div class="header d-flex justify-content-between align-items-center">
+                            <h2><strong>Role</strong> Information</h2>
+                            <button mat-raised-button color="primary" type="submit" [disabled]="!roleForm.valid">
+                                <mat-icon>save</mat-icon> Save Changes
+                            </button>
+                        </div>
+                        <div class="body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <mat-form-field class="example-full-width" appearance="outline">
+                                        <mat-label>Role Name</mat-label>
+                                        <input matInput formControlName="roleName">
+                                        <mat-icon matSuffix>badge</mat-icon>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <mat-form-field class="example-full-width" appearance="outline">
+                                        <mat-label>Priority Level</mat-label>
+                                        <mat-select formControlName="priorityLevel">
+                                            <mat-option value="Low">Low</mat-option>
+                                            <mat-option value="Medium">Medium</mat-option>
+                                            <mat-option value="High">High</mat-option>
+                                            <mat-option value="Critical">Critical</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <mat-form-field class="example-full-width" appearance="outline">
+                                        <mat-label>Status</mat-label>
+                                        <mat-select formControlName="status">
+                                            <mat-option value="Active">Active</mat-option>
+                                            <mat-option value="Inactive">Inactive</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-12">
+                                    <mat-form-field class="example-full-width" appearance="outline">
+                                        <mat-label>Description</mat-label>
+                                        <textarea matInput formControlName="description"></textarea>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-card>
+
+                    <!-- Permissions Matrix Card -->
+                    <mat-card class="card-box">
+                        <div class="header">
+                            <h2><strong>Permissions</strong> Matrix</h2>
+                        </div>
+                        <div class="body">
+                            <div class="responsive_table">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="ps-4">Module Name</th>
+                                            <th class="text-center">View</th>
+                                            <th class="text-center">Create</th>
+                                            <th class="text-center">Edit</th>
+                                            <th class="text-center">Delete</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (mod of selectedRole.modules; track mod.module) {
+                                        <tr>
+                                            <td class="ps-4">
+                                                <span class="font-weight-bold">{{mod.module}}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <mat-checkbox color="primary" [checked]="mod.view"
+                                                    (change)="togglePermission(mod, 'view')"></mat-checkbox>
+                                            </td>
+                                            <td class="text-center">
+                                                <mat-checkbox color="primary" [checked]="mod.create"
+                                                    (change)="togglePermission(mod, 'create')"></mat-checkbox>
+                                            </td>
+                                            <td class="text-center">
+                                                <mat-checkbox color="primary" [checked]="mod.edit"
+                                                    (change)="togglePermission(mod, 'edit')"></mat-checkbox>
+                                            </td>
+                                            <td class="text-center">
+                                                <mat-checkbox color="primary" [checked]="mod.delete"
+                                                    (change)="togglePermission(mod, 'delete')"></mat-checkbox>
+                                            </td>
+                                        </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </mat-card>
+                </form>
+                }
+            </div>
+        </div>
+        } @else {
+        <div class="d-flex justify-content-center p-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        }
+    </div>
+</section>
