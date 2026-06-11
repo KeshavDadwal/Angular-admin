@@ -2,18 +2,6 @@
   "routes": [
     {
       "path": "",
-      "title": "MENUITEMS.MAIN.TEXT",
-      "iconType": "",
-      "icon": "",
-      "class": "",
-      "groupTitle": true,
-      "badge": "",
-      "badgeClass": "",
-      "role": ["ADMIN"],
-      "submenu": []
-    },
-    {
-      "path": "",
       "title": "MENUITEMS.DASHBOARD.TEXT",
       "iconType": "material-icons-outlined",
       "icon": "space_dashboard",
@@ -21,7 +9,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/dashboard/main",
@@ -32,19 +22,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/admin/dashboard/dashboard2",
-          "title": "MENUITEMS.DASHBOARD.LIST.DASHBOARD2",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -56,7 +36,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -68,7 +50,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -80,7 +64,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -92,12 +78,13 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
     },
-
     {
       "path": "",
       "title": "MENUITEMS.FRONT-OFFICE.TEXT",
@@ -107,7 +94,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/front-office/admission-inquiry",
@@ -118,7 +107,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -130,7 +121,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -142,7 +135,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -156,7 +151,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/teachers/all-teachers",
@@ -167,7 +164,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -179,7 +178,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -191,7 +192,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -203,7 +206,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -215,7 +220,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -227,7 +234,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -241,7 +250,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/students/all-students",
@@ -252,7 +263,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -264,7 +277,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -276,7 +291,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -288,7 +305,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -300,7 +319,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -312,7 +333,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -324,7 +347,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -336,7 +361,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -348,7 +375,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -362,7 +391,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/admissions/admission-enquiries",
@@ -373,7 +404,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -385,7 +418,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -397,7 +432,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -409,7 +446,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -421,7 +460,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -435,7 +476,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/examination/exam-types",
@@ -446,7 +489,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -458,7 +503,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -470,7 +517,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -482,7 +531,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -494,7 +545,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -506,7 +559,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -520,7 +575,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/courses/all-courses",
@@ -531,7 +588,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -543,7 +602,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -555,7 +616,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -567,7 +630,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -581,7 +646,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/library/all-assets",
@@ -592,7 +659,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -604,7 +673,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -616,7 +687,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -628,7 +701,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -640,7 +715,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -652,7 +729,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -666,7 +745,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/staff/all-staff",
@@ -677,7 +758,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -689,7 +772,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -701,7 +786,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -713,7 +800,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -725,7 +814,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -739,7 +830,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/human-resources/leave-requests",
@@ -750,7 +843,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -762,7 +857,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -774,7 +871,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -786,7 +885,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -798,7 +899,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -810,7 +913,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -822,7 +927,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -834,7 +941,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -846,12 +955,13 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
     },
-
     {
       "path": "",
       "title": "MENUITEMS.TRANSPORT.TEXT",
@@ -861,7 +971,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/transport/vehicles",
@@ -872,7 +984,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -884,7 +998,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -896,7 +1012,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -908,7 +1026,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -920,7 +1040,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -934,7 +1056,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/holidays/all-holidays",
@@ -945,7 +1069,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -957,7 +1083,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -969,7 +1097,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -983,7 +1113,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/communication/notice-board",
@@ -994,7 +1126,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1006,7 +1140,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1018,7 +1154,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -1032,7 +1170,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/fees/all-fees",
@@ -1043,7 +1183,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1055,7 +1197,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1067,7 +1211,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1079,7 +1225,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1091,7 +1239,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1103,7 +1253,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -1117,7 +1269,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/class/class-list",
@@ -1128,7 +1282,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": ["ADMIN"],
+          "role": [
+            "ADMIN"
+          ],
           "submenu": []
         },
         {
@@ -1140,7 +1296,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": ["ADMIN"],
+          "role": [
+            "ADMIN"
+          ],
           "submenu": []
         }
       ]
@@ -1154,7 +1312,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/academics/academic-year",
@@ -1165,7 +1325,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1177,7 +1339,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1189,7 +1353,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1201,7 +1367,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1213,7 +1381,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1225,7 +1395,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1237,7 +1409,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -1251,7 +1425,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/hostel/room-list",
@@ -1262,7 +1438,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": ["ADMIN"],
+          "role": [
+            "ADMIN"
+          ],
           "submenu": []
         },
         {
@@ -1274,7 +1452,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": ["ADMIN"],
+          "role": [
+            "ADMIN"
+          ],
           "submenu": []
         },
         {
@@ -1286,7 +1466,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": ["ADMIN"],
+          "role": [
+            "ADMIN"
+          ],
           "submenu": []
         },
         {
@@ -1298,7 +1480,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": ["ADMIN"],
+          "role": [
+            "ADMIN"
+          ],
           "submenu": []
         },
         {
@@ -1310,7 +1494,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": ["ADMIN"],
+          "role": [
+            "ADMIN"
+          ],
           "submenu": []
         }
       ]
@@ -1324,7 +1510,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/departments/all-departments",
@@ -1335,7 +1523,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1347,7 +1537,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1359,7 +1551,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -1373,7 +1567,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/reports/academic-reports",
@@ -1384,7 +1580,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1396,7 +1594,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1408,7 +1608,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1420,7 +1622,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1432,7 +1636,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -1446,7 +1652,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["ADMIN"],
+      "role": [
+        "ADMIN"
+      ],
       "submenu": [
         {
           "path": "/admin/settings/institute-profile",
@@ -1457,7 +1665,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1469,7 +1679,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1481,7 +1693,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1493,7 +1707,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1505,7 +1721,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1517,7 +1735,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1529,12 +1749,13 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
     },
-
     {
       "path": "",
       "title": "MENUITEMS.TEACHER.TEXT",
@@ -1544,7 +1765,9 @@
       "groupTitle": true,
       "badge": "",
       "badgeClass": "",
-      "role": ["TEACHER"],
+      "role": [
+        "TEACHER"
+      ],
       "submenu": []
     },
     {
@@ -1556,7 +1779,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["TEACHER"],
+      "role": [
+        "TEACHER"
+      ],
       "submenu": []
     },
     {
@@ -1568,7 +1793,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["TEACHER"],
+      "role": [
+        "TEACHER"
+      ],
       "submenu": []
     },
     {
@@ -1580,7 +1807,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["TEACHER"],
+      "role": [
+        "TEACHER"
+      ],
       "submenu": [
         {
           "path": "/teacher/academics/my-classes",
@@ -1589,7 +1818,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1599,7 +1830,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1609,7 +1842,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1619,7 +1854,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1629,7 +1866,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -1643,7 +1882,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["TEACHER"],
+      "role": [
+        "TEACHER"
+      ],
       "submenu": [
         {
           "path": "/teacher/students/class-students",
@@ -1652,7 +1893,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1662,7 +1905,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1672,7 +1917,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1682,7 +1929,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -1696,7 +1945,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["TEACHER"],
+      "role": [
+        "TEACHER"
+      ],
       "submenu": [
         {
           "path": "/teacher/examination/exam-schedule",
@@ -1705,7 +1956,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1715,7 +1968,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1725,7 +1980,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1735,7 +1992,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -1749,7 +2008,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["TEACHER"],
+      "role": [
+        "TEACHER"
+      ],
       "submenu": [
         {
           "path": "/teacher/timetable/my-timetable",
@@ -1758,7 +2019,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1768,7 +2031,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -1782,7 +2047,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["TEACHER"],
+      "role": [
+        "TEACHER"
+      ],
       "submenu": [
         {
           "path": "/teacher/communication/notices",
@@ -1791,7 +2058,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1801,7 +2070,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1811,7 +2082,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -1825,7 +2098,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["TEACHER"],
+      "role": [
+        "TEACHER"
+      ],
       "submenu": [
         {
           "path": "/teacher/attendance/daily-attendance",
@@ -1834,7 +2109,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1846,7 +2123,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -1860,7 +2139,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["TEACHER"],
+      "role": [
+        "TEACHER"
+      ],
       "submenu": [
         {
           "path": "/teacher/leave/apply-leave",
@@ -1869,7 +2150,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1879,7 +2162,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -1893,7 +2178,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["TEACHER"],
+      "role": [
+        "TEACHER"
+      ],
       "submenu": []
     },
     {
@@ -1905,7 +2192,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["TEACHER"],
+      "role": [
+        "TEACHER"
+      ],
       "submenu": [
         {
           "path": "/teacher/my-profile/profile-info",
@@ -1914,7 +2203,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1924,7 +2215,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -1934,7 +2227,9 @@
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -1948,10 +2243,11 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["TEACHER"],
+      "role": [
+        "TEACHER"
+      ],
       "submenu": []
     },
-
     {
       "path": "/student/dashboard",
       "title": "MENUITEMS.STUDENT.LIST.DASHBOARD",
@@ -1961,7 +2257,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["STUDENT"],
+      "role": [
+        "STUDENT"
+      ],
       "submenu": []
     },
     {
@@ -1973,7 +2271,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["STUDENT"],
+      "role": [
+        "STUDENT"
+      ],
       "submenu": []
     },
     {
@@ -1985,7 +2285,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["STUDENT"],
+      "role": [
+        "STUDENT"
+      ],
       "submenu": []
     },
     {
@@ -1997,7 +2299,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["STUDENT"],
+      "role": [
+        "STUDENT"
+      ],
       "submenu": []
     },
     {
@@ -2009,7 +2313,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["STUDENT"],
+      "role": [
+        "STUDENT"
+      ],
       "submenu": [
         {
           "path": "/student/academics/syllabus",
@@ -2020,7 +2326,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2032,7 +2340,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2044,7 +2354,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2056,7 +2368,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2068,7 +2382,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -2082,7 +2398,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["STUDENT"],
+      "role": [
+        "STUDENT"
+      ],
       "submenu": [
         {
           "path": "/student/examination/exam-schedule",
@@ -2093,7 +2411,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2105,7 +2425,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2117,7 +2439,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2129,7 +2453,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2141,7 +2467,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -2155,7 +2483,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["STUDENT"],
+      "role": [
+        "STUDENT"
+      ],
       "submenu": [
         {
           "path": "/student/attendance/monthly-summary",
@@ -2166,7 +2496,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2178,7 +2510,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -2192,7 +2526,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["STUDENT"],
+      "role": [
+        "STUDENT"
+      ],
       "submenu": []
     },
     {
@@ -2204,7 +2540,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["STUDENT"],
+      "role": [
+        "STUDENT"
+      ],
       "submenu": [
         {
           "path": "/student/fees/fee-receipts",
@@ -2215,7 +2553,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2227,7 +2567,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2239,7 +2581,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2251,7 +2595,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -2265,7 +2611,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["STUDENT"],
+      "role": [
+        "STUDENT"
+      ],
       "submenu": [
         {
           "path": "/student/library/my-issued-books",
@@ -2276,7 +2624,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2288,7 +2638,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2300,7 +2652,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -2314,7 +2668,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["STUDENT"],
+      "role": [
+        "STUDENT"
+      ],
       "submenu": [
         {
           "path": "/student/transport/my-route",
@@ -2325,7 +2681,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2337,7 +2695,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -2351,7 +2711,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["STUDENT"],
+      "role": [
+        "STUDENT"
+      ],
       "submenu": [
         {
           "path": "/student/hostel/room-details",
@@ -2362,7 +2724,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2374,7 +2738,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         },
         {
@@ -2386,7 +2752,9 @@
           "groupTitle": false,
           "badge": "",
           "badgeClass": "",
-          "role": [""],
+          "role": [
+            ""
+          ],
           "submenu": []
         }
       ]
@@ -2400,7 +2768,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["STUDENT"],
+      "role": [
+        "STUDENT"
+      ],
       "submenu": []
     },
     {
@@ -2412,7 +2782,9 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["STUDENT"],
+      "role": [
+        "STUDENT"
+      ],
       "submenu": []
     },
     {
@@ -2424,959 +2796,10 @@
       "groupTitle": false,
       "badge": "",
       "badgeClass": "",
-      "role": ["STUDENT"],
+      "role": [
+        "STUDENT"
+      ],
       "submenu": []
-    },
-
-    {
-      "path": "",
-      "title": "MENUITEMS.APPS.TEXT",
-      "iconType": "",
-      "icon": "",
-      "class": "",
-      "groupTitle": true,
-      "badge": "",
-      "badgeClass": "",
-      "role": ["ADMIN"],
-      "submenu": []
-    },
-    {
-      "path": "calendar",
-      "title": "MENUITEMS.CALENDAR.TEXT",
-      "iconType": "material-icons-outlined",
-      "icon": "event_note",
-      "class": "",
-      "groupTitle": false,
-      "badge": "New",
-      "badgeClass": "badge bg-blue sidebar-badge float-end",
-      "role": ["ADMIN"],
-      "submenu": []
-    },
-    {
-      "path": "task",
-      "title": "MENUITEMS.TASK.TEXT",
-      "iconType": "material-icons-outlined",
-      "icon": "fact_check",
-      "class": "",
-      "groupTitle": false,
-      "badge": "",
-      "badgeClass": "",
-      "role": ["ADMIN"],
-      "submenu": []
-    },
-    {
-      "path": "contacts",
-      "title": "MENUITEMS.CONTACTS.TEXT",
-      "iconType": "material-icons-outlined",
-      "icon": "contacts",
-      "class": "",
-      "groupTitle": false,
-      "badge": "",
-      "badgeClass": "",
-      "role": ["ADMIN"],
-      "submenu": []
-    },
-    {
-      "path": "",
-      "title": "Email",
-      "iconType": "material-icons-outlined",
-      "icon": "email",
-      "class": "menu-toggle",
-      "groupTitle": false,
-      "badge": "",
-      "badgeClass": "",
-      "role": ["ADMIN"],
-      "submenu": [
-        {
-          "path": "/email/inbox",
-          "title": "Inbox",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/email/compose",
-          "title": "Compose",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/email/read-mail",
-          "title": "Read Email",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        }
-      ]
-    },
-    {
-      "path": "",
-      "title": "More Apps",
-      "iconType": "material-icons-outlined",
-      "icon": "stars",
-      "class": "menu-toggle",
-      "groupTitle": false,
-      "badge": "5",
-      "badgeClass": "badge bg-orange sidebar-badge float-end",
-      "role": ["ADMIN"],
-      "submenu": [
-        {
-          "path": "/apps/chat",
-          "title": "Chat",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/apps/dragdrop",
-          "title": "Drag & Drop",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/apps/contact-grid",
-          "title": "Contact Grid",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/apps/support",
-          "title": "Support",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        }
-      ]
-    },
-    {
-      "path": "",
-      "title": "Widgets",
-      "iconType": "material-icons-outlined",
-      "icon": "widgets",
-      "class": "menu-toggle",
-      "groupTitle": false,
-      "badge": "",
-      "badgeClass": "",
-      "role": ["ADMIN"],
-      "submenu": [
-        {
-          "path": "/widget/chart-widget",
-          "title": "Chart Widget",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/widget/data-widget",
-          "title": "Data Widget",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        }
-      ]
-    },
-    {
-      "path": "",
-      "title": "Components",
-      "iconType": "",
-      "icon": "",
-      "class": "",
-      "groupTitle": true,
-      "badge": "",
-      "badgeClass": "",
-      "role": ["ADMIN"],
-      "submenu": []
-    },
-    {
-      "path": "",
-      "title": "User Interface (UI)",
-      "iconType": "material-icons-outlined",
-      "icon": "dvr",
-      "class": "menu-toggle",
-      "groupTitle": false,
-      "badge": "",
-      "badgeClass": "",
-      "role": ["ADMIN"],
-      "submenu": [
-        {
-          "path": "/ui/alerts",
-          "title": "Alerts",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/ui/badges",
-          "title": "Badges",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/ui/chips",
-          "title": "Chips",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/ui/modal",
-          "title": "Modal",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/ui/buttons",
-          "title": "Buttons",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/ui/expansion-panel",
-          "title": "Expansion Panel",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/ui/bottom-sheet",
-          "title": "Bottom Sheet",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/ui/dialogs",
-          "title": "Dialogs",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/ui/cards",
-          "title": "Cards",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/ui/labels",
-          "title": "Labels",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/ui/list-group",
-          "title": "List Group",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/ui/snackbar",
-          "title": "Snackbar",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/ui/preloaders",
-          "title": "Preloaders",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/ui/progressbars",
-          "title": "Progress Bars",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/ui/tabs",
-          "title": "Tabs",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/ui/typography",
-          "title": "Typography",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/ui/helper-classes",
-          "title": "Helper Classes",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        }
-      ]
-    },
-    {
-      "path": "",
-      "title": "Forms",
-      "iconType": "material-icons-outlined",
-      "icon": "subtitles",
-      "class": "menu-toggle",
-      "groupTitle": false,
-      "badge": "",
-      "badgeClass": "",
-      "role": ["ADMIN"],
-      "submenu": [
-        {
-          "path": "/forms/form-controls",
-          "title": "Form Controls",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/forms/advance-controls",
-          "title": "Advanced Controls",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/forms/form-example",
-          "title": "Form Examples",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/forms/form-validation",
-          "title": "Form Validation",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/forms/wizard",
-          "title": "Form Wizard",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/forms/editors",
-          "title": "Editors",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        }
-      ]
-    },
-    {
-      "path": "",
-      "title": "Tables",
-      "iconType": "material-icons-outlined",
-      "icon": "view_list",
-      "class": "menu-toggle",
-      "groupTitle": false,
-      "badge": "",
-      "badgeClass": "",
-      "role": ["ADMIN"],
-      "submenu": [
-        {
-          "path": "/tables/basic-tables",
-          "title": "Basic Tables",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/tables/material-tables",
-          "title": "Material Tables",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/tables/ngx-datatable",
-          "title": "ngx-datatable",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        }
-      ]
-    },
-    {
-      "path": "",
-      "title": "Charts",
-      "iconType": "material-icons-outlined",
-      "icon": "insert_chart",
-      "class": "menu-toggle",
-      "groupTitle": false,
-      "badge": "7",
-      "badgeClass": "badge bg-green sidebar-badge float-end",
-      "role": ["ADMIN"],
-      "submenu": [
-        {
-          "path": "/charts/echart",
-          "title": "Echart",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/charts/apex",
-          "title": "Apex",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/charts/chartjs",
-          "title": "ChartJS",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/charts/ngx-charts",
-          "title": "Ngx-Charts",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/charts/gauge",
-          "title": "Gauge",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        }
-      ]
-    },
-    {
-      "path": "",
-      "title": "Timeline",
-      "iconType": "material-icons-outlined",
-      "icon": "timeline",
-      "class": "menu-toggle",
-      "groupTitle": false,
-      "badge": "",
-      "badgeClass": "",
-      "role": ["ADMIN"],
-      "submenu": [
-        {
-          "path": "/timeline/timeline1",
-          "title": "Timeline 1",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/timeline/timeline2",
-          "title": "Timeline 2",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        }
-      ]
-    },
-    {
-      "path": "",
-      "title": "Icons",
-      "iconType": "material-icons-outlined",
-      "icon": "eco",
-      "class": "menu-toggle",
-      "groupTitle": false,
-      "badge": "",
-      "badgeClass": "",
-      "role": ["ADMIN"],
-      "submenu": [
-        {
-          "path": "/icons/material",
-          "title": "Material Icons",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/icons/font-awesome",
-          "title": "Font Awesome",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        }
-      ]
-    },
-    {
-      "path": "",
-      "title": "Authentication",
-      "iconType": "material-icons-outlined",
-      "icon": "supervised_user_circle",
-      "class": "menu-toggle",
-      "groupTitle": false,
-      "badge": "",
-      "badgeClass": "",
-      "role": ["ADMIN"],
-      "submenu": [
-        {
-          "path": "/authentication/signin",
-          "title": "Sign In",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/authentication/signup",
-          "title": "Sign Up",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/authentication/forgot-password",
-          "title": "Forgot Password",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/authentication/locked",
-          "title": "Locked",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/authentication/page404",
-          "title": "404 - Not Found",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/authentication/page500",
-          "title": "500 - Server Error",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        }
-      ]
-    },
-    {
-      "path": "",
-      "title": "Extra Pages",
-      "iconType": "material-icons-outlined",
-      "icon": "description",
-      "class": "menu-toggle",
-      "groupTitle": false,
-      "badge": "",
-      "badgeClass": "",
-      "role": ["ADMIN"],
-      "submenu": [
-        {
-          "path": "/extra-pages/profile",
-          "title": "Profile",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/extra-pages/pricing",
-          "title": "Pricing",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/extra-pages/invoice",
-          "title": "Invoice",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/extra-pages/faqs",
-          "title": "Faqs",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/extra-pages/blank",
-          "title": "Blank Page",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        }
-      ]
-    },
-    {
-      "path": "",
-      "title": "Multi level Menu",
-      "iconType": "material-icons-outlined",
-      "icon": "slideshow",
-      "class": "menu-toggle",
-      "groupTitle": false,
-      "badge": "",
-      "badgeClass": "",
-      "role": ["ADMIN"],
-      "submenu": [
-        {
-          "path": "/multilevel/first1",
-          "title": "First",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        },
-        {
-          "path": "/",
-          "title": "Second",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-sub-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": [
-            {
-              "path": "/multilevel/secondlevel/second1",
-              "title": "Second 1",
-              "iconType": "",
-              "icon": "",
-              "class": "ml-menu2",
-              "groupTitle": false,
-              "badge": "",
-              "badgeClass": "",
-              "role": [""],
-              "submenu": []
-            },
-            {
-              "path": "/",
-              "title": "Second 2",
-              "iconType": "",
-              "icon": "",
-              "class": "ml-sub-menu2",
-              "groupTitle": false,
-              "badge": "",
-              "badgeClass": "",
-              "role": [""],
-              "submenu": [
-                {
-                  "path": "/multilevel/thirdlevel/third1",
-                  "title": "third 1",
-                  "iconType": "",
-                  "icon": "",
-                  "class": "ml-menu3",
-                  "groupTitle": false,
-                  "badge": "",
-                  "badgeClass": "",
-                  "role": [""],
-                  "submenu": []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "path": "/multilevel/first3",
-          "title": "Third",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [""],
-          "submenu": []
-        }
-      ]
     }
   ]
 }
