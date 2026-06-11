@@ -15,14 +15,14 @@ export class ErrorInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
       catchError((err) => {
-        if (err.status === 401) {
+        if (err.status === 401 && !request.url.includes('/api/login')) {
           // auto logout if 401 response returned from api
           this.authenticationService.logout();
           location.reload();
         }
 
-        const error = err.error.message || err.statusText;
-        return throwError(error);
+        const error = err.error?.error || err.error?.message || err.statusText;
+        return throwError(() => error);
       })
     );
   }

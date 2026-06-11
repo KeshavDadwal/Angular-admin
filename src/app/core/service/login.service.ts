@@ -1,9 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { User } from '@core/models/interface';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { LocalStorageService } from '@shared/services';
 import { JWT } from './JWT';
+import { environment } from 'environments/environment';
 const jwt = new JWT();
 
 @Injectable({
@@ -64,38 +66,67 @@ export class LoginService {
   ];
 
   login(username: string, password: string, _rememberMe = false) {
-    // Simulate a login API call
-    const user = this.users.find(
-      (u) => u['username'] === username && u['password'] === password
+    return this.http.post<any>(`${environment.apiUrl}/api/login`, { username, password }).pipe(
+      map((res) => {
+        const token = res.token;
+        const role = res.role; // e.g. "admin", "teacher", "student"
+        
+        let uppercaseRole = 'STUDENT';
+        let priority = 3;
+        let name = 'Student User';
+        let email = 'student@school.dev';
+        let permissions = ['canRead'];
+        let avatar = 'student.jpg';
+
+        if (role === 'admin') {
+          uppercaseRole = 'ADMIN';
+          priority = 1;
+          name = 'Sarah Smith';
+          email = 'admin@school.dev';
+          permissions = ['canAdd', 'canDelete', 'canEdit', 'canRead'];
+          avatar = 'admin.jpg';
+        } else if (role === 'teacher') {
+          uppercaseRole = 'TEACHER';
+          priority = 2;
+          name = 'Ashton Cox';
+          email = 'teacher@school.dev';
+          permissions = ['canAdd', 'canEdit', 'canRead'];
+          avatar = 'teacher.jpg';
+        } else if (role === 'student') {
+          uppercaseRole = 'STUDENT';
+          priority = 3;
+          name = 'Cara Stevens';
+          email = 'student@school.dev';
+          permissions = ['canRead'];
+          avatar = 'student.jpg';
+        }
+
+        const currentUser = {
+          id: username,
+          username: username,
+          name: name,
+          email: email,
+          roles: [
+            {
+              name: uppercaseRole,
+              priority: priority
+            }
+          ],
+          permissions: permissions,
+          avatar: avatar
+        };
+
+        return {
+          user: currentUser,
+          token: token,
+          status: 200
+        };
+      }),
+      catchError((err) => {
+        const errorMsg = err || 'Login failed';
+        return throwError(() => errorMsg);
+      })
     );
-    if (!user) {
-      return of({ status: 401, body: {} });
-    }
-
-    if (user['password'] !== password) {
-      const result = {
-        status: 422,
-        error: {
-          errors: { password: ['The provided password is incorrect.'] },
-        },
-      };
-      return of(Object.assign(result));
-    }
-
-    const currentUser = Object.assign({}, user);
-    delete currentUser['password'];
-
-    if (user) {
-      const userResponse = {
-        user: currentUser,
-        token: jwt.generate(currentUser),
-        status: 200,
-      };
-
-      return of(userResponse);
-    } else {
-      return of({ error: 'Invalid credentials' });
-    }
   }
 
   refresh() {
