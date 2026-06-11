@@ -4,9 +4,7 @@ import { User } from '@core/models/interface';
 import { of, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { LocalStorageService } from '@shared/services';
-import { JWT } from './JWT';
 import { environment } from 'environments/environment';
-const jwt = new JWT();
 
 @Injectable({
   providedIn: 'root',
