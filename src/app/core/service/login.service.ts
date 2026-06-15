@@ -14,10 +14,28 @@ export class LoginService {
   private store = inject(LocalStorageService);
 
   login(username: string, password: string, _rememberMe = false) {
-    return this.http.post<any>(`${environment.apiUrl}/api/login`, { username, password }).pipe(
+    const body = {
+      query: `
+        mutation Login($username: String!, $password: String!) {
+          login(input: { username: $username, password: $password }) {
+            token
+            role
+          }
+        }
+      `,
+      variables: {
+        username,
+        password
+      }
+    };
+
+    return this.http.post<any>(`${environment.apiUrl}/query`, body).pipe(
       map((res) => {
-        const token = res.token;
-        const role = res.role; // e.g. "admin", "teacher", "student"
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Login failed');
+        }
+        const token = res.data.login.token;
+        const role = res.data.login.role; // e.g. "admin", "teacher", "student"
 
         let uppercaseRole = 'STUDENT';
         let priority = 3;
@@ -71,7 +89,10 @@ export class LoginService {
         };
       }),
       catchError((err) => {
-        const errorMsg = err || 'Login failed';
+        if (err instanceof Error) {
+          return throwError(() => err.message);
+        }
+        const errorMsg = err.error?.message || err.error?.error || err.message || 'Login failed';
         return throwError(() => errorMsg);
       })
     );
