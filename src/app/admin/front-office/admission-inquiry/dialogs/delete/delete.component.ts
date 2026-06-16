@@ -11,7 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { AdmissionInquiryService } from '../../admission-inquiry.service';
 
 export interface DialogData {
-  inquiryId: number;
+  inquiryId: string;
   studentName: string;
   contactNumber: string;
 }

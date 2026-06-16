@@ -187,12 +187,12 @@
         <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
           <mat-form-field class="example-full-width mb-3" appearance="outline">
             <mat-label>Assigned To</mat-label>
-            <input matInput formControlName="assignedTo">
-            @if (admissionInquiryForm.get('assignedTo')?.hasError('maxlength')) {
-            <mat-error>
-              Maximum length is 100 characters
-            </mat-error>
-            }
+            <mat-select formControlName="assignedTo">
+              <mat-option value="">-- Unassigned --</mat-option>
+              @for (user of assignees; track user.id) {
+                <mat-option [value]="user.id">{{ user.username }} ({{ user.role }})</mat-option>
+              }
+            </mat-select>
           </mat-form-field>
         </div>
       </div>

@@ -6,6 +6,11 @@ import {
 } from '@angular/material/dialog';
 import { Component, inject } from '@angular/core';
 import {
+  MatSnackBar,
+  MatSnackBarHorizontalPosition,
+  MatSnackBarVerticalPosition,
+} from '@angular/material/snack-bar';
+import {
   UntypedFormControl,
   Validators,
   UntypedFormGroup,
@@ -54,11 +59,13 @@ export class AdmissionInquirysFormComponent {
   data = inject<DialogData>(MAT_DIALOG_DATA);
   admissionInquiryService = inject(AdmissionInquiryService);
   private fb = inject(UntypedFormBuilder);
+  private snackBar = inject(MatSnackBar);
 
   action: string;
   dialogTitle: string;
   admissionInquiryForm: UntypedFormGroup;
   admissionInquiry: AdmissionInquiry;
+  assignees: any[] = [];
 
   constructor() {
     const data = this.data;
@@ -76,6 +83,16 @@ export class AdmissionInquirysFormComponent {
 
     // Create form
     this.admissionInquiryForm = this.createAdmissionInquiryForm();
+
+    // Fetch assignees
+    this.admissionInquiryService.getAssigneeOptions().subscribe({
+      next: (list) => {
+        this.assignees = list;
+      },
+      error: (err) => {
+        console.error('Failed to load assignees:', err);
+      }
+    });
   }
 
   // Create form group for admissionInquiry fields with validation
@@ -166,6 +183,12 @@ export class AdmissionInquirysFormComponent {
             },
             error: (error) => {
               console.error('Update Error:', error);
+              this.showNotification(
+                'snackbar-danger',
+                error.message || error,
+                'bottom',
+                'center'
+              );
             },
           });
       } else {
@@ -175,10 +198,30 @@ export class AdmissionInquirysFormComponent {
           },
           error: (error) => {
             console.error('Add Error:', error);
+            this.showNotification(
+              'snackbar-danger',
+              error.message || error,
+              'bottom',
+              'center'
+            );
           },
         });
       }
     }
+  }
+
+  showNotification(
+    colorName: string,
+    text: string,
+    placementFrom: MatSnackBarVerticalPosition,
+    placementAlign: MatSnackBarHorizontalPosition
+  ) {
+    this.snackBar.open(text, '', {
+      duration: 3000,
+      verticalPosition: placementFrom,
+      horizontalPosition: placementAlign,
+      panelClass: colorName,
+    });
   }
 
   // Close the dialog without submitting

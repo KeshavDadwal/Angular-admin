@@ -133,22 +133,83 @@ export class AdmissionInquiryService {
   updateAdmissionInquiry(
     admissionInquiry: AdmissionInquiry
   ): Observable<AdmissionInquiry> {
-    // Simulate updating the admission inquiry
-    return of(admissionInquiry).pipe(
-      map((response) => {
-        this.dialogData = admissionInquiry;
-        return response; // Return the updated admission inquiry
+    const body = {
+      query: `
+        mutation UpdateAdmissionInquiry($input: UpdateAdmissionInquiryInput!) {
+          updateAdmissionInquiry(input: $input) {
+            inquiryId
+            studentName
+            guardianName
+            contactNumber
+            emailAddress
+            dateOfInquiry
+            programOfInterest
+            preferredStartDate
+            inquirySource
+            status
+            notes
+            followUpDate
+            assignedTo
+            campusLocation
+            previousEducation
+            img
+          }
+        }
+      `,
+      variables: {
+        input: {
+          inquiryId: admissionInquiry.inquiryId,
+          studentName: admissionInquiry.studentName,
+          guardianName: admissionInquiry.guardianName,
+          contactNumber: admissionInquiry.contactNumber,
+          emailAddress: admissionInquiry.emailAddress,
+          dateOfInquiry: admissionInquiry.dateOfInquiry,
+          programOfInterest: admissionInquiry.programOfInterest,
+          preferredStartDate: admissionInquiry.preferredStartDate,
+          inquirySource: admissionInquiry.inquirySource,
+          status: admissionInquiry.status,
+          notes: admissionInquiry.notes || null,
+          followUpDate: admissionInquiry.followUpDate || null,
+          assignedTo: admissionInquiry.assignedTo || null,
+          campusLocation: admissionInquiry.campusLocation || null,
+          previousEducation: admissionInquiry.previousEducation || null,
+          img: admissionInquiry.img || null
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update admission inquiry');
+        }
+        const updatedInquiry = res.data.updateAdmissionInquiry;
+        this.dialogData = updatedInquiry;
+        return updatedInquiry;
       }),
       catchError(this.handleError)
     );
   }
 
   /** DELETE: Remove an admission inquiry by ID */
-  deleteAdmissionInquiry(id: number): Observable<number> {
-    // Simulate deleting the admission inquiry by ID
-    return of(id).pipe(
-      map(() => {
-        return id; // Return the ID of the deleted admission inquiry
+  deleteAdmissionInquiry(id: string): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteAdmissionInquiry($inquiryId: String!) {
+          deleteAdmissionInquiry(inquiryId: $inquiryId)
+        }
+      `,
+      variables: {
+        inquiryId: id
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete admission inquiry');
+        }
+        return res.data.deleteAdmissionInquiry;
       }),
       catchError(this.handleError)
     );
@@ -187,11 +248,37 @@ export class AdmissionInquiryService {
     return of(filtered);
   }
 
-  /** Handle Http operation that failed */
-  private handleError(error: HttpErrorResponse) {
-    console.error('An error occurred:', error.message);
-    return throwError(
-      () => new Error('Something went wrong; please try again later.')
+  /** GET: Fetch available users to assign inquiries to */
+  getAssigneeOptions(): Observable<any[]> {
+    const body = {
+      query: `
+        query GetAssigneeOptions {
+          users {
+            id
+            username
+            role
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch assignees');
+        }
+        const users = res.data.users || [];
+        // Only return users who are admins or teachers
+        return users.filter((u: any) => u.role === 'admin' || u.role === 'teacher');
+      }),
+      catchError(this.handleError)
     );
+  }
+
+  /** Handle Http operation that failed */
+  private handleError(error: any) {
+    const errorMsg = error.message || error.error?.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }
