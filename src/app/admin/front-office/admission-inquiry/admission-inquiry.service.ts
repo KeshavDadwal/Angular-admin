@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { AdmissionInquiry } from './admission-inquiry.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,7 @@ import { AdmissionInquiry } from './admission-inquiry.model';
 export class AdmissionInquiryService {
   private httpClient = inject(HttpClient);
 
-  private readonly API_URL = 'assets/data/admission-inquiries.json';
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
   dataChange: BehaviorSubject<AdmissionInquiry[]> = new BehaviorSubject<
     AdmissionInquiry[]
@@ -29,8 +30,37 @@ export class AdmissionInquiryService {
 
   /** GET: Fetch admission inquiries */
   getAdmissionInquiries(): Observable<AdmissionInquiry[]> {
-    return this.httpClient.get<AdmissionInquiry[]>(this.API_URL).pipe(
-      map((data) => {
+    const body = {
+      query: `
+        query GetAdmissionInquiries {
+          admissionInquiries {
+            inquiryId
+            studentName
+            guardianName
+            contactNumber
+            emailAddress
+            dateOfInquiry
+            programOfInterest
+            preferredStartDate
+            inquirySource
+            status
+            notes
+            followUpDate
+            assignedTo
+            campusLocation
+            previousEducation
+            img
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch admission inquiries');
+        }
+        const data = res.data.admissionInquiries || [];
         this.dataChange.next(data);
         return data;
       }),
@@ -50,15 +80,6 @@ export class AdmissionInquiryService {
       }),
       catchError(this.handleError)
     );
-
-    // API call to add the admission inquiry
-    // return this.httpClient.post<AdmissionInquiry>(this.API_URL, admissionInquiry).pipe(
-    //   map(() => {
-    //     this.dialogData = admissionInquiry;
-    //     return admissionInquiry;
-    //   }),
-    //   catchError(this.handleError)
-    // );
   }
 
   /** PUT: Update an existing admission inquiry */
@@ -73,15 +94,6 @@ export class AdmissionInquiryService {
       }),
       catchError(this.handleError)
     );
-
-    // API call to update the admission inquiry
-    // return this.httpClient.put<AdmissionInquiry>(`${this.API_URL}`, admissionInquiry).pipe(
-    //   map(() => {
-    //     this.dialogData = admissionInquiry;
-    //     return admissionInquiry;
-    //   }),
-    //   catchError(this.handleError)
-    // );
   }
 
   /** DELETE: Remove an admission inquiry by ID */
@@ -93,38 +105,24 @@ export class AdmissionInquiryService {
       }),
       catchError(this.handleError)
     );
-
-    // API call to delete the admission inquiry
-    // return this.httpClient.delete<void>(`${this.API_URL}`).pipe(
-    //   map(() => {
-    //     return id;
-    //   }),
-    //   catchError(this.handleError)
-    // );
   }
 
   /** GET: Search admission inquiries by reference number */
   searchByReferenceNo(referenceNo: string): Observable<AdmissionInquiry[]> {
-    return this.httpClient
-      .get<AdmissionInquiry[]>(`${this.API_URL}?ref=${referenceNo}`)
-      .pipe(
-        map((data) => {
-          return data;
-        }),
-        catchError(this.handleError)
-      );
+    const query = referenceNo.toLowerCase();
+    const filtered = this.data.filter(
+      (item) => item.studentName.toLowerCase().includes(query) ||
+                item.emailAddress.toLowerCase().includes(query)
+    );
+    return of(filtered);
   }
 
   /** GET: Filter admission inquiries by status */
   filterByStatus(status: string): Observable<AdmissionInquiry[]> {
-    return this.httpClient
-      .get<AdmissionInquiry[]>(`${this.API_URL}?status=${status}`)
-      .pipe(
-        map((data) => {
-          return data;
-        }),
-        catchError(this.handleError)
-      );
+    const filtered = this.data.filter(
+      (item) => item.status.toLowerCase() === status.toLowerCase()
+    );
+    return of(filtered);
   }
 
   /** GET: Filter admission inquiries by date range */
@@ -132,18 +130,14 @@ export class AdmissionInquiryService {
     startDate: Date,
     endDate: Date
   ): Observable<AdmissionInquiry[]> {
-    return this.httpClient
-      .get<AdmissionInquiry[]>(
-        `${
-          this.API_URL
-        }?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`
-      )
-      .pipe(
-        map((data) => {
-          return data;
-        }),
-        catchError(this.handleError)
-      );
+    const start = startDate.getTime();
+    const end = endDate.getTime();
+    const filtered = this.data.filter((item) => {
+      if (!item.dateOfInquiry) return false;
+      const date = new Date(item.dateOfInquiry).getTime();
+      return date >= start && date <= end;
+    });
+    return of(filtered);
   }
 
   /** Handle Http operation that failed */
