@@ -72,11 +72,58 @@ export class AdmissionInquiryService {
   addAdmissionInquiry(
     admissionInquiry: AdmissionInquiry
   ): Observable<AdmissionInquiry> {
-    // Simulate adding the admission inquiry
-    return of(admissionInquiry).pipe(
-      map((response) => {
-        this.dialogData = admissionInquiry;
-        return response; // Return the added admission inquiry
+    const body = {
+      query: `
+        mutation CreateAdmissionInquiry($input: CreateAdmissionInquiryInput!) {
+          createAdmissionInquiry(input: $input) {
+            inquiryId
+            studentName
+            guardianName
+            contactNumber
+            emailAddress
+            dateOfInquiry
+            programOfInterest
+            preferredStartDate
+            inquirySource
+            status
+            notes
+            followUpDate
+            assignedTo
+            campusLocation
+            previousEducation
+            img
+          }
+        }
+      `,
+      variables: {
+        input: {
+          studentName: admissionInquiry.studentName,
+          guardianName: admissionInquiry.guardianName,
+          contactNumber: admissionInquiry.contactNumber,
+          emailAddress: admissionInquiry.emailAddress,
+          dateOfInquiry: admissionInquiry.dateOfInquiry,
+          programOfInterest: admissionInquiry.programOfInterest,
+          preferredStartDate: admissionInquiry.preferredStartDate,
+          inquirySource: admissionInquiry.inquirySource,
+          status: admissionInquiry.status,
+          notes: admissionInquiry.notes || null,
+          followUpDate: admissionInquiry.followUpDate || null,
+          assignedTo: admissionInquiry.assignedTo || null,
+          campusLocation: admissionInquiry.campusLocation || null,
+          previousEducation: admissionInquiry.previousEducation || null,
+          img: admissionInquiry.img || null
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create admission inquiry');
+        }
+        const newInquiry = res.data.createAdmissionInquiry;
+        this.dialogData = newInquiry;
+        return newInquiry;
       }),
       catchError(this.handleError)
     );
