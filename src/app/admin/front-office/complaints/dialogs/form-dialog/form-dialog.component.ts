@@ -4,7 +4,7 @@ import {
   MatDialogContent,
   MatDialogClose,
 } from '@angular/material/dialog';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, ChangeDetectorRef } from '@angular/core';
 import { ComplaintsService } from '../../complaints.service';
 import {
   UntypedFormControl,
@@ -59,11 +59,13 @@ export class ComplaintsFormComponent {
   data = inject<DialogData>(MAT_DIALOG_DATA);
   complaintsService = inject(ComplaintsService);
   private fb = inject(UntypedFormBuilder);
+  private cdr = inject(ChangeDetectorRef);
 
   action: string;
   dialogTitle: string;
   complaintsForm: UntypedFormGroup;
   complaints: Complaints;
+  assignees: any[] = [];
 
   constructor() {
     const data = this.data;
@@ -75,6 +77,17 @@ export class ComplaintsFormComponent {
     this.complaints =
       this.action === 'edit' ? data.complaints : new Complaints({});
     this.complaintsForm = this.createStudentForm();
+
+    // Fetch assignees
+    this.complaintsService.getAssigneeOptions().subscribe({
+      next: (list) => {
+        this.assignees = list;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Failed to load assignees:', err);
+      }
+    });
   }
 
   createStudentForm(): UntypedFormGroup {

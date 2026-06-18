@@ -11,7 +11,7 @@ import { ComplaintsService } from '../../complaints.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  complaintId: number;
+  complaintId: string;
   complainantName: string;
   complainantType: string;
 }
