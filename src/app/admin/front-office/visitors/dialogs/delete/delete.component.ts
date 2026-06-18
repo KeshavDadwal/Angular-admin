@@ -11,7 +11,7 @@ import { VisitorsService } from '../../visitors.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  visitorId: number;
+  visitorId: string;
   visitorName: string;
   visitDate: string;
 }

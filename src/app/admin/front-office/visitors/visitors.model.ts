@@ -8,7 +8,7 @@ export class Visitors {
   purposeOfVisit: string;
   contactNumber: string;
   visitorType: string;
-  visitorsName: string;
+  studentName: string;
   departmentPersonVisited: string;
   checkOutTime: string;
   idProofType: string;
@@ -27,7 +27,7 @@ export class Visitors {
     this.purposeOfVisit = visitorData.purposeOfVisit || '';
     this.contactNumber = visitorData.contactNumber || '';
     this.visitorType = visitorData.visitorType || '';
-    this.visitorsName = visitorData.visitorsName || '';
+    this.studentName = visitorData.studentName || '';
     this.departmentPersonVisited = visitorData.departmentPersonVisited || '';
     this.checkOutTime = visitorData.checkOutTime || '';
     this.idProofType = visitorData.idProofType || '';
