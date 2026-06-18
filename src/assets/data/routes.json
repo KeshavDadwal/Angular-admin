@@ -170,62 +170,6 @@
           "submenu": []
         },
         {
-          "path": "/admin/teachers/add-teacher",
-          "title": "MENUITEMS.TEACHERS.LIST.ADD-TEACHER",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/teachers/edit-teacher",
-          "title": "MENUITEMS.TEACHERS.LIST.EDIT-TEACHER",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/teachers/about-teacher",
-          "title": "MENUITEMS.TEACHERS.LIST.ABOUT-TEACHER",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/teachers/teacher-timetable",
-          "title": "MENUITEMS.TEACHERS.LIST.TEACHER-TIMETABLE",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
           "path": "/admin/teachers/assign-class-teacher",
           "title": "MENUITEMS.TEACHERS.LIST.ASSIGN-CLASS-TEACHER",
           "iconType": "",
