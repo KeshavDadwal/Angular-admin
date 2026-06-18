@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { Teachers } from './teachers.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -10,73 +11,213 @@ import { Teachers } from './teachers.model';
 export class TeachersService {
   private httpClient = inject(HttpClient);
 
-  private readonly API_URL = 'assets/data/teachers.json';
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
   dataChange: BehaviorSubject<Teachers[]> = new BehaviorSubject<Teachers[]>([]);
+  dialogData!: Teachers;
+
+  get data(): Teachers[] {
+    return this.dataChange.value;
+  }
+
+  getDialogData(): Teachers {
+    return this.dialogData;
+  }
+
+  private formatDate(date: any): string {
+    if (!date) return '';
+    if (date instanceof Date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    if (typeof date === 'string') {
+      return date.split('T')[0];
+    }
+    return String(date);
+  }
 
   /** GET: Fetch all teachers */
   getAllTeachers(): Observable<Teachers[]> {
-    // Local mock data response
-    return this.httpClient.get<Teachers[]>(this.API_URL).pipe(
-      map((data) => {
-        this.dataChange.next(data); // Update the BehaviorSubject with the new data
-        return data; // Return the fetched data
+    const body = {
+      query: `
+        query GetTeachers {
+          teachers: teachersList {
+            id
+            img
+            name
+            gender
+            email
+            department
+            mobile
+            degree
+            address
+            hire_date: hireDate
+            salary
+            subject_specialization: subjectSpecialization
+            experience_years: experienceYears
+            status
+            birthdate
+            bio
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch teachers');
+        }
+        const data = res.data.teachers || [];
+        this.dataChange.next(data);
+        return data;
       }),
       catchError(this.handleError)
     );
-
-    // Commented API call
-    // return this.httpClient
-    //   .get<Teachers[]>(this.API_URL)
-    //   .pipe(catchError(this.handleError));
   }
 
   /** POST: Add a new teacher */
   addTeacher(teacher: Teachers): Observable<Teachers> {
-    // Local mock data response
-    return of(teacher).pipe(
-      map(() => teacher), // Return the added teacher
+    const body = {
+      query: `
+        mutation CreateTeacher($input: CreateTeacherInfoInput!) {
+          createTeacher(input: $input) {
+            id
+            img
+            name
+            gender
+            email
+            department
+            mobile
+            degree
+            address
+            hire_date: hireDate
+            salary
+            subject_specialization: subjectSpecialization
+            experience_years: experienceYears
+            status
+            birthdate
+            bio
+          }
+        }
+      `,
+      variables: {
+        input: {
+          img: teacher.img || null,
+          name: teacher.name,
+          gender: teacher.gender,
+          email: teacher.email,
+          department: teacher.department,
+          mobile: teacher.mobile,
+          degree: teacher.degree,
+          address: teacher.address,
+          hireDate: this.formatDate(teacher.hire_date),
+          salary: teacher.salary,
+          subjectSpecialization: teacher.subject_specialization,
+          experienceYears: Number(teacher.experience_years),
+          status: teacher.status,
+          birthdate: this.formatDate(teacher.birthdate),
+          bio: teacher.bio || null
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create teacher');
+        }
+        const newTeacher = res.data.createTeacher;
+        this.dialogData = newTeacher;
+        return newTeacher;
+      }),
       catchError(this.handleError)
     );
-
-    // Commented API call
-    // return this.httpClient
-    //   .post<Teachers>(this.API_URL, teacher)
-    //   .pipe(
-    //     map((response) => teacher), // Return teacher from API
-    //     catchError(this.handleError)
-    //   );
   }
 
   /** PUT: Update an existing teacher */
   updateTeacher(teacher: Teachers): Observable<Teachers> {
-    // Local mock data response
-    return of(teacher).pipe(
-      map(() => teacher), // Return the updated teacher
+    const body = {
+      query: `
+        mutation UpdateTeacher($input: UpdateTeacherInfoInput!) {
+          updateTeacher(input: $input) {
+            id
+            img
+            name
+            gender
+            email
+            department
+            mobile
+            degree
+            address
+            hire_date: hireDate
+            salary
+            subject_specialization: subjectSpecialization
+            experience_years: experienceYears
+            status
+            birthdate
+            bio
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: teacher.id,
+          img: teacher.img || null,
+          name: teacher.name,
+          gender: teacher.gender,
+          email: teacher.email,
+          department: teacher.department,
+          mobile: teacher.mobile,
+          degree: teacher.degree,
+          address: teacher.address,
+          hireDate: this.formatDate(teacher.hire_date),
+          salary: teacher.salary,
+          subjectSpecialization: teacher.subject_specialization,
+          experienceYears: Number(teacher.experience_years),
+          status: teacher.status,
+          birthdate: this.formatDate(teacher.birthdate),
+          bio: teacher.bio || null
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update teacher');
+        }
+        const updatedTeacher = res.data.updateTeacher;
+        this.dialogData = updatedTeacher;
+        return updatedTeacher;
+      }),
       catchError(this.handleError)
     );
-
-    // Commented API call
-    // return this.httpClient
-    //   .put<Teachers>(`${this.API_URL}`, teacher)
-    //   .pipe(
-    //     map((response) => teacher), // Return teacher from API
-    //     catchError(this.handleError)
-    //   );
   }
 
   /** DELETE: Remove a teacher by ID */
-  deleteTeacher(id: number): Observable<number> {
-    // Local mock data response
-    return of(id).pipe(
-      map(() => id), // Return the ID of the deleted teacher
+  deleteTeacher(id: string): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteTeacher($id: String!) {
+          deleteTeacher(id: $id)
+        }
+      `,
+      variables: {
+        id: id
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete teacher');
+        }
+        return res.data.deleteTeacher;
+      }),
       catchError(this.handleError)
     );
-
-    // Commented API call
-    // return this.httpClient.delete<void>(`${this.API_URL}`).pipe(
-    //   map(() => id), // Return the ID of the deleted teacher
-    //   catchError(this.handleError)
-    // );
   }
 
   /** Handle Http operation that failed */

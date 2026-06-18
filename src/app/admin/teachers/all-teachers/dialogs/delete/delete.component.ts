@@ -11,7 +11,7 @@ import { TeachersService } from '../../teachers.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   name: string;
   department: string;
   mobile: string;
