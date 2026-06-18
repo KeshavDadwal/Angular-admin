@@ -25,7 +25,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   assignClassTeacher: AssignClassTeacher;
 }
@@ -129,7 +129,6 @@ export class AssignClassTeacherFormComponent {
             },
             error: (error) => {
               console.error('Update Error:', error);
-              // Optionally display an error message to the user
             },
           });
       } else {
@@ -141,7 +140,6 @@ export class AssignClassTeacherFormComponent {
             },
             error: (error) => {
               console.error('Add Error:', error);
-              // Optionally display an error message to the user
             },
           });
       }

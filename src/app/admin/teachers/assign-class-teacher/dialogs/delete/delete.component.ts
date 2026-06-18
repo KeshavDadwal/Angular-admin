@@ -11,7 +11,8 @@ import { AssignClassTeacherService } from '../../assign-class-teacher.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  teacherId: number;
+  id: string;
+  teacherId: string;
   teacherName: string;
   className: string;
 }
@@ -36,16 +37,13 @@ export class AssignClassTeacherDeleteComponent {
 
   confirmDelete(): void {
     this.assignClassTeacherService
-      .deleteClassTeacherAssignment(this.data.teacherId)
+      .deleteClassTeacherAssignment(this.data.id)
       .subscribe({
         next: (response) => {
-          // Handle successful deletion
-          this.dialogRef.close(response); // Close the dialog with the response
-          // Optionally, handle other UI actions like refreshing a list
+          this.dialogRef.close(response);
         },
         error: (error) => {
           console.error('Delete Error:', error);
-          // Handle error appropriately
         },
       });
   }

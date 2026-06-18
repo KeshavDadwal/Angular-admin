@@ -109,7 +109,7 @@ export class AssignClassTeacherComponent implements OnInit, OnDestroy {
           filter: string
         ) =>
           Object.values(data).some((value) =>
-            value.toString().toLowerCase().includes(filter)
+            value != null && value.toString().toLowerCase().includes(filter)
           );
       },
       error: (err) => {

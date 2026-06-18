@@ -7,7 +7,6 @@ import { LeaveRequestComponent } from './leave-request/leave-request.component';
 import { SettingsComponent } from './settings/settings.component';
 import { MyClassesComponent } from './academics/my-classes/my-classes.component';
 import { SubjectsTaughtComponent } from './academics/subjects-taught/subjects-taught.component';
-import { AboutTeacherComponent } from 'app/admin/teachers/about-teacher/about-teacher.component';
 import { LessonPlansComponent } from './academics/lesson-plans/lesson-plans.component';
 import { StudyMaterialsComponent } from './academics/study-materials/study-materials.component';
 import { AssignmentsComponent } from './academics/assignments/assignments.component';
