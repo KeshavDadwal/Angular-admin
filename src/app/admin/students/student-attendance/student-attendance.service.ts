@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { StudentAttendance } from './student-attendance.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,7 @@ import { StudentAttendance } from './student-attendance.model';
 export class StudentAttendanceService {
   private httpClient = inject(HttpClient);
 
-  private readonly API_URL = 'assets/data/student-attendance.json';
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
   dataChange: BehaviorSubject<StudentAttendance[]> = new BehaviorSubject<
     StudentAttendance[]
   >([]);
@@ -27,76 +28,212 @@ export class StudentAttendanceService {
     return this.dialogData;
   }
 
+  private formatDate(date: any): string {
+    if (!date) return '';
+    if (date instanceof Date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    if (typeof date === 'string') {
+      return date.split('T')[0];
+    }
+    return String(date);
+  }
+
+  private mapGraphQLToModel(item: any): StudentAttendance {
+    return new StudentAttendance(item);
+  }
+
   /** CRUD METHODS */
 
   /** GET: Fetch all student attendances */
   getAllStudentAttendances(): Observable<StudentAttendance[]> {
-    // Local mock data response
-    return this.httpClient.get<StudentAttendance[]>(this.API_URL).pipe(
-      map((data) => {
-        this.dataChange.next(data); // Update the BehaviorSubject with the new data
-        return data; // Return the fetched data
+    const body = {
+      query: `
+        query GetStudentAttendanceList {
+          studentAttendanceList {
+            id
+            rollNo
+            img
+            sName
+            class
+            date
+            status
+            note
+            semester
+            subject
+            attendance_time
+            present_count
+            absent_count
+            reason_for_absence
+            approved
+            timestamp
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch student attendance');
+        }
+        const list = res.data.studentAttendanceList || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
       }),
       catchError(this.handleError)
     );
-
-    // Commented API call
-    // return this.httpClient
-    //   .get<StudentAttendance[]>(this.API_URL)
-    //   .pipe(catchError(this.handleError));
   }
 
   /** POST: Add a new student attendance */
   addStudentAttendance(
     studentAttendance: StudentAttendance
   ): Observable<StudentAttendance> {
-    // Local mock data response
-    return of(studentAttendance).pipe(
-      map(() => studentAttendance), // Return the added student attendance
+    const body = {
+      query: `
+        mutation CreateStudentAttendance($input: CreateStudentAttendanceInfoInput!) {
+          createStudentAttendance(input: $input) {
+            id
+            rollNo
+            img
+            sName
+            class
+            date
+            status
+            note
+            semester
+            subject
+            attendance_time
+            present_count
+            absent_count
+            reason_for_absence
+            approved
+            timestamp
+          }
+        }
+      `,
+      variables: {
+        input: {
+          rollNo: studentAttendance.rollNo,
+          img: studentAttendance.img || null,
+          sName: studentAttendance.sName,
+          class: studentAttendance.class,
+          date: this.formatDate(studentAttendance.date),
+          status: studentAttendance.status,
+          note: studentAttendance.note || null,
+          semester: studentAttendance.semester,
+          subject: studentAttendance.subject,
+          attendance_time: studentAttendance.attendance_time || null,
+          present_count: studentAttendance.present_count || 0,
+          absent_count: studentAttendance.absent_count || 0,
+          reason_for_absence: studentAttendance.reason_for_absence || null,
+          approved: studentAttendance.approved || false,
+          timestamp: studentAttendance.timestamp || null,
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create student attendance');
+        }
+        const newAttendance = this.mapGraphQLToModel(res.data.createStudentAttendance);
+        this.dialogData = newAttendance;
+        return newAttendance;
+      }),
       catchError(this.handleError)
     );
-
-    // Commented API call
-    // return this.httpClient
-    //   .post<StudentAttendance>(this.API_URL, studentAttendance)
-    //   .pipe(
-    //     map(() => studentAttendance), // Return the added student attendance
-    //     catchError(this.handleError)
-    //   );
   }
 
   /** PUT: Update an existing student attendance */
   updateStudentAttendance(
     studentAttendance: StudentAttendance
   ): Observable<StudentAttendance> {
-    // Local mock data response
-    return of(studentAttendance).pipe(
-      map(() => studentAttendance), // Return the updated student attendance
+    const body = {
+      query: `
+        mutation UpdateStudentAttendance($input: UpdateStudentAttendanceInfoInput!) {
+          updateStudentAttendance(input: $input) {
+            id
+            rollNo
+            img
+            sName
+            class
+            date
+            status
+            note
+            semester
+            subject
+            attendance_time
+            present_count
+            absent_count
+            reason_for_absence
+            approved
+            timestamp
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: studentAttendance.id,
+          rollNo: studentAttendance.rollNo,
+          img: studentAttendance.img || null,
+          sName: studentAttendance.sName,
+          class: studentAttendance.class,
+          date: this.formatDate(studentAttendance.date),
+          status: studentAttendance.status,
+          note: studentAttendance.note || null,
+          semester: studentAttendance.semester,
+          subject: studentAttendance.subject,
+          attendance_time: studentAttendance.attendance_time || null,
+          present_count: studentAttendance.present_count || 0,
+          absent_count: studentAttendance.absent_count || 0,
+          reason_for_absence: studentAttendance.reason_for_absence || null,
+          approved: studentAttendance.approved || false,
+          timestamp: studentAttendance.timestamp || null,
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update student attendance');
+        }
+        const updatedAttendance = this.mapGraphQLToModel(res.data.updateStudentAttendance);
+        this.dialogData = updatedAttendance;
+        return updatedAttendance;
+      }),
       catchError(this.handleError)
     );
-
-    // Commented API call
-    // return this.httpClient
-    //   .put<StudentAttendance>(`${this.API_URL}`, studentAttendance)
-    //   .pipe(
-    //     map(() => studentAttendance), // Return the updated student attendance
-    //     catchError(this.handleError)
-    //   );
   }
 
   /** DELETE: Remove a student attendance by ID */
-  deleteStudentAttendance(id: number): Observable<number> {
-    // Local mock data response
-    return of(id).pipe(
-      map(() => id), // Return the ID of the deleted student attendance
+  deleteStudentAttendance(id: string): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteStudentAttendance($id: String!) {
+          deleteStudentAttendance(id: $id)
+        }
+      `,
+      variables: {
+        id: id
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete student attendance');
+        }
+        return res.data.deleteStudentAttendance;
+      }),
       catchError(this.handleError)
     );
-
-    // Commented API call
-    // return this.httpClient.delete<void>(`${this.API_URL}`).pipe(
-    //   map(() => id), // Return the ID of the deleted student attendance
-    //   catchError(this.handleError)
-    // );
   }
 
   /** Handle Http operation that failed */

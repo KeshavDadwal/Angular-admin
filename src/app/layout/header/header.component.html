@@ -19,22 +19,6 @@
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <!-- Full Screen Button -->
-        <li class="fullscreen">
-          <button mat-icon-button class="nav-notification-icons" (click)="callFullscreen()"> <i
-              class="material-icons-outlined icon-color">
-              fullscreen
-            </i></button>
-        </li>
-        <!-- #END# Full Screen Button -->
-        <!-- #START# Notifications-->
-        <li>
-          <app-notification-list [notifications]="notifications" (markAllAsRead)="onMarkAllNotificationsRead()"
-            (readAll)="onReadAllNotifications()" (closeNotification)="onRemoveNotification($event)"
-            (actionClick)="onNotificationActionClick($event)">
-          </app-notification-list>
-        </li>
-        <!-- #END# Notifications-->
         <!-- #START# Multi Language-->
         <li class="nav-item">
           <app-language-list [flagvalue]="flagvalue" [defaultFlag]="defaultFlag" [listLang]="listLang"

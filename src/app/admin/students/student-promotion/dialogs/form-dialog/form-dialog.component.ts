@@ -24,29 +24,29 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   studentPromotion: StudentPromotion;
 }
 
 @Component({
-    selector: 'app-student-promotion-form',
-    templateUrl: './form-dialog.component.html',
-    styleUrls: ['./form-dialog.component.scss'],
-    providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }],
-    imports: [
-        MatButtonModule,
-        MatIconModule,
-        MatDialogContent,
-        FormsModule,
-        ReactiveFormsModule,
-        MatFormFieldModule,
-        MatSelectModule,
-        MatOptionModule,
-        MatInputModule,
-        MatDatepickerModule,
-        MatDialogClose,
-    ]
+  selector: 'app-student-promotion-form',
+  templateUrl: './form-dialog.component.html',
+  styleUrls: ['./form-dialog.component.scss'],
+  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }],
+  imports: [
+    MatButtonModule,
+    MatIconModule,
+    MatDialogContent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatOptionModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatDialogClose,
+  ],
 })
 export class StudentPromotionFormComponent {
   dialogRef = inject<MatDialogRef<StudentPromotionFormComponent>>(MatDialogRef);
@@ -71,7 +71,7 @@ export class StudentPromotionFormComponent {
     this.studentPromotion =
       this.action === 'edit'
         ? data.studentPromotion
-        : new StudentPromotion({} as StudentPromotion);
+        : new StudentPromotion({});
 
     // Create form
     this.studentPromotionForm = this.createStudentPromotionForm();

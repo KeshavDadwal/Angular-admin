@@ -30,7 +30,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   studentAttendance: StudentAttendance;
 }
@@ -146,7 +146,6 @@ export class StudentAttendanceFormComponent {
             },
             error: (error) => {
               console.error('Update Error:', error);
-              // Handle error appropriately
             },
           });
       } else {
@@ -156,7 +155,6 @@ export class StudentAttendanceFormComponent {
           },
           error: (error) => {
             console.error('Add Error:', error);
-            // Handle error appropriately
           },
         });
       }

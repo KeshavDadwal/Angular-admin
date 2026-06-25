@@ -19,17 +19,6 @@ import { MatMenuModule } from '@angular/material/menu';
 import { LanguageListComponent } from '../components/language-list/language-list.component';
 import { UserProfileMenuComponent } from '../components/user-profile-menu/user-profile-menu.component';
 
-interface Notifications {
-  message: string;
-  time: string;
-  userImg?: string;
-  actionLabel?: string;
-  actionType?: string;
-  icon?: string;
-  color: string;
-  status: string;
-}
-
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
@@ -40,7 +29,6 @@ interface Notifications {
     MatButtonModule,
     MatIconModule,
     MatToolbarModule,
-    NotificationListComponent,
     MatMenuModule,
     LanguageListComponent,
     UserProfileMenuComponent,
@@ -48,8 +36,7 @@ interface Notifications {
 })
 export class HeaderComponent
   extends UnsubscribeOnDestroyAdapter
-  implements OnInit
-{
+  implements OnInit {
   private document = inject<Document>(DOCUMENT);
   private renderer = inject(Renderer2);
   elementRef = inject(ElementRef);
@@ -76,65 +63,6 @@ export class HeaderComponent
     { text: 'English', flag: 'assets/images/flags/us.svg', lang: 'en' },
     { text: 'Spanish', flag: 'assets/images/flags/spain.svg', lang: 'es' },
     { text: 'German', flag: 'assets/images/flags/germany.svg', lang: 'de' },
-  ];
-  notifications: Notifications[] = [
-    {
-      message: 'Please check your mail',
-      time: '14 mins ago',
-      icon: 'mail',
-      color: 'notification-green',
-      status: 'msg-unread',
-      actionLabel: 'View',
-      actionType: 'view',
-    },
-    {
-      message: 'New Patient Added..',
-      time: '22 mins ago',
-      userImg: 'assets/images/user/user1.jpg',
-      color: 'notification-blue',
-      status: 'msg-unread',
-    },
-    {
-      message: 'Your leave is approved!! ',
-      time: '3 hours ago',
-      icon: 'event_available',
-      color: 'notification-orange',
-      status: 'msg-read',
-    },
-    {
-      message: 'Lets break for lunch...',
-      time: '5 hours ago',
-      userImg: 'assets/images/user/user2.jpg',
-      color: 'notification-blue',
-      status: 'msg-unread',
-      actionLabel: 'Reply',
-      actionType: 'reply',
-    },
-    {
-      message: 'Patient report generated',
-      time: '14 mins ago',
-      icon: 'description',
-      color: 'notification-green',
-      status: 'msg-read',
-      actionLabel: 'Download',
-      actionType: 'download',
-    },
-    {
-      message: 'Please check your mail',
-      time: '22 mins ago',
-      icon: 'mail',
-      color: 'notification-red',
-      status: 'msg-read',
-    },
-    {
-      message: 'Salary credited...',
-      time: '3 hours ago',
-      userImg: 'assets/images/user/user3.jpg',
-      color: 'notification-purple',
-      status: 'msg-read',
-      actionLabel: 'Important',
-      actionType: 'mark-important',
-    },
   ];
   ngOnInit() {
     this.config = this.configService.configData;
@@ -163,65 +91,6 @@ export class HeaderComponent
     } else {
       this.flagvalue = val.map((element) => element.flag);
     }
-  }
-
-  onMarkAllNotificationsRead() {
-    this.notifications = this.notifications.map((n) => ({
-      ...n,
-      status: 'msg-read',
-    }));
-  }
-
-  onReadAllNotifications() {
-    alert('Navigating to notifications page to read all'); // Replace with router if needed
-  }
-
-  onRemoveNotification(notification: Notifications) {
-    this.notifications = this.notifications.filter((n) => n !== notification);
-  }
-
-  onNotificationActionClick(event: {
-    notification: Notifications;
-    actionType: string;
-  }) {
-    const { notification, actionType } = event;
-
-    // Handle different action types
-    switch (actionType) {
-      case 'view':
-        console.log('Viewing notification:', notification);
-        // Implement view logic
-        break;
-      case 'profile':
-        console.log('Opening profile from notification:', notification);
-        // Implement profile navigation
-        break;
-      case 'reply':
-        console.log('Replying to notification:', notification);
-        // Implement reply logic
-        break;
-      case 'download':
-        console.log('Downloading from notification:', notification);
-        // Implement download logic
-        break;
-      case 'mark-important':
-        console.log('Marking notification as important:', notification);
-        // Implement importance marking
-        break;
-      default:
-        console.log('Default action for notification:', notification);
-    }
-  }
-
-  callFullscreen() {
-    if (!this.isFullScreen) {
-      if (this.docElement?.requestFullscreen != null) {
-        this.docElement?.requestFullscreen();
-      }
-    } else {
-      document.exitFullscreen();
-    }
-    this.isFullScreen = !this.isFullScreen;
   }
   setLanguage(text: string, lang: string, flag: string) {
     this.countryName = text;

@@ -1,237 +1,144 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { StudentPromotion } from './student-promotion.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StudentPromotionService {
+  private httpClient = inject(HttpClient);
+
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
   dataChange: BehaviorSubject<StudentPromotion[]> = new BehaviorSubject<
     StudentPromotion[]
   >([]);
 
-  private staticData: StudentPromotion[] = [
-    {
-      id: 1,
-      img: 'assets/images/user/user1.jpg',
-      student_name: 'John Doe',
-      rollNo: '101',
-      current_class: 'Grade 5',
-      promoted_class: 'Grade 6',
-      section: 'A',
-      session: '2023-2024',
-      promotion_date: '2024-06-15',
-      total_marks: 500,
-      obtained_marks: 450,
-      percentage: '90%',
-      result: 'Pass',
-      status: 'Promoted',
-      getRandomID: () => 1,
-    },
-    {
-      id: 2,
-      img: 'assets/images/user/user2.jpg',
-      student_name: 'Sarah Smith',
-      rollNo: '102',
-      current_class: 'Grade 5',
-      promoted_class: 'Grade 6',
-      section: 'B',
-      session: '2023-2024',
-      promotion_date: '2024-06-15',
-      total_marks: 500,
-      obtained_marks: 420,
-      percentage: '84%',
-      result: 'Pass',
-      status: 'Promoted',
-      getRandomID: () => 2,
-    },
-    {
-      id: 3,
-      img: 'assets/images/user/user3.jpg',
-      student_name: 'Michael Brown',
-      rollNo: '103',
-      current_class: 'Grade 5',
-      promoted_class: 'Grade 6',
-      section: 'A',
-      session: '2023-2024',
-      promotion_date: '2024-06-15',
-      total_marks: 500,
-      obtained_marks: 380,
-      percentage: '76%',
-      result: 'Pass',
-      status: 'Promoted',
-      getRandomID: () => 3,
-    },
-    {
-      id: 4,
-      img: 'assets/images/user/user4.jpg',
-      student_name: 'Emily Davis',
-      rollNo: '104',
-      current_class: 'Grade 4',
-      promoted_class: 'Grade 5',
-      section: 'C',
-      session: '2023-2024',
-      promotion_date: '2024-06-15',
-      total_marks: 500,
-      obtained_marks: 470,
-      percentage: '94%',
-      result: 'Pass',
-      status: 'Promoted',
-      getRandomID: () => 4,
-    },
-    {
-      id: 5,
-      img: 'assets/images/user/user5.jpg',
-      student_name: 'David Wilson',
-      rollNo: '105',
-      current_class: 'Grade 4',
-      promoted_class: 'Grade 5',
-      section: 'B',
-      session: '2023-2024',
-      promotion_date: '2024-06-15',
-      total_marks: 500,
-      obtained_marks: 310,
-      percentage: '62%',
-      result: 'Pass',
-      status: 'Promoted',
-      getRandomID: () => 5,
-    },
-    {
-      id: 6,
-      img: 'assets/images/user/user6.jpg',
-      student_name: 'Jessica Taylor',
-      rollNo: '106',
-      current_class: 'Grade 4',
-      promoted_class: 'Grade 4',
-      section: 'A',
-      session: '2023-2024',
-      promotion_date: '2024-06-15',
-      total_marks: 500,
-      obtained_marks: 150,
-      percentage: '30%',
-      result: 'Fail',
-      status: 'Detained',
-      getRandomID: () => 6,
-    },
-    {
-      id: 7,
-      img: 'assets/images/user/user7.jpg',
-      student_name: 'Kevin Anderson',
-      rollNo: '107',
-      current_class: 'Grade 3',
-      promoted_class: 'Grade 4',
-      section: 'B',
-      session: '2023-2024',
-      promotion_date: '2024-06-15',
-      total_marks: 500,
-      obtained_marks: 400,
-      percentage: '80%',
-      result: 'Pass',
-      status: 'Promoted',
-      getRandomID: () => 7,
-    },
-    {
-      id: 8,
-      img: 'assets/images/user/user8.jpg',
-      student_name: 'Linda Martinez',
-      rollNo: '108',
-      current_class: 'Grade 3',
-      promoted_class: 'Grade 4',
-      section: 'C',
-      session: '2023-2024',
-      promotion_date: '2024-06-15',
-      total_marks: 500,
-      obtained_marks: 430,
-      percentage: '86%',
-      result: 'Pass',
-      status: 'Promoted',
-      getRandomID: () => 8,
-    },
-    {
-      id: 9,
-      img: 'assets/images/user/user9.jpg',
-      student_name: 'Robert Thomas',
-      rollNo: '109',
-      current_class: 'Grade 3',
-      promoted_class: 'Grade 4',
-      section: 'A',
-      session: '2023-2024',
-      promotion_date: '2024-06-15',
-      total_marks: 500,
-      obtained_marks: 390,
-      percentage: '78%',
-      result: 'Pass',
-      status: 'Promoted',
-      getRandomID: () => 9,
-    },
-    {
-      id: 10,
-      img: 'assets/images/user/user10.jpg',
-      student_name: 'Jennifer Lee',
-      rollNo: '110',
-      current_class: 'Grade 2',
-      promoted_class: 'Grade 3',
-      section: 'B',
-      session: '2023-2024',
-      promotion_date: '2024-06-15',
-      total_marks: 500,
-      obtained_marks: 460,
-      percentage: '92%',
-      result: 'Pass',
-      status: 'Promoted',
-      getRandomID: () => 10,
-    },
-    {
-      id: 11,
-      img: 'assets/images/user/user1.jpg',
-      student_name: 'William Garcia',
-      rollNo: '111',
-      current_class: 'Grade 2',
-      promoted_class: 'Grade 3',
-      section: 'A',
-      session: '2023-2024',
-      promotion_date: '2024-06-15',
-      total_marks: 500,
-      obtained_marks: 350,
-      percentage: '70%',
-      result: 'Pass',
-      status: 'Promoted',
-      getRandomID: () => 11,
-    },
-    {
-      id: 12,
-      img: 'assets/images/user/user2.jpg',
-      student_name: 'Elizabeth Young',
-      rollNo: '112',
-      current_class: 'Grade 2',
-      promoted_class: 'Grade 3',
-      section: 'C',
-      session: '2023-2024',
-      promotion_date: '2024-06-15',
-      total_marks: 500,
-      obtained_marks: 410,
-      percentage: '82%',
-      result: 'Pass',
-      status: 'Promoted',
-      getRandomID: () => 12,
-    },
-  ];
+  dialogData!: StudentPromotion;
+
+  // Getter for current data
+  get data(): StudentPromotion[] {
+    return this.dataChange.value;
+  }
+
+  // Getter for dialog data
+  getDialogData(): StudentPromotion {
+    return this.dialogData;
+  }
+
+  private formatDate(date: any): string {
+    if (!date) return '';
+    if (date instanceof Date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    if (typeof date === 'string') {
+      return date.split('T')[0];
+    }
+    return String(date);
+  }
+
+  private mapGraphQLToModel(item: any): StudentPromotion {
+    return new StudentPromotion(item);
+  }
+
+  /** CRUD METHODS */
 
   /** GET: Fetch all student promotions */
   getAllStudentPromotions(): Observable<StudentPromotion[]> {
-    this.dataChange.next(this.staticData);
-    return of(this.staticData);
+    const body = {
+      query: `
+        query GetStudentPromotionList {
+          studentPromotionList {
+            id
+            img
+            student_name
+            rollNo
+            current_class
+            promoted_class
+            section
+            session
+            promotion_date
+            total_marks
+            obtained_marks
+            percentage
+            result
+            status
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch student promotions');
+        }
+        const list = res.data.studentPromotionList || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   /** POST: Add a new student promotion */
   addStudentPromotion(
     studentPromotion: StudentPromotion
   ): Observable<StudentPromotion> {
-    return of(studentPromotion).pipe(
-      map((response) => {
-        return response;
+    const body = {
+      query: `
+        mutation CreateStudentPromotion($input: CreateStudentPromotionInfoInput!) {
+          createStudentPromotion(input: $input) {
+            id
+            img
+            student_name
+            rollNo
+            current_class
+            promoted_class
+            section
+            session
+            promotion_date
+            total_marks
+            obtained_marks
+            percentage
+            result
+            status
+          }
+        }
+      `,
+      variables: {
+        input: {
+          img: studentPromotion.img || null,
+          student_name: studentPromotion.student_name,
+          rollNo: studentPromotion.rollNo,
+          current_class: studentPromotion.current_class,
+          promoted_class: studentPromotion.promoted_class,
+          section: studentPromotion.section,
+          session: studentPromotion.session,
+          promotion_date: this.formatDate(studentPromotion.promotion_date),
+          total_marks: studentPromotion.total_marks || 0,
+          obtained_marks: studentPromotion.obtained_marks || 0,
+          percentage: studentPromotion.percentage || null,
+          result: studentPromotion.result || null,
+          status: studentPromotion.status || null,
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create student promotion');
+        }
+        const newPromotion = this.mapGraphQLToModel(res.data.createStudentPromotion);
+        this.dialogData = newPromotion;
+        return newPromotion;
       }),
       catchError(this.handleError)
     );
@@ -241,19 +148,79 @@ export class StudentPromotionService {
   updateStudentPromotion(
     studentPromotion: StudentPromotion
   ): Observable<StudentPromotion> {
-    return of(studentPromotion).pipe(
-      map((response) => {
-        return response;
+    const body = {
+      query: `
+        mutation UpdateStudentPromotion($input: UpdateStudentPromotionInfoInput!) {
+          updateStudentPromotion(input: $input) {
+            id
+            img
+            student_name
+            rollNo
+            current_class
+            promoted_class
+            section
+            session
+            promotion_date
+            total_marks
+            obtained_marks
+            percentage
+            result
+            status
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: studentPromotion.id,
+          img: studentPromotion.img || null,
+          student_name: studentPromotion.student_name,
+          rollNo: studentPromotion.rollNo,
+          current_class: studentPromotion.current_class,
+          promoted_class: studentPromotion.promoted_class,
+          section: studentPromotion.section,
+          session: studentPromotion.session,
+          promotion_date: this.formatDate(studentPromotion.promotion_date),
+          total_marks: studentPromotion.total_marks || 0,
+          obtained_marks: studentPromotion.obtained_marks || 0,
+          percentage: studentPromotion.percentage || null,
+          result: studentPromotion.result || null,
+          status: studentPromotion.status || null,
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update student promotion');
+        }
+        const updatedPromotion = this.mapGraphQLToModel(res.data.updateStudentPromotion);
+        this.dialogData = updatedPromotion;
+        return updatedPromotion;
       }),
       catchError(this.handleError)
     );
   }
 
   /** DELETE: Remove a student promotion by ID */
-  deleteStudentPromotion(id: number): Observable<number> {
-    return of(id).pipe(
-      map((_response) => {
-        return id;
+  deleteStudentPromotion(id: string): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteStudentPromotion($id: String!) {
+          deleteStudentPromotion(id: $id)
+        }
+      `,
+      variables: {
+        id: id
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete student promotion');
+        }
+        return res.data.deleteStudentPromotion;
       }),
       catchError(this.handleError)
     );

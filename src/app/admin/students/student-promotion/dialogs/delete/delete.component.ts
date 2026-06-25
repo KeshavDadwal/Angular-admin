@@ -11,7 +11,7 @@ import { StudentPromotionService } from '../../student-promotion.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   student_name: string;
   rollNo: string;
   current_class: string;

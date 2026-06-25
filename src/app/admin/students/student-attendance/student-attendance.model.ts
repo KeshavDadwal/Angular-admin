@@ -1,7 +1,7 @@
 import { formatDate } from '@angular/common';
 
 export class StudentAttendance {
-  id: number;
+  id: string;
   img: string;
   rollNo: string;
   sName: string;
@@ -40,10 +40,10 @@ export class StudentAttendance {
       formatDate(new Date(), 'yyyy-MM-ddTHH:mm:ssZ', 'en');
   }
 
-  public getRandomID(): number {
+  public getRandomID(): string {
     const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
+      return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
     };
-    return S4() + S4();
+    return S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4();
   }
 }

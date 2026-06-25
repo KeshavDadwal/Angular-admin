@@ -1,5 +1,5 @@
 export class StudentPromotion {
-  id: number;
+  id: string;
   img: string;
   student_name: string;
   rollNo: string;
@@ -14,7 +14,7 @@ export class StudentPromotion {
   result: string;
   status: string;
 
-  constructor(studentPromotion: StudentPromotion) {
+  constructor(studentPromotion: Partial<StudentPromotion>) {
     this.id = studentPromotion.id || this.getRandomID();
     this.img = studentPromotion.img || 'assets/images/user/new.jpg';
     this.student_name = studentPromotion.student_name || '';
@@ -31,10 +31,10 @@ export class StudentPromotion {
     this.status = studentPromotion.status || '';
   }
 
-  public getRandomID(): number {
+  public getRandomID(): string {
     const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
+      return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
     };
-    return S4() + S4();
+    return S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4();
   }
 }
