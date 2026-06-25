@@ -1,7 +1,7 @@
 import { formatDate } from '@angular/common';
 
 export class Students {
-  id: number;
+  id: string;
   img: string;
   name: string;
   email: string;
@@ -40,10 +40,10 @@ export class Students {
     this.scholarship_status = students.scholarship_status || 'none'; // Default value
   }
 
-  public getRandomID(): number {
+  public getRandomID(): string {
     const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
+      return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
     };
-    return S4() + S4();
+    return S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4();
   }
 }
