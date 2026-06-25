@@ -43,3 +43,10 @@ export class AssignClassTeacher {
     return S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4();
   }
 }
+
+export interface ClassInfo {
+  classId: string;
+  className: string;
+  classCode: string;
+}
+

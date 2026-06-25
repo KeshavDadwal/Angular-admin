@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
-import { AssignClassTeacher } from './assign-class-teacher.model';
+import { AssignClassTeacher, ClassInfo } from './assign-class-teacher.model';
 import { environment } from 'environments/environment';
 
 @Injectable({
@@ -72,6 +72,31 @@ export class AssignClassTeacherService {
         const data = res.data.assignClassTeacherList || [];
         this.dataChange.next(data);
         return data;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /** GET: Fetch all available classes */
+  getClassList(): Observable<ClassInfo[]> {
+    const body = {
+      query: `
+        query GetClassList {
+          classList {
+            classId
+            className
+            classCode
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch class list');
+        }
+        return res.data.classList || [];
       }),
       catchError(this.handleError)
     );
@@ -213,6 +238,34 @@ export class AssignClassTeacherService {
         return res.data.deleteAssignClassTeacher;
       }),
       catchError(this.handleError)
+    );
+  }
+
+  getAssigneeOptions(): Observable<any[]> {
+    const body = {
+      query: `
+        query GetAssigneeOptions {
+          users {
+            id
+            username
+            role
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch assignees');
+        }
+        const users = res.data.users || [];
+        return users.filter((u: any) => u.role === 'admin' || u.role === 'teacher');
+      }),
+      catchError((err) => {
+        console.error('An error occurred fetching assignee options:', err);
+        return throwError(() => new Error(err.message || 'Something went wrong; please try again later.'));
+      })
     );
   }
 

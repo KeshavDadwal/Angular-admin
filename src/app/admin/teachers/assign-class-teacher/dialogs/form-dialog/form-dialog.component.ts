@@ -15,7 +15,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { AssignClassTeacher } from '../../assign-class-teacher.model';
+import { AssignClassTeacher, ClassInfo } from '../../assign-class-teacher.model';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
@@ -58,6 +58,8 @@ export class AssignClassTeacherFormComponent {
   dialogTitle: string;
   stdForm: UntypedFormGroup;
   assignClassTeacher: AssignClassTeacher;
+  classes: ClassInfo[] = [];
+  assignees: any[] = [];
 
   constructor() {
     const data = this.data;
@@ -73,12 +75,45 @@ export class AssignClassTeacherFormComponent {
         ? data.assignClassTeacher
         : new AssignClassTeacher({});
     this.stdForm = this.createAssignClassTeacherForm();
+    this.loadClassList();
+    this.loadAssignees();
+  }
+
+  loadClassList() {
+    this.assignClassTeacherService.getClassList().subscribe({
+      next: (classList) => {
+        this.classes = classList;
+      },
+      error: (error) => {
+        console.error('Failed to load class list:', error);
+      }
+    });
+  }
+
+  loadAssignees() {
+    this.assignClassTeacherService.getAssigneeOptions().subscribe({
+      next: (assigneesList) => {
+        this.assignees = assigneesList;
+      },
+      error: (error) => {
+        console.error('Failed to load assignees:', error);
+      }
+    });
+  }
+
+  onClassSelectionChange(classId: string) {
+    const selectedClass = this.classes.find(c => c.classId === classId);
+    if (selectedClass) {
+      this.stdForm.patchValue({
+        className: selectedClass.className
+      });
+    }
   }
 
   createAssignClassTeacherForm(): UntypedFormGroup {
     return this.fb.group({
       id: [this.assignClassTeacher.id],
-      teacherId: [this.assignClassTeacher.teacherId, [Validators.required]],
+      teacherId: [this.assignClassTeacher.teacherId],
       img: [this.assignClassTeacher.img],
       teacherName: [this.assignClassTeacher.teacherName, [Validators.required]],
       classId: [this.assignClassTeacher.classId, [Validators.required]],
