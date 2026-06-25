@@ -213,34 +213,6 @@
           "submenu": []
         },
         {
-          "path": "/admin/students/add-student",
-          "title": "MENUITEMS.STUDENTS.LIST.ADD-STUDENT",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/students/edit-student",
-          "title": "MENUITEMS.STUDENTS.LIST.EDIT-STUDENT",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
           "path": "/admin/students/student-attendance",
           "title": "MENUITEMS.STUDENTS.LIST.STUDENT-ATTENDANCE",
           "iconType": "",
@@ -299,20 +271,6 @@
         {
           "path": "/admin/students/student-health-records",
           "title": "MENUITEMS.STUDENTS.LIST.STUDENT-HEALTH-RECORDS",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/students/about-student",
-          "title": "MENUITEMS.STUDENTS.LIST.ABOUT-STUDENT",
           "iconType": "",
           "icon": "",
           "class": "ml-menu",

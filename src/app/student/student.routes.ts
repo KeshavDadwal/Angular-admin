@@ -6,7 +6,6 @@ import { LeaveRequestComponent } from './leave-request/leave-request.component';
 import { TimetableComponent } from './timetable/timetable.component';
 import { SettingsComponent } from './settings/settings.component';
 import { StudentClassComponent } from './student-class/student-class.component';
-import { AboutStudentComponent } from 'app/admin/students/about-student/about-student.component';
 import { NoticesComponent } from './notices/notices.component';
 import { FeeDetailsComponent } from './fees/fee-details/fee-details.component';
 import { FeeReceiptsComponent } from './fees/fee-receipts/fee-receipts.component';
@@ -116,10 +115,6 @@ export const STUDENT_ROUTE: Route[] = [
       { path: 'hostel-fees', component: HostelFeesComponent },
       { path: 'complaints', component: ComplaintsComponent },
     ],
-  },
-  {
-    path: 'profile',
-    component: AboutStudentComponent,
   },
   {
     path: 'settings',
