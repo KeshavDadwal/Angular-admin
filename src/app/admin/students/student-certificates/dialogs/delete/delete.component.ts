@@ -11,7 +11,7 @@ import { StudentCertificateService } from '../../student-certificates.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   student_name: string;
   certificate_type: string;
 }

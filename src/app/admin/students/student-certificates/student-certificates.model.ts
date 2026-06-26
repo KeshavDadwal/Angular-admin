@@ -1,5 +1,5 @@
 export class StudentCertificate {
-  id: number;
+  id: string;
   img: string;
   student_name: string;
   certificate_type: string;
@@ -11,7 +11,7 @@ export class StudentCertificate {
   description: string;
   status: string;
 
-  constructor(studentCertificate: StudentCertificate) {
+  constructor(studentCertificate: Partial<StudentCertificate>) {
     this.id = studentCertificate.id || this.getRandomID();
     this.img = studentCertificate.img || 'assets/images/user/new.jpg';
     this.student_name = studentCertificate.student_name || '';
@@ -25,10 +25,10 @@ export class StudentCertificate {
     this.status = studentCertificate.status || '';
   }
 
-  public getRandomID(): number {
+  public getRandomID(): string {
     const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
+      return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
     };
-    return S4() + S4();
+    return S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4();
   }
 }

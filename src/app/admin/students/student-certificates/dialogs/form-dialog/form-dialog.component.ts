@@ -24,7 +24,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   studentCertificate: StudentCertificate;
 }
@@ -71,7 +71,7 @@ export class StudentCertificateFormComponent {
     this.studentCertificate =
       this.action === 'edit'
         ? data.studentCertificate
-        : new StudentCertificate({} as StudentCertificate);
+        : new StudentCertificate({});
 
     // Create form
     this.studentCertificateForm = this.createStudentCertificateForm();
