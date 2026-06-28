@@ -1,58 +1,197 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
 import { MeritList } from './merit-list.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MeritListService {
-  dataChange: BehaviorSubject<MeritList[]> = new BehaviorSubject<MeritList[]>([]);
+  private httpClient = inject(HttpClient);
 
-  private staticData: any[] = [
-    { id: 1, student_name: 'John Doe', application_no: 'APP001', category: 'General', entrance_score: 85, academic_score: 90, total_score: 175, rank: 1, course: 'Computer Science', selection_status: 'Selected', getRandomID: () => 1 },
-    { id: 2, student_name: 'Jane Smith', application_no: 'APP002', category: 'OBC', entrance_score: 82, academic_score: 88, total_score: 170, rank: 2, course: 'Computer Science', selection_status: 'Selected', getRandomID: () => 2 },
-    { id: 3, student_name: 'Mike Ross', application_no: 'APP003', category: 'General', entrance_score: 80, academic_score: 85, total_score: 165, rank: 3, course: 'Law', selection_status: 'Selected', getRandomID: () => 3 },
-    { id: 4, student_name: 'Rachel Zane', application_no: 'APP004', category: 'SC', entrance_score: 78, academic_score: 82, total_score: 160, rank: 4, course: 'Law', selection_status: 'Waiting', getRandomID: () => 4 },
-    { id: 5, student_name: 'Harvey Specter', application_no: 'APP005', category: 'General', entrance_score: 90, academic_score: 95, total_score: 185, rank: 1, course: 'Economics', selection_status: 'Selected', getRandomID: () => 5 },
-    { id: 6, student_name: 'Donna Paulsen', application_no: 'APP006', category: 'General', entrance_score: 88, academic_score: 92, total_score: 180, rank: 2, course: 'Management', selection_status: 'Selected', getRandomID: () => 6 },
-    { id: 7, student_name: 'Louis Litt', application_no: 'APP007', category: 'General', entrance_score: 75, academic_score: 80, total_score: 155, rank: 10, course: 'Finance', selection_status: 'Waiting', getRandomID: () => 7 },
-    { id: 8, student_name: 'Jessica Pearson', application_no: 'APP008', category: 'General', entrance_score: 92, academic_score: 96, total_score: 188, rank: 1, course: 'Political Science', selection_status: 'Selected', getRandomID: () => 8 },
-    { id: 9, student_name: 'Oliver Queen', application_no: 'APP009', category: 'ST', entrance_score: 70, academic_score: 75, total_score: 145, rank: 5, course: 'Mechanical Eng', selection_status: 'Selected', getRandomID: () => 9 },
-    { id: 10, student_name: 'Barry Allen', application_no: 'APP010', category: 'OBC', entrance_score: 86, academic_score: 89, total_score: 175, rank: 1, course: 'Physics', selection_status: 'Selected', getRandomID: () => 10 },
-    { id: 11, student_name: 'Iris West', application_no: 'APP011', category: 'General', entrance_score: 80, academic_score: 84, total_score: 164, rank: 3, course: 'Journalism', selection_status: 'Selected', getRandomID: () => 11 },
-    { id: 12, student_name: 'Cisco Ramon', application_no: 'APP012', category: 'SC', entrance_score: 76, academic_score: 78, total_score: 154, rank: 4, course: 'Electrical Eng', selection_status: 'Waiting', getRandomID: () => 12 },
-  ];
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
+
+  dataChange: BehaviorSubject<MeritList[]> = new BehaviorSubject<MeritList[]>([]);
+  dialogData!: MeritList;
 
   get data(): MeritList[] {
     return this.dataChange.value;
   }
 
+  getDialogData(): MeritList {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): MeritList {
+    return new MeritList({
+      id: item.id,
+      student_name: item.studentName || '',
+      application_no: item.applicationNo || '',
+      category: item.category || '',
+      entrance_score: Number(item.entranceScore || 0),
+      academic_score: Number(item.academicScore || 0),
+      total_score: Number(item.totalScore || 0),
+      rank: Number(item.rank || 0),
+      course: item.course || '',
+      selection_status: item.selectionStatus || ''
+    });
+  }
+
   getAllMeritLists(): Observable<MeritList[]> {
-    this.dataChange.next(this.staticData);
-    return of(this.staticData);
+    const body = {
+      query: `
+        query GetMeritLists {
+          meritLists {
+            id
+            studentName
+            applicationNo
+            category
+            entranceScore
+            academicScore
+            totalScore
+            rank
+            course
+            selectionStatus
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch merit list');
+        }
+        const list = res.data.meritLists || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   addMeritList(meritList: MeritList): Observable<MeritList> {
-    this.staticData.push(meritList);
-    this.dataChange.next(this.staticData);
-    return of(meritList);
+    const body = {
+      query: `
+        mutation CreateMeritList($input: CreateMeritListInput!) {
+          createMeritList(input: $input) {
+            id
+            studentName
+            applicationNo
+            category
+            entranceScore
+            academicScore
+            totalScore
+            rank
+            course
+            selectionStatus
+          }
+        }
+      `,
+      variables: {
+        input: {
+          studentName: meritList.student_name,
+          applicationNo: meritList.application_no,
+          category: meritList.category,
+          entranceScore: Number(meritList.entrance_score || 0),
+          academicScore: Number(meritList.academic_score || 0),
+          totalScore: Number(meritList.total_score || 0),
+          rank: Number(meritList.rank || 0),
+          course: meritList.course,
+          selectionStatus: meritList.selection_status
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create merit list entry');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createMeritList);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   updateMeritList(meritList: MeritList): Observable<MeritList> {
-    const index = this.staticData.findIndex((item) => item.id === meritList.id);
-    if (index !== -1) {
-      this.staticData[index] = meritList;
-      this.dataChange.next(this.staticData);
-    }
-    return of(meritList);
+    const body = {
+      query: `
+        mutation UpdateMeritList($input: UpdateMeritListInput!) {
+          updateMeritList(input: $input) {
+            id
+            studentName
+            applicationNo
+            category
+            entranceScore
+            academicScore
+            totalScore
+            rank
+            course
+            selectionStatus
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(meritList.id),
+          studentName: meritList.student_name,
+          applicationNo: meritList.application_no,
+          category: meritList.category,
+          entranceScore: Number(meritList.entrance_score || 0),
+          academicScore: Number(meritList.academic_score || 0),
+          totalScore: Number(meritList.total_score || 0),
+          rank: Number(meritList.rank || 0),
+          course: meritList.course,
+          selectionStatus: meritList.selection_status
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update merit list entry');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateMeritList);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
-  deleteMeritList(id: number): Observable<number> {
-    const index = this.staticData.findIndex((item) => item.id === id);
-    if (index !== -1) {
-      this.staticData.splice(index, 1);
-      this.dataChange.next(this.staticData);
-    }
-    return of(id);
+  deleteMeritList(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteMeritList($id: String!) {
+          deleteMeritList(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete merit list entry');
+        }
+        return res.data.deleteMeritList;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

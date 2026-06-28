@@ -1,5 +1,5 @@
 export class AdmissionEnquiry {
-  id: number;
+  id: string | number;
   student_name: string;
   mobile: string;
   email: string;
@@ -14,7 +14,7 @@ export class AdmissionEnquiry {
   note: string;
 
   constructor(admissionEnquiry: AdmissionEnquiry) {
-    this.id = admissionEnquiry.id || this.getRandomID();
+    this.id = admissionEnquiry.id !== undefined ? admissionEnquiry.id : this.getRandomID();
     this.student_name = admissionEnquiry.student_name || '';
     this.mobile = admissionEnquiry.mobile || '';
     this.email = admissionEnquiry.email || '';

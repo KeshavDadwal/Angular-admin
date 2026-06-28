@@ -1,5 +1,5 @@
 export class MeritList {
-  id: number;
+  id: string | number;
   student_name: string;
   application_no: string;
   category: string;
@@ -10,8 +10,8 @@ export class MeritList {
   course: string;
   selection_status: string;
 
-  constructor(meritList: MeritList) {
-    this.id = meritList.id || this.getRandomID();
+  constructor(meritList: Partial<MeritList>) {
+    this.id = meritList.id !== undefined ? meritList.id : this.getRandomID();
     this.student_name = meritList.student_name || '';
     this.application_no = meritList.application_no || '';
     this.category = meritList.category || '';

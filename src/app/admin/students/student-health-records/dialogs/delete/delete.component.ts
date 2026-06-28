@@ -11,7 +11,7 @@ import { StudentHealthRecordService } from '../../student-health-records.service
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   student_name: string;
 }
 

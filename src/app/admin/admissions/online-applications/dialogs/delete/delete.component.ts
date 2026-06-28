@@ -10,7 +10,7 @@ import { OnlineApplicationService } from '../../online-applications.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string | number;
   student_name: string;
 }
 

@@ -10,7 +10,7 @@ import { EntranceExamService } from '../../entrance-exams.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string | number;
   exam_name: string;
 }
 

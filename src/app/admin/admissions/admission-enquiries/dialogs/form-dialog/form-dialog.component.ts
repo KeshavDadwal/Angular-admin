@@ -58,6 +58,7 @@ export class AdmissionEnquiryFormComponent {
   dialogTitle: string;
   admissionEnquiryForm: UntypedFormGroup;
   admissionEnquiry: AdmissionEnquiry;
+  assignees: any[] = [];
 
   constructor() {
     const data = this.data;
@@ -71,18 +72,38 @@ export class AdmissionEnquiryFormComponent {
         ? data.admissionEnquiry
         : new AdmissionEnquiry({} as AdmissionEnquiry);
     this.admissionEnquiryForm = this.createAdmissionEnquiryForm();
+
+    // Fetch assignee options
+    this.admissionEnquiryService.getAssigneeOptions().subscribe({
+      next: (list) => {
+        this.assignees = list;
+      },
+      error: (err) => {
+        console.error('Failed to load assignees:', err);
+      }
+    });
   }
 
   createAdmissionEnquiryForm(): UntypedFormGroup {
+    const enquiryDate = this.admissionEnquiry.enquiry_date
+      ? new Date(this.admissionEnquiry.enquiry_date)
+      : '';
+    const lastFollowUp = this.admissionEnquiry.last_follow_up
+      ? new Date(this.admissionEnquiry.last_follow_up)
+      : '';
+    const nextFollowUp = this.admissionEnquiry.next_follow_up
+      ? new Date(this.admissionEnquiry.next_follow_up)
+      : '';
+
     return this.fb.group({
       id: [this.admissionEnquiry.id],
       student_name: [this.admissionEnquiry.student_name, [Validators.required]],
       mobile: [this.admissionEnquiry.mobile, [Validators.required]],
       email: [this.admissionEnquiry.email, [Validators.email]],
       address: [this.admissionEnquiry.address],
-      enquiry_date: [this.admissionEnquiry.enquiry_date, [Validators.required]],
-      last_follow_up: [this.admissionEnquiry.last_follow_up],
-      next_follow_up: [this.admissionEnquiry.next_follow_up],
+      enquiry_date: [enquiryDate, [Validators.required]],
+      last_follow_up: [lastFollowUp],
+      next_follow_up: [nextFollowUp],
       course: [this.admissionEnquiry.course, [Validators.required]],
       source: [this.admissionEnquiry.source],
       assigned_to: [this.admissionEnquiry.assigned_to],

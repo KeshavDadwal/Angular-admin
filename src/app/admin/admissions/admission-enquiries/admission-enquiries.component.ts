@@ -50,9 +50,9 @@ export class AdmissionEnquiriesComponent implements OnInit, OnDestroy {
       type: 'status',
       visible: true,
       statusBadgeMap: {
-        'In Progress': 'badge badge-solid-orange',
-        'Pending': 'badge badge-solid-red',
-        'Completed': 'badge badge-solid-green',
+        'New': 'badge badge-solid-green',
+        'In Process': 'badge badge-solid-purple',
+        'Closed': 'badge badge-solid-orange',
       },
     },
     { def: 'actions', label: 'Actions', type: 'actionBtn', visible: true },

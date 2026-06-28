@@ -1,58 +1,225 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
 import { EntranceExam } from './entrance-exams.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EntranceExamService {
-  dataChange: BehaviorSubject<EntranceExam[]> = new BehaviorSubject<EntranceExam[]>([]);
+  private httpClient = inject(HttpClient);
 
-  private staticData: any[] = [
-    { id: 1, exam_name: 'CS Entrance 2024', exam_code: 'CSE101', exam_date: '2024-05-10', start_time: '10:00 AM', end_time: '01:00 PM', venue: 'Hall A', max_marks: 100, passing_marks: 40, status: 'Scheduled', description: 'Entrance for CS Department', getRandomID: () => 1 },
-    { id: 2, exam_name: 'MBA Entrance 2024', exam_code: 'MBA202', exam_date: '2024-05-12', start_time: '02:00 PM', end_time: '05:00 PM', venue: 'Hall B', max_marks: 100, passing_marks: 50, status: 'Scheduled', description: 'Entrance for Management', getRandomID: () => 2 },
-    { id: 3, exam_name: 'Law Entrance 2024', exam_code: 'LAW303', exam_date: '2024-05-15', start_time: '09:00 AM', end_time: '12:00 PM', venue: 'Hall C', max_marks: 150, passing_marks: 75, status: 'Completed', description: 'Entrance for Law School', getRandomID: () => 3 },
-    { id: 4, exam_name: 'Eng Entrance 2024', exam_code: 'ENG404', exam_date: '2024-05-18', start_time: '10:00 AM', end_time: '01:00 PM', venue: 'Hall A', max_marks: 120, passing_marks: 60, status: 'Cancelled', description: 'Entrance for Engineering', getRandomID: () => 4 },
-    { id: 5, exam_name: 'Med Entrance 2024', exam_code: 'MED505', exam_date: '2024-05-20', start_time: '02:00 PM', end_time: '05:00 PM', venue: 'Main Lab', max_marks: 200, passing_marks: 100, status: 'Scheduled', description: 'Entrance for Medical Science', getRandomID: () => 5 },
-    { id: 6, exam_name: 'Arts Entrance 2024', exam_code: 'ART606', exam_date: '2024-05-22', start_time: '09:00 AM', end_time: '12:00 PM', venue: 'Auditorium', max_marks: 100, passing_marks: 35, status: 'Scheduled', description: 'Entrance for Fine Arts', getRandomID: () => 6 },
-    { id: 7, exam_name: 'Physics Entrance 2024', exam_code: 'PHY707', exam_date: '2024-05-25', start_time: '10:00 AM', end_time: '01:00 PM', venue: 'Science Block', max_marks: 100, passing_marks: 45, status: 'Scheduled', description: 'Entrance for Physics Honors', getRandomID: () => 7 },
-    { id: 8, exam_name: 'Chem Entrance 2024', exam_code: 'CHE808', exam_date: '2024-05-28', start_time: '02:00 PM', end_time: '05:00 PM', venue: 'Chem Lab 1', max_marks: 100, passing_marks: 45, status: 'Scheduled', description: 'Entrance for Chemistry Honors', getRandomID: () => 8 },
-    { id: 9, exam_name: 'Math Entrance 2024', exam_code: 'MAT909', exam_date: '2024-05-30', start_time: '09:00 AM', end_time: '12:00 PM', venue: 'Math Hall', max_marks: 100, passing_marks: 50, status: 'Scheduled', description: 'Entrance for Mathematics', getRandomID: () => 9 },
-    { id: 10, exam_name: 'History Entrance 2024', exam_code: 'HIS111', exam_date: '2024-06-02', start_time: '10:00 AM', end_time: '01:00 PM', venue: 'Library Hall', max_marks: 100, passing_marks: 40, status: 'Scheduled', description: 'Entrance for History', getRandomID: () => 10 },
-    { id: 11, exam_name: 'Bio Entrance 2024', exam_code: 'BIO222', exam_date: '2024-06-05', start_time: '02:00 PM', end_time: '05:00 PM', venue: 'Bio Lab 2', max_marks: 100, passing_marks: 45, status: 'Scheduled', description: 'Entrance for Biology', getRandomID: () => 11 },
-    { id: 12, exam_name: 'Geo Entrance 2024', exam_code: 'GEO333', exam_date: '2024-06-08', start_time: '09:00 AM', end_time: '12:00 PM', venue: 'Geo Dept', max_marks: 100, passing_marks: 40, status: 'Scheduled', description: 'Entrance for Geography', getRandomID: () => 12 },
-  ];
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
+
+  dataChange: BehaviorSubject<EntranceExam[]> = new BehaviorSubject<EntranceExam[]>([]);
+  dialogData!: EntranceExam;
 
   get data(): EntranceExam[] {
     return this.dataChange.value;
   }
 
+  getDialogData(): EntranceExam {
+    return this.dialogData;
+  }
+
+  private formatDate(date: any): string {
+    if (!date) return '';
+    let d: Date;
+    if (date instanceof Date) {
+      d = date;
+    } else {
+      d = new Date(date);
+    }
+    
+    if (isNaN(d.getTime())) {
+      if (typeof date === 'string') {
+        return date.split('T')[0];
+      }
+      return String(date);
+    }
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private mapGraphQLToModel(item: any): EntranceExam {
+    return new EntranceExam({
+      id: item.id,
+      exam_name: item.examName || '',
+      exam_code: item.examCode || '',
+      exam_date: item.examDate || '',
+      start_time: item.startTime || '',
+      end_time: item.endTime || '',
+      venue: item.venue || '',
+      max_marks: Number(item.maxMarks || 0),
+      passing_marks: Number(item.passingMarks || 0),
+      status: item.status || '',
+      description: item.description || ''
+    });
+  }
+
   getAllEntranceExams(): Observable<EntranceExam[]> {
-    this.dataChange.next(this.staticData);
-    return of(this.staticData);
+    const body = {
+      query: `
+        query GetEntranceExams {
+          entranceExams {
+            id
+            examName
+            examCode
+            examDate
+            startTime
+            endTime
+            venue
+            maxMarks
+            passingMarks
+            status
+            description
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch entrance exams');
+        }
+        const list = res.data.entranceExams || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   addEntranceExam(entranceExam: EntranceExam): Observable<EntranceExam> {
-    this.staticData.push(entranceExam);
-    this.dataChange.next(this.staticData);
-    return of(entranceExam);
+    const body = {
+      query: `
+        mutation CreateEntranceExam($input: CreateEntranceExamInput!) {
+          createEntranceExam(input: $input) {
+            id
+            examName
+            examCode
+            examDate
+            startTime
+            endTime
+            venue
+            maxMarks
+            passingMarks
+            status
+            description
+          }
+        }
+      `,
+      variables: {
+        input: {
+          examName: entranceExam.exam_name,
+          examCode: entranceExam.exam_code,
+          examDate: this.formatDate(entranceExam.exam_date),
+          startTime: entranceExam.start_time,
+          endTime: entranceExam.end_time,
+          venue: entranceExam.venue,
+          maxMarks: Number(entranceExam.max_marks || 0),
+          passingMarks: Number(entranceExam.passing_marks || 0),
+          status: entranceExam.status || 'Scheduled',
+          description: entranceExam.description || null
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create entrance exam');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createEntranceExam);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   updateEntranceExam(entranceExam: EntranceExam): Observable<EntranceExam> {
-    const index = this.staticData.findIndex((item) => item.id === entranceExam.id);
-    if (index !== -1) {
-      this.staticData[index] = entranceExam;
-      this.dataChange.next(this.staticData);
-    }
-    return of(entranceExam);
+    const body = {
+      query: `
+        mutation UpdateEntranceExam($input: UpdateEntranceExamInput!) {
+          updateEntranceExam(input: $input) {
+            id
+            examName
+            examCode
+            examDate
+            startTime
+            endTime
+            venue
+            maxMarks
+            passingMarks
+            status
+            description
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(entranceExam.id),
+          examName: entranceExam.exam_name,
+          examCode: entranceExam.exam_code,
+          examDate: this.formatDate(entranceExam.exam_date),
+          startTime: entranceExam.start_time,
+          endTime: entranceExam.end_time,
+          venue: entranceExam.venue,
+          maxMarks: Number(entranceExam.max_marks || 0),
+          passingMarks: Number(entranceExam.passing_marks || 0),
+          status: entranceExam.status,
+          description: entranceExam.description || null
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update entrance exam');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateEntranceExam);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
-  deleteEntranceExam(id: number): Observable<number> {
-    const index = this.staticData.findIndex((item) => item.id === id);
-    if (index !== -1) {
-      this.staticData.splice(index, 1);
-      this.dataChange.next(this.staticData);
-    }
-    return of(id);
+  deleteEntranceExam(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteEntranceExam($id: String!) {
+          deleteEntranceExam(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete entrance exam');
+        }
+        return res.data.deleteEntranceExam;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

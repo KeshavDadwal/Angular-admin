@@ -1,5 +1,5 @@
 export class OnlineApplication {
-  id: number;
+  id: string | number;
   img: string;
   student_name: string;
   application_no: string;
@@ -12,8 +12,8 @@ export class OnlineApplication {
   payment_status: string;
   application_status: string;
 
-  constructor(onlineApplication: OnlineApplication) {
-    this.id = onlineApplication.id || this.getRandomID();
+  constructor(onlineApplication: Partial<OnlineApplication>) {
+    this.id = onlineApplication.id !== undefined ? onlineApplication.id : this.getRandomID();
     this.img = onlineApplication.img || 'assets/images/user/new.jpg';
     this.student_name = onlineApplication.student_name || '';
     this.application_no = onlineApplication.application_no || '';

@@ -1,5 +1,5 @@
 export class EntranceExam {
-  id: number;
+  id: string | number;
   exam_name: string;
   exam_code: string;
   exam_date: string;
@@ -11,8 +11,8 @@ export class EntranceExam {
   status: string;
   description: string;
 
-  constructor(entranceExam: EntranceExam) {
-    this.id = entranceExam.id || this.getRandomID();
+  constructor(entranceExam: Partial<EntranceExam>) {
+    this.id = entranceExam.id !== undefined ? entranceExam.id : this.getRandomID();
     this.exam_name = entranceExam.exam_name || '';
     this.exam_code = entranceExam.exam_code || '';
     this.exam_date = entranceExam.exam_date || '';
