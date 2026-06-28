@@ -24,7 +24,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   studentDiscipline: StudentDiscipline;
 }
@@ -71,7 +71,7 @@ export class StudentDisciplineFormComponent {
     this.studentDiscipline =
       this.action === 'edit'
         ? data.studentDiscipline
-        : new StudentDiscipline({} as StudentDiscipline);
+        : new StudentDiscipline({});
 
     // Create form
     this.studentDisciplineForm = this.createStudentDisciplineForm();

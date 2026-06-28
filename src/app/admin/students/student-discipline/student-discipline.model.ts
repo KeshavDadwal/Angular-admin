@@ -1,5 +1,5 @@
 export class StudentDiscipline {
-  id: number;
+  id: string;
   img: string;
   student_name: string;
   incident_date: string;
@@ -12,7 +12,7 @@ export class StudentDiscipline {
   severity: string;
   status: string;
 
-  constructor(studentDiscipline: StudentDiscipline) {
+  constructor(studentDiscipline: Partial<StudentDiscipline>) {
     this.id = studentDiscipline.id || this.getRandomID();
     this.img = studentDiscipline.img || 'assets/images/user/new.jpg';
     this.student_name = studentDiscipline.student_name || '';
@@ -27,10 +27,10 @@ export class StudentDiscipline {
     this.status = studentDiscipline.status || '';
   }
 
-  public getRandomID(): number {
+  public getRandomID(): string {
     const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
+      return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
     };
-    return S4() + S4();
+    return S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4();
   }
 }

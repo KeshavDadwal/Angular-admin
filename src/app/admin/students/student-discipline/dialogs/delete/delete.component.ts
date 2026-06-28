@@ -11,7 +11,7 @@ import { StudentDisciplineService } from '../../student-discipline.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   student_name: string;
   incident_type: string;
 }
