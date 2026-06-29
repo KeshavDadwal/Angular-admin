@@ -10,7 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 
 export interface DialogData {
-  id: number;
+  id: string | number;
   action: string;
   examType: ExamType;
 }
@@ -70,12 +70,22 @@ export class FormDialogComponent {
     if (this.examTypeForm.valid) {
       const examTypeData = this.examTypeForm.getRawValue();
       if (this.action === 'edit') {
-        this.examTypesService.updateExamType(examTypeData).subscribe(() => {
-          this.dialogRef.close(examTypeData);
+        this.examTypesService.updateExamType(examTypeData).subscribe({
+          next: (response: any) => {
+            this.dialogRef.close(response);
+          },
+          error: (error: any) => {
+            console.error('Update Error:', error);
+          }
         });
       } else {
-        this.examTypesService.addExamType(examTypeData).subscribe(() => {
-          this.dialogRef.close(examTypeData);
+        this.examTypesService.addExamType(examTypeData).subscribe({
+          next: (response: any) => {
+            this.dialogRef.close(response);
+          },
+          error: (error: any) => {
+            console.error('Add Error:', error);
+          }
         });
       }
     }

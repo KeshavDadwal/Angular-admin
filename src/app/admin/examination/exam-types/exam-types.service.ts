@@ -1,143 +1,167 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
 import { ExamType } from './exam-types.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ExamTypesService {
-  private readonly staticData: any[] = [
-    {
-      id: 1,
-      exam_name: 'Internal Assessment 1',
-      exam_code: 'IA1',
-      description: 'First internal assessment for semester',
-      status: 'Active',
-    },
-    {
-      id: 2,
-      exam_name: 'Internal Assessment 2',
-      exam_code: 'IA2',
-      description: 'Second internal assessment for semester',
-      status: 'Active',
-    },
-    {
-      id: 3,
-      exam_name: 'Mid-Term Examination',
-      exam_code: 'MTE',
-      description: 'Mid-semester examination',
-      status: 'Active',
-    },
-    {
-      id: 4,
-      exam_name: 'End-Term Examination',
-      exam_code: 'ETE',
-      description: 'Final semester examination',
-      status: 'Active',
-    },
-    {
-      id: 5,
-      exam_name: 'Practical Examination',
-      exam_code: 'PRC',
-      description: 'Practical/Lab assessment',
-      status: 'Active',
-    },
-    {
-      id: 6,
-      exam_name: 'Viva Voce',
-      exam_code: 'VVA',
-      description: 'Oral examination',
-      status: 'Active',
-    },
-    {
-      id: 7,
-      exam_name: 'Special Supplementary',
-      exam_code: 'SUP',
-      description: 'Backlog/Supplementary exam',
-      status: 'Inactive',
-    },
-    {
-      id: 8,
-      exam_name: 'Entrance Test',
-      exam_code: 'ENT',
-      description: 'Admission entrance test',
-      status: 'Active',
-    },
-    {
-      id: 9,
-      exam_name: 'Aptitude Test',
-      exam_code: 'APT',
-      description: 'General aptitude assessment',
-      status: 'Active',
-    },
-    {
-      id: 10,
-      exam_name: 'Quarterly Exam',
-      exam_code: 'QTR',
-      description: 'Quarterly school assessment',
-      status: 'Active',
-    },
-    {
-      id: 11,
-      exam_name: 'Half Yearly Exam',
-      exam_code: 'HYE',
-      description: 'Mid-year school assessment',
-      status: 'Active',
-    },
-    {
-      id: 12,
-      exam_name: 'Annual Exam',
-      exam_code: 'ANN',
-      description: 'Final year school assessment',
-      status: 'Active',
-    },
-  ];
+  private httpClient = inject(HttpClient);
+
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
   dataChange: BehaviorSubject<ExamType[]> = new BehaviorSubject<ExamType[]>([]);
-
-  constructor() {}
+  dialogData!: ExamType;
 
   get data(): ExamType[] {
     return this.dataChange.value;
   }
 
+  getDialogData(): ExamType {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): ExamType {
+    return new ExamType({
+      id: item.id,
+      exam_name: item.examName || '',
+      exam_code: item.examCode || '',
+      description: item.description || '',
+      status: item.status || ''
+    });
+  }
+
   getAllExamTypes(): Observable<ExamType[]> {
-    this.dataChange.next(this.staticData);
-    return of(this.staticData);
+    const body = {
+      query: `
+        query GetExamTypes {
+          examTypes {
+            id
+            examName
+            examCode
+            description
+            status
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch exam types');
+        }
+        const list = res.data.examTypes || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   addExamType(examType: ExamType): Observable<ExamType> {
-    this.staticData.push(examType);
-    this.dataChange.next(this.staticData);
-    return of(examType);
+    const body = {
+      query: `
+        mutation CreateExamType($input: CreateExamTypeInput!) {
+          createExamType(input: $input) {
+            id
+            examName
+            examCode
+            description
+            status
+          }
+        }
+      `,
+      variables: {
+        input: {
+          examName: examType.exam_name,
+          examCode: examType.exam_code,
+          description: examType.description,
+          status: examType.status
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create exam type entry');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createExamType);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   updateExamType(examType: ExamType): Observable<ExamType> {
-    const index = this.staticData.findIndex((it) => it.id === examType.id);
-    if (index !== -1) {
-      this.staticData[index] = examType;
-      this.dataChange.next(this.staticData);
-    }
-    return of(examType);
-  }
-
-  deleteExamType(id: number): Observable<number> {
-    const index = this.staticData.findIndex((it) => it.id === id);
-    if (index !== -1) {
-      this.staticData.splice(index, 1);
-      this.dataChange.next(this.staticData);
-    }
-    return of(id);
-  }
-
-  deleteMultipleExamTypes(ids: number[]): Observable<number[]> {
-    ids.forEach((id) => {
-      const index = this.staticData.findIndex((it) => it.id === id);
-      if (index !== -1) {
-        this.staticData.splice(index, 1);
+    const body = {
+      query: `
+        mutation UpdateExamType($input: UpdateExamTypeInput!) {
+          updateExamType(input: $input) {
+            id
+            examName
+            examCode
+            description
+            status
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(examType.id),
+          examName: examType.exam_name,
+          examCode: examType.exam_code,
+          description: examType.description,
+          status: examType.status
+        }
       }
-    });
-    this.dataChange.next(this.staticData);
-    return of(ids);
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update exam type entry');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateExamType);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  deleteExamType(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteExamType($id: String!) {
+          deleteExamType(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete exam type entry');
+        }
+        return res.data.deleteExamType;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

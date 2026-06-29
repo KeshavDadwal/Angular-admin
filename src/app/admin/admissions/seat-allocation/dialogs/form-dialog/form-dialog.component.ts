@@ -25,7 +25,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 
 export interface DialogData {
-  id: number;
+  id: string | number;
   action: string;
   seatAllocation: SeatAllocation;
 }
@@ -102,19 +102,19 @@ export class SeatAllocationFormComponent {
       const formData = this.seatAllocationForm.getRawValue();
       if (this.action === 'edit') {
         this.seatAllocationService.updateSeatAllocation(formData).subscribe({
-          next: (response) => {
+          next: (response: any) => {
             this.dialogRef.close(response);
           },
-          error: (error) => {
+          error: (error: any) => {
             console.error('Update Error:', error);
           },
         });
       } else {
         this.seatAllocationService.addSeatAllocation(formData).subscribe({
-          next: (response) => {
+          next: (response: any) => {
             this.dialogRef.close(response);
           },
-          error: (error) => {
+          error: (error: any) => {
             console.error('Add Error:', error);
           },
         });

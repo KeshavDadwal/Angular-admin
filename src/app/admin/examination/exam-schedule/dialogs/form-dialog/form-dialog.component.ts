@@ -9,9 +9,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { formatDate } from '@angular/common';
 
 export interface DialogData {
-  id: number;
+  id: string | number;
   action: string;
   examSchedule: ExamSchedule;
 }
@@ -75,13 +76,26 @@ export class FormDialogComponent {
   submit() {
     if (this.examScheduleForm.valid) {
       const examScheduleData = this.examScheduleForm.getRawValue();
+      if (examScheduleData.exam_date) {
+        examScheduleData.exam_date = formatDate(examScheduleData.exam_date, 'yyyy-MM-dd', 'en');
+      }
       if (this.action === 'edit') {
-        this.examScheduleService.updateExamSchedule(examScheduleData).subscribe(() => {
-          this.dialogRef.close(examScheduleData);
+        this.examScheduleService.updateExamSchedule(examScheduleData).subscribe({
+          next: (response: any) => {
+            this.dialogRef.close(response);
+          },
+          error: (error: any) => {
+            console.error('Update Error:', error);
+          }
         });
       } else {
-        this.examScheduleService.addExamSchedule(examScheduleData).subscribe(() => {
-          this.dialogRef.close(examScheduleData);
+        this.examScheduleService.addExamSchedule(examScheduleData).subscribe({
+          next: (response: any) => {
+            this.dialogRef.close(response);
+          },
+          error: (error: any) => {
+            console.error('Add Error:', error);
+          }
         });
       }
     }

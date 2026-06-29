@@ -1,5 +1,5 @@
 export class SeatAllocation {
-  id: number;
+  id: string | number;
   student_name: string;
   application_no: string;
   course: string;
@@ -10,8 +10,8 @@ export class SeatAllocation {
   status: string;
   fees_paid: boolean;
 
-  constructor(seatAllocation: SeatAllocation) {
-    this.id = seatAllocation.id || this.getRandomID();
+  constructor(seatAllocation: Partial<SeatAllocation>) {
+    this.id = seatAllocation.id !== undefined ? seatAllocation.id : this.getRandomID();
     this.student_name = seatAllocation.student_name || '';
     this.application_no = seatAllocation.application_no || '';
     this.course = seatAllocation.course || '';

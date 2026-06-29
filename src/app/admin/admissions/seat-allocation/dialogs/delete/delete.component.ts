@@ -10,7 +10,7 @@ import { SeatAllocationService } from '../../seat-allocation.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string | number;
   student_name: string;
 }
 
@@ -32,10 +32,10 @@ export class SeatAllocationDeleteComponent {
 
   confirmDelete(): void {
     this.seatAllocationService.deleteSeatAllocation(this.data.id).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         this.dialogRef.close(response);
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Delete Error:', error);
       },
     });

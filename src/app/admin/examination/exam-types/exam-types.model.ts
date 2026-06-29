@@ -1,18 +1,16 @@
 export class ExamType {
-  id: number;
+  id: string | number;
   exam_name: string;
   exam_code: string;
   description: string;
   status: string;
 
-  constructor(examType: ExamType) {
-    {
-      this.id = examType.id || this.getRandomID();
-      this.exam_name = examType.exam_name || '';
-      this.exam_code = examType.exam_code || '';
-      this.description = examType.description || '';
-      this.status = examType.status || '';
-    }
+  constructor(examType: Partial<ExamType>) {
+    this.id = examType.id !== undefined ? examType.id : this.getRandomID();
+    this.exam_name = examType.exam_name || '';
+    this.exam_code = examType.exam_code || '';
+    this.description = examType.description || '';
+    this.status = examType.status || '';
   }
   public getRandomID(): number {
     const S4 = () => {

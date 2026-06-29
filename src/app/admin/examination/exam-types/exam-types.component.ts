@@ -83,7 +83,7 @@ export class ExamTypesComponent implements OnInit, OnDestroy {
   loadData() {
     this.isLoading = true;
     this.examTypesService.getAllExamTypes().subscribe({
-      next: (data) => {
+      next: (data: any) => {
         this.dataSource.data = data;
         this.isLoading = false;
         this.dataSource.filterPredicate = (data: any, filter: string) => {
@@ -99,7 +99,7 @@ export class ExamTypesComponent implements OnInit, OnDestroy {
           return dataStr.indexOf(filter) !== -1;
         };
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error(err);
         this.isLoading = false;
       },
@@ -125,7 +125,7 @@ export class ExamTypesComponent implements OnInit, OnDestroy {
       autoFocus: false,
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
         if (action === 'add') {
           this.dataSource.data = [result, ...this.dataSource.data];
@@ -156,17 +156,24 @@ export class ExamTypesComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(DeleteComponent, {
       data: row,
     });
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.dataSource.data = this.dataSource.data.filter(
-          (record) => record.id !== row.id
-        );
-        this.showNotification(
-          'snackbar-danger',
-          'Delete Record Successfully...!!!',
-          'bottom',
-          'center'
-        );
+        this.examTypesService.deleteExamType(row.id).subscribe({
+          next: () => {
+            this.dataSource.data = this.dataSource.data.filter(
+              (record) => record.id !== row.id
+            );
+            this.showNotification(
+              'snackbar-danger',
+              'Delete Record Successfully...!!!',
+              'bottom',
+              'center'
+            );
+          },
+          error: (error: any) => {
+            console.error('Delete Error:', error);
+          }
+        });
       }
     });
   }

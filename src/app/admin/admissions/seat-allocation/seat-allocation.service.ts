@@ -1,58 +1,197 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
 import { SeatAllocation } from './seat-allocation.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SeatAllocationService {
-  dataChange: BehaviorSubject<SeatAllocation[]> = new BehaviorSubject<SeatAllocation[]>([]);
+  private httpClient = inject(HttpClient);
 
-  private staticData: any[] = [
-    { id: 1, student_name: 'John Doe', application_no: 'APP001', course: 'Computer Science', category: 'General', allotted_seat_type: 'Merit', allocation_date: '2024-06-15', reporting_date: '2024-06-20', status: 'Confirmed', fees_paid: true, getRandomID: () => 1 },
-    { id: 2, student_name: 'Jane Smith', application_no: 'APP002', course: 'Computer Science', category: 'OBC', allotted_seat_type: 'Merit', allocation_date: '2024-06-15', reporting_date: '2024-06-20', status: 'Pending', fees_paid: false, getRandomID: () => 2 },
-    { id: 3, student_name: 'Mike Ross', application_no: 'APP003', course: 'Law', category: 'General', allotted_seat_type: 'Management', allocation_date: '2024-06-16', reporting_date: '2024-06-21', status: 'Confirmed', fees_paid: true, getRandomID: () => 3 },
-    { id: 4, student_name: 'Rachel Zane', application_no: 'APP004', course: 'Law', category: 'SC', allotted_seat_type: 'Reserved', allocation_date: '2024-06-16', reporting_date: '2024-06-21', status: 'Cancelled', fees_paid: false, getRandomID: () => 4 },
-    { id: 5, student_name: 'Harvey Specter', application_no: 'APP005', course: 'Economics', category: 'General', allotted_seat_type: 'Merit', allocation_date: '2024-06-17', reporting_date: '2024-06-22', status: 'Confirmed', fees_paid: true, getRandomID: () => 5 },
-    { id: 6, student_name: 'Donna Paulsen', application_no: 'APP006', course: 'Management', category: 'General', allotted_seat_type: 'Merit', allocation_date: '2024-06-17', reporting_date: '2024-06-22', status: 'Confirmed', fees_paid: true, getRandomID: () => 6 },
-    { id: 7, student_name: 'Louis Litt', application_no: 'APP007', course: 'Finance', category: 'General', allotted_seat_type: 'Merit', allocation_date: '2024-06-18', reporting_date: '2024-06-23', status: 'Pending', fees_paid: false, getRandomID: () => 7 },
-    { id: 8, student_name: 'Jessica Pearson', application_no: 'APP008', course: 'Political Science', category: 'General', allotted_seat_type: 'Merit', allocation_date: '2024-06-18', reporting_date: '2024-06-23', status: 'Confirmed', fees_paid: true, getRandomID: () => 8 },
-    { id: 9, student_name: 'Oliver Queen', application_no: 'APP009', course: 'Mechanical Eng', category: 'ST', allotted_seat_type: 'Reserved', allocation_date: '2024-06-19', reporting_date: '2024-06-24', status: 'Confirmed', fees_paid: true, getRandomID: () => 9 },
-    { id: 10, student_name: 'Barry Allen', application_no: 'APP010', course: 'Physics', category: 'OBC', allotted_seat_type: 'Merit', allocation_date: '2024-06-19', reporting_date: '2024-06-24', status: 'Confirmed', fees_paid: true, getRandomID: () => 10 },
-    { id: 11, student_name: 'Iris West', application_no: 'APP011', course: 'Journalism', category: 'General', allotted_seat_type: 'Merit', allocation_date: '2024-06-20', reporting_date: '2024-06-25', status: 'Confirmed', fees_paid: true, getRandomID: () => 11 },
-    { id: 12, student_name: 'Cisco Ramon', application_no: 'APP012', course: 'Electrical Eng', category: 'SC', allotted_seat_type: 'Reserved', allocation_date: '2024-06-20', reporting_date: '2024-06-25', status: 'Pending', fees_paid: false, getRandomID: () => 12 },
-  ];
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
+
+  dataChange: BehaviorSubject<SeatAllocation[]> = new BehaviorSubject<SeatAllocation[]>([]);
+  dialogData!: SeatAllocation;
 
   get data(): SeatAllocation[] {
     return this.dataChange.value;
   }
 
+  getDialogData(): SeatAllocation {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): SeatAllocation {
+    return new SeatAllocation({
+      id: item.id,
+      student_name: item.studentName || '',
+      application_no: item.applicationNo || '',
+      course: item.course || '',
+      category: item.category || '',
+      allotted_seat_type: item.allottedSeatType || '',
+      allocation_date: item.allocationDate || '',
+      reporting_date: item.reportingDate || '',
+      status: item.status || '',
+      fees_paid: item.feesPaid || false
+    });
+  }
+
   getAllSeatAllocations(): Observable<SeatAllocation[]> {
-    this.dataChange.next(this.staticData);
-    return of(this.staticData);
+    const body = {
+      query: `
+        query GetSeatAllocations {
+          seatAllocations {
+            id
+            studentName
+            applicationNo
+            course
+            category
+            allottedSeatType
+            allocationDate
+            reportingDate
+            status
+            feesPaid
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch seat allocations');
+        }
+        const list = res.data.seatAllocations || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   addSeatAllocation(seatAllocation: SeatAllocation): Observable<SeatAllocation> {
-    this.staticData.push(seatAllocation);
-    this.dataChange.next(this.staticData);
-    return of(seatAllocation);
+    const body = {
+      query: `
+        mutation CreateSeatAllocation($input: CreateSeatAllocationInput!) {
+          createSeatAllocation(input: $input) {
+            id
+            studentName
+            applicationNo
+            course
+            category
+            allottedSeatType
+            allocationDate
+            reportingDate
+            status
+            feesPaid
+          }
+        }
+      `,
+      variables: {
+        input: {
+          studentName: seatAllocation.student_name,
+          applicationNo: seatAllocation.application_no,
+          course: seatAllocation.course,
+          category: seatAllocation.category,
+          allottedSeatType: seatAllocation.allotted_seat_type,
+          allocationDate: seatAllocation.allocation_date,
+          reportingDate: seatAllocation.reporting_date,
+          status: seatAllocation.status,
+          feesPaid: !!seatAllocation.fees_paid
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create seat allocation entry');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createSeatAllocation);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   updateSeatAllocation(seatAllocation: SeatAllocation): Observable<SeatAllocation> {
-    const index = this.staticData.findIndex((item) => item.id === seatAllocation.id);
-    if (index !== -1) {
-      this.staticData[index] = seatAllocation;
-      this.dataChange.next(this.staticData);
-    }
-    return of(seatAllocation);
+    const body = {
+      query: `
+        mutation UpdateSeatAllocation($input: UpdateSeatAllocationInput!) {
+          updateSeatAllocation(input: $input) {
+            id
+            studentName
+            applicationNo
+            course
+            category
+            allottedSeatType
+            allocationDate
+            reportingDate
+            status
+            feesPaid
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(seatAllocation.id),
+          studentName: seatAllocation.student_name,
+          applicationNo: seatAllocation.application_no,
+          course: seatAllocation.course,
+          category: seatAllocation.category,
+          allottedSeatType: seatAllocation.allotted_seat_type,
+          allocationDate: seatAllocation.allocation_date,
+          reportingDate: seatAllocation.reporting_date,
+          status: seatAllocation.status,
+          feesPaid: !!seatAllocation.fees_paid
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update seat allocation entry');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateSeatAllocation);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
-  deleteSeatAllocation(id: number): Observable<number> {
-    const index = this.staticData.findIndex((item) => item.id === id);
-    if (index !== -1) {
-      this.staticData.splice(index, 1);
-      this.dataChange.next(this.staticData);
-    }
-    return of(id);
+  deleteSeatAllocation(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteSeatAllocation($id: String!) {
+          deleteSeatAllocation(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete seat allocation entry');
+        }
+        return res.data.deleteSeatAllocation;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }
