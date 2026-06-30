@@ -11,7 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 
 export interface DialogData {
-  id: number;
+  id: string | number;
   action: string;
   resultGeneration: ResultGeneration;
 }
@@ -73,12 +73,22 @@ export class FormDialogComponent {
     if (this.resultGenerationForm.valid) {
       const resultGenerationData = this.resultGenerationForm.getRawValue();
       if (this.action === 'edit') {
-        this.resultGenerationService.updateResultGeneration(resultGenerationData).subscribe(() => {
-          this.dialogRef.close(resultGenerationData);
+        this.resultGenerationService.updateResultGeneration(resultGenerationData).subscribe({
+          next: (response: ResultGeneration) => {
+            this.dialogRef.close(response);
+          },
+          error: (err: Error) => {
+            console.error('Update error:', err);
+          }
         });
       } else {
-        this.resultGenerationService.addResultGeneration(resultGenerationData).subscribe(() => {
-          this.dialogRef.close(resultGenerationData);
+        this.resultGenerationService.addResultGeneration(resultGenerationData).subscribe({
+          next: (response: ResultGeneration) => {
+            this.dialogRef.close(response);
+          },
+          error: (err: Error) => {
+            console.error('Create error:', err);
+          }
         });
       }
     }

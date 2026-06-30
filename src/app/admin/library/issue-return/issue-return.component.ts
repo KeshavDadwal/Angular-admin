@@ -87,7 +87,7 @@ export class IssueReturnComponent implements OnInit, OnDestroy {
   loadData() {
     this.isLoading = true;
     this.issueReturnService.getAllIssueReturns().subscribe({
-      next: (data) => {
+      next: (data: IssueReturn[]) => {
         this.dataSource.data = data;
         this.isLoading = false;
         this.dataSource.filterPredicate = (data: IssueReturn, filter: string) =>
@@ -95,7 +95,7 @@ export class IssueReturnComponent implements OnInit, OnDestroy {
             value ? value.toString().toLowerCase().includes(filter) : false
           );
       },
-      error: (err) => {
+      error: (err: Error) => {
         console.error(err);
         this.isLoading = false;
       },
@@ -111,7 +111,8 @@ export class IssueReturnComponent implements OnInit, OnDestroy {
   }
 
   openDialog(action: 'add' | 'edit', data?: IssueReturn) {
-    const varDirection: Direction = this.localStorageService.get('isRtl') === 'true' ? 'rtl' : 'ltr';
+    const varDirection: Direction =
+      this.localStorageService.get('isRtl') === 'true' ? 'rtl' : 'ltr';
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '60vw',
       maxWidth: '100vw',
@@ -151,32 +152,46 @@ export class IssueReturnComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(DeleteComponent, {
       data: row,
     });
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.dataSource.data = this.dataSource.data.filter(
-          (record) => record.id !== row.id
-        );
-        this.showNotification(
-          'snackbar-danger',
-          'Delete Record Successfully...!!!',
-          'bottom',
-          'center'
-        );
+        this.issueReturnService.deleteIssueReturn(row.id).subscribe({
+          next: () => {
+            this.dataSource.data = this.dataSource.data.filter(
+              (record) => record.id !== row.id
+            );
+            this.showNotification(
+              'snackbar-danger',
+              'Delete Record Successfully...!!!',
+              'bottom',
+              'center'
+            );
+          },
+          error: (error: Error) => {
+            console.error('Delete Error:', error);
+          },
+        });
       }
     });
   }
 
   handleBulkDelete(selectedRows: IssueReturn[]) {
-    const totalSelect = selectedRows.length;
-    this.dataSource.data = this.dataSource.data.filter(
-      (item) => !selectedRows.includes(item)
-    );
-    this.showNotification(
-      'snackbar-danger',
-      `${totalSelect} Record(s) Deleted Successfully...!!!`,
-      'bottom',
-      'center'
-    );
+    const ids = selectedRows.map((r) => r.id);
+    this.issueReturnService.deleteMultipleIssueReturns(ids).subscribe({
+      next: () => {
+        this.dataSource.data = this.dataSource.data.filter(
+          (item) => !selectedRows.includes(item)
+        );
+        this.showNotification(
+          'snackbar-danger',
+          `${ids.length} Record(s) Deleted Successfully...!!!`,
+          'bottom',
+          'center'
+        );
+      },
+      error: (err: Error) => {
+        console.error('Bulk delete error:', err);
+      }
+    });
   }
 
   showNotification(

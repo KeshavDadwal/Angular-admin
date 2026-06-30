@@ -1,7 +1,7 @@
 import { formatDate } from '@angular/common';
 
 export class AllAssets {
-  id: number;
+  id: string | number;
   no: string;
   title: string;
   subject: string;
@@ -9,13 +9,13 @@ export class AllAssets {
   department: string;
   type: string;
   status: string;
-  last_borrowed: string | '';
-  borrower_name: string | '';
-  due_date: string | '';
+  last_borrowed: string;
+  borrower_name: string;
+  due_date: string;
   shelf_location: string;
 
   constructor(allAssets: Partial<AllAssets>) {
-    this.id = allAssets.id || this.getRandomID();
+    this.id = allAssets.id || '';
     this.no = allAssets.no || '';
     this.title = allAssets.title || '';
     this.subject = allAssets.subject || '';
@@ -28,12 +28,5 @@ export class AllAssets {
     this.borrower_name = allAssets.borrower_name || '';
     this.due_date = allAssets.due_date || '';
     this.shelf_location = allAssets.shelf_location || '';
-  }
-
-  public getRandomID(): number {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
-    };
-    return S4() + S4();
   }
 }

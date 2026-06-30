@@ -1,111 +1,214 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
 import { IssueReturn } from './issue-return.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class IssueReturnService {
-  private readonly staticData: any[] = [
-    {
-      id: 1,
-      book_no: 'B101',
-      book_title: 'Introduction to Algorithms',
-      student_name: 'John Doe',
-      roll_no: 'CS001',
-      issue_date: '2023-12-01',
-      return_date: '2023-12-15',
-      status: 'Returned',
-    },
-    {
-      id: 2,
-      book_no: 'B105',
-      book_title: 'Modern Operating Systems',
-      student_name: 'Jane Smith',
-      roll_no: 'CS002',
-      issue_date: '2023-12-05',
-      return_date: '2023-12-20',
-      status: 'Issued',
-    },
-    {
-      id: 3,
-      book_no: 'B110',
-      book_title: 'Database System Concepts',
-      student_name: 'Robert Brown',
-      roll_no: 'CS003',
-      issue_date: '2023-11-20',
-      return_date: '2023-12-05',
-      status: 'Overdue',
-    },
-    {
-      id: 4,
-      book_no: 'B115',
-      book_title: 'Computer Networks',
-      student_name: 'Emily Davis',
-      roll_no: 'CS004',
-      issue_date: '2023-12-10',
-      return_date: '2023-12-25',
-      status: 'Issued',
-    },
-    {
-      id: 5,
-      book_no: 'B120',
-      book_title: 'Software Engineering',
-      student_name: 'Michael Wilson',
-      roll_no: 'CS005',
-      issue_date: '2023-12-15',
-      return_date: '2023-12-30',
-      status: 'Issued',
-    },
-  ];
+  private httpClient = inject(HttpClient);
 
-  dataChange: BehaviorSubject<IssueReturn[]> = new BehaviorSubject<IssueReturn[]>(
-    []
-  );
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
-  constructor() {}
+  dataChange: BehaviorSubject<IssueReturn[]> = new BehaviorSubject<IssueReturn[]>([]);
+  dialogData!: IssueReturn;
 
   get data(): IssueReturn[] {
     return this.dataChange.value;
   }
 
+  getDialogData(): IssueReturn {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): IssueReturn {
+    return new IssueReturn({
+      id: item.id,
+      book_no: item.bookNo || '',
+      book_title: item.bookTitle || '',
+      student_name: item.studentName || '',
+      roll_no: item.rollNo || '',
+      issue_date: item.issueDate || '',
+      return_date: item.returnDate || '',
+      status: item.status || '',
+    });
+  }
+
   getAllIssueReturns(): Observable<IssueReturn[]> {
-    this.dataChange.next(this.staticData);
-    return of(this.staticData);
+    const body = {
+      query: `
+        query GetIssueReturns {
+          issueReturns {
+            id
+            bookNo
+            bookTitle
+            studentName
+            rollNo
+            issueDate
+            returnDate
+            status
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch issue returns');
+        }
+        const list = res.data.issueReturns || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   addIssueReturn(issueReturn: IssueReturn): Observable<IssueReturn> {
-    this.staticData.push(issueReturn);
-    this.dataChange.next(this.staticData);
-    return of(issueReturn);
+    const body = {
+      query: `
+        mutation CreateIssueReturn($input: CreateIssueReturnInput!) {
+          createIssueReturn(input: $input) {
+            id
+            bookNo
+            bookTitle
+            studentName
+            rollNo
+            issueDate
+            returnDate
+            status
+          }
+        }
+      `,
+      variables: {
+        input: {
+          bookNo: issueReturn.book_no,
+          bookTitle: issueReturn.book_title,
+          studentName: issueReturn.student_name,
+          rollNo: issueReturn.roll_no,
+          issueDate: issueReturn.issue_date || '',
+          returnDate: issueReturn.return_date || '',
+          status: issueReturn.status,
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create issue return');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createIssueReturn);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   updateIssueReturn(issueReturn: IssueReturn): Observable<IssueReturn> {
-    const index = this.staticData.findIndex((it) => it.id === issueReturn.id);
-    if (index !== -1) {
-      this.staticData[index] = issueReturn;
-      this.dataChange.next(this.staticData);
-    }
-    return of(issueReturn);
-  }
-
-  deleteIssueReturn(id: number): Observable<number> {
-    const index = this.staticData.findIndex((it) => it.id === id);
-    if (index !== -1) {
-      this.staticData.splice(index, 1);
-      this.dataChange.next(this.staticData);
-    }
-    return of(id);
-  }
-
-  deleteMultipleIssueReturns(ids: number[]): Observable<number[]> {
-    ids.forEach((id) => {
-      const index = this.staticData.findIndex((it) => it.id === id);
-      if (index !== -1) {
-        this.staticData.splice(index, 1);
+    const body = {
+      query: `
+        mutation UpdateIssueReturn($input: UpdateIssueReturnInput!) {
+          updateIssueReturn(input: $input) {
+            id
+            bookNo
+            bookTitle
+            studentName
+            rollNo
+            issueDate
+            returnDate
+            status
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(issueReturn.id),
+          bookNo: issueReturn.book_no,
+          bookTitle: issueReturn.book_title,
+          studentName: issueReturn.student_name,
+          rollNo: issueReturn.roll_no,
+          issueDate: issueReturn.issue_date || '',
+          returnDate: issueReturn.return_date || '',
+          status: issueReturn.status,
+        }
       }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update issue return');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateIssueReturn);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  deleteIssueReturn(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteIssueReturn($id: String!) {
+          deleteIssueReturn(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete issue return');
+        }
+        return res.data.deleteIssueReturn;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  deleteMultipleIssueReturns(ids: (string | number)[]): Observable<string[]> {
+    // Return all deleted ids after deleting sequentially
+    const obsList = ids.map((id) => this.deleteIssueReturn(id));
+    return new Observable<string[]>((observer) => {
+      let completedCount = 0;
+      const results: string[] = [];
+      if (ids.length === 0) {
+        observer.next([]);
+        observer.complete();
+        return;
+      }
+      ids.forEach((id) => {
+        this.deleteIssueReturn(id).subscribe({
+          next: (deletedId) => {
+            results.push(deletedId);
+            completedCount++;
+            if (completedCount === ids.length) {
+              observer.next(results);
+              observer.complete();
+            }
+          },
+          error: (err) => {
+            observer.error(err);
+          }
+        });
+      });
     });
-    this.dataChange.next(this.staticData);
-    return of(ids);
+  }
+
+  private handleError(error: HttpErrorResponse | Error) {
+    const msg = error instanceof HttpErrorResponse ? error.message : error.message;
+    console.error('An error occurred:', msg);
+    return throwError(() => new Error('Something went wrong; please try again later.'));
   }
 }

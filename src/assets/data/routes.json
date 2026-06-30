@@ -470,77 +470,6 @@
     },
     {
       "path": "",
-      "title": "MENUITEMS.COURSES.TEXT",
-      "iconType": "material-icons-outlined",
-      "icon": "school",
-      "class": "menu-toggle",
-      "groupTitle": false,
-      "badge": "",
-      "badgeClass": "",
-      "role": [
-        "ADMIN"
-      ],
-      "submenu": [
-        {
-          "path": "/admin/courses/all-courses",
-          "title": "MENUITEMS.COURSES.LIST.ALL-COURSES",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/courses/add-course",
-          "title": "MENUITEMS.COURSES.LIST.ADD-COURSE",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/courses/edit-course",
-          "title": "MENUITEMS.COURSES.LIST.EDIT-COURSE",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/courses/about-course",
-          "title": "MENUITEMS.COURSES.LIST.ABOUT-COURSE",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        }
-      ]
-    },
-    {
-      "path": "",
       "title": "MENUITEMS.LIBRARY.TEXT",
       "iconType": "material-icons-outlined",
       "icon": "local_library",
@@ -555,34 +484,6 @@
         {
           "path": "/admin/library/all-assets",
           "title": "MENUITEMS.LIBRARY.LIST.ALL-LIBRARY",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/library/add-asset",
-          "title": "MENUITEMS.LIBRARY.LIST.ADD-LIBRARY",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/library/edit-asset",
-          "title": "MENUITEMS.LIBRARY.LIST.EDIT-LIBRARY",
           "iconType": "",
           "icon": "",
           "class": "ml-menu",

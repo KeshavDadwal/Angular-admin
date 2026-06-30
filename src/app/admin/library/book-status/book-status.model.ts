@@ -1,8 +1,8 @@
 import { formatDate } from '@angular/common';
 
 export class BookStatus {
-  bookStatusID: number;
-  bookID: number;
+  bookStatusID: string | number;
+  bookID: string | number;
   bookName: string;
   status: string;
   dateUpdated: string;
@@ -15,27 +15,19 @@ export class BookStatus {
   notes: string;
 
   constructor(bookStatusData: Partial<BookStatus> = {}) {
-    this.bookStatusID = bookStatusData.bookStatusID || this.getRandomID();
-    this.bookID = bookStatusData.bookID || 0;
+    this.bookStatusID = bookStatusData.bookStatusID || '';
+    this.bookID = bookStatusData.bookID || '';
     this.bookName = bookStatusData.bookName || '';
     this.status = bookStatusData.status || 'Available';
     this.dateUpdated =
       bookStatusData.dateUpdated || formatDate(new Date(), 'yyyy-MM-dd', 'en');
     this.lastCheckedOutDate =
-      bookStatusData.lastCheckedOutDate ||
-      formatDate(new Date(), 'yyyy-MM-dd', 'en');
-    this.dueDate =
-      bookStatusData.dueDate || formatDate(new Date(), 'yyyy-MM-dd', 'en');
+      bookStatusData.lastCheckedOutDate || '';
+    this.dueDate = bookStatusData.dueDate || '';
     this.checkedOutBy = bookStatusData.checkedOutBy || '';
     this.reservedBy = bookStatusData.reservedBy || '';
     this.condition = bookStatusData.condition || 'Good';
-    this.returnDate =
-      bookStatusData.returnDate || formatDate(new Date(), 'yyyy-MM-dd', 'en');
+    this.returnDate = bookStatusData.returnDate || '';
     this.notes = bookStatusData.notes || '';
-  }
-
-  // Optional: Method to generate a random ID if needed
-  public getRandomID(): number {
-    return Math.floor(Math.random() * 1000000);
   }
 }

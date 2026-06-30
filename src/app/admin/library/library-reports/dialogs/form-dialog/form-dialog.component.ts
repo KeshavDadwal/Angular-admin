@@ -11,7 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 
 export interface DialogData {
-  id: number;
+  id: string | number;
   action: string;
   libraryReport: LibraryReport;
 }
@@ -72,12 +72,22 @@ export class FormDialogComponent {
     if (this.libraryReportForm.valid) {
       const libraryReportData = this.libraryReportForm.getRawValue();
       if (this.action === 'edit') {
-        this.libraryReportService.updateLibraryReport(libraryReportData).subscribe(() => {
-          this.dialogRef.close(libraryReportData);
+        this.libraryReportService.updateLibraryReport(libraryReportData).subscribe({
+          next: (response) => {
+            this.dialogRef.close(response);
+          },
+          error: (err: Error) => {
+            console.error('Update Error:', err);
+          }
         });
       } else {
-        this.libraryReportService.addLibraryReport(libraryReportData).subscribe(() => {
-          this.dialogRef.close(libraryReportData);
+        this.libraryReportService.addLibraryReport(libraryReportData).subscribe({
+          next: (response) => {
+            this.dialogRef.close(response);
+          },
+          error: (err: Error) => {
+            console.error('Add Error:', err);
+          }
         });
       }
     }
@@ -87,3 +97,4 @@ export class FormDialogComponent {
     this.dialogRef.close();
   }
 }
+

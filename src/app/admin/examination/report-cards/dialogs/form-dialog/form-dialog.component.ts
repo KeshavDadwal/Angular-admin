@@ -10,7 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 
 export interface DialogData {
-  id: number;
+  id: string | number;
   action: string;
   reportCard: ReportCard;
 }
@@ -73,12 +73,22 @@ export class FormDialogComponent {
     if (this.reportCardForm.valid) {
       const reportCardData = this.reportCardForm.getRawValue();
       if (this.action === 'edit') {
-        this.reportCardsService.updateReportCard(reportCardData).subscribe(() => {
-          this.dialogRef.close(reportCardData);
+        this.reportCardsService.updateReportCard(reportCardData).subscribe({
+          next: (response: ReportCard) => {
+            this.dialogRef.close(response);
+          },
+          error: (err: Error) => {
+            console.error('Update error:', err);
+          }
         });
       } else {
-        this.reportCardsService.addReportCard(reportCardData).subscribe(() => {
-          this.dialogRef.close(reportCardData);
+        this.reportCardsService.addReportCard(reportCardData).subscribe({
+          next: (response: ReportCard) => {
+            this.dialogRef.close(response);
+          },
+          error: (err: Error) => {
+            console.error('Create error:', err);
+          }
         });
       }
     }

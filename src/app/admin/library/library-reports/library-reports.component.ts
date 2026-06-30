@@ -88,7 +88,7 @@ export class LibraryReportsComponent implements OnInit, OnDestroy {
   loadData() {
     this.isLoading = true;
     this.libraryReportService.getAllLibraryReports().subscribe({
-      next: (data) => {
+      next: (data: LibraryReport[]) => {
         this.dataSource.data = data;
         this.isLoading = false;
         this.dataSource.filterPredicate = (data: LibraryReport, filter: string) =>
@@ -96,7 +96,7 @@ export class LibraryReportsComponent implements OnInit, OnDestroy {
             value ? value.toString().toLowerCase().includes(filter) : false
           );
       },
-      error: (err) => {
+      error: (err: Error) => {
         console.error(err);
         this.isLoading = false;
       },
@@ -112,7 +112,8 @@ export class LibraryReportsComponent implements OnInit, OnDestroy {
   }
 
   openDialog(action: 'add' | 'edit', data?: LibraryReport) {
-    const varDirection: Direction = this.localStorageService.get('isRtl') === 'true' ? 'rtl' : 'ltr';
+    const varDirection: Direction =
+      this.localStorageService.get('isRtl') === 'true' ? 'rtl' : 'ltr';
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '60vw',
       maxWidth: '100vw',
@@ -152,32 +153,46 @@ export class LibraryReportsComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(DeleteComponent, {
       data: row,
     });
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.dataSource.data = this.dataSource.data.filter(
-          (record) => record.id !== row.id
-        );
-        this.showNotification(
-          'snackbar-danger',
-          'Delete Record Successfully...!!!',
-          'bottom',
-          'center'
-        );
+        this.libraryReportService.deleteLibraryReport(row.id).subscribe({
+          next: () => {
+            this.dataSource.data = this.dataSource.data.filter(
+              (record) => record.id !== row.id
+            );
+            this.showNotification(
+              'snackbar-danger',
+              'Delete Record Successfully...!!!',
+              'bottom',
+              'center'
+            );
+          },
+          error: (error: Error) => {
+            console.error('Delete Error:', error);
+          },
+        });
       }
     });
   }
 
   handleBulkDelete(selectedRows: LibraryReport[]) {
-    const totalSelect = selectedRows.length;
-    this.dataSource.data = this.dataSource.data.filter(
-      (item) => !selectedRows.includes(item)
-    );
-    this.showNotification(
-      'snackbar-danger',
-      `${totalSelect} Record(s) Deleted Successfully...!!!`,
-      'bottom',
-      'center'
-    );
+    const ids = selectedRows.map((r) => r.id);
+    this.libraryReportService.deleteMultipleLibraryReports(ids).subscribe({
+      next: () => {
+        this.dataSource.data = this.dataSource.data.filter(
+          (item) => !selectedRows.includes(item)
+        );
+        this.showNotification(
+          'snackbar-danger',
+          `${ids.length} Record(s) Deleted Successfully...!!!`,
+          'bottom',
+          'center'
+        );
+      },
+      error: (err: Error) => {
+        console.error('Bulk delete error:', err);
+      }
+    });
   }
 
   showNotification(

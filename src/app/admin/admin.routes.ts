@@ -36,11 +36,6 @@ export const ADMIN_ROUTE: Route[] = [
       ),
   },
   {
-    path: 'courses',
-    loadChildren: () =>
-      import('./courses/courses.routes').then((m) => m.COURSE_ROUTE),
-  },
-  {
     path: 'library',
     loadChildren: () =>
       import('./library/library.routes').then((m) => m.LIBRARY_ROUTE),

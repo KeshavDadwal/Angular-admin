@@ -1,118 +1,173 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import {
-  ResultGeneration,
-  ResultGenerationData,
-} from './result-generation.model';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
+import { ResultGeneration } from './result-generation.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ResultGenerationService {
-  private readonly staticData: any[] = [
-    new ResultGeneration({
-      id: 1,
-      exam_name: 'Mid-Term Jan 2024',
-      course: 'B.Tech',
-      semester: 'Sem 1',
-      result_date: '2024-02-15',
-      status: 'Published',
-    }),
-    new ResultGeneration({
-      id: 2,
-      exam_name: 'Mid-Term Jan 2024',
-      course: 'MBA',
-      semester: 'Sem 2',
-      result_date: '2024-02-20',
-      status: 'Published',
-    }),
-    new ResultGeneration({
-      id: 3,
-      exam_name: 'Final Exam May 2024',
-      course: 'B.Com',
-      semester: 'Sem 3',
-      result_date: '2024-06-10',
-      status: 'Pending',
-    }),
-    new ResultGeneration({
-      id: 4,
-      exam_name: 'Entrance Test 2024',
-      course: 'All',
-      semester: 'N/A',
-      result_date: '2024-04-05',
-      status: 'Published',
-    }),
-    new ResultGeneration({
-      id: 5,
-      exam_name: 'Internal Assessment 1',
-      course: 'B.Tech',
-      semester: 'Sem 4',
-      result_date: '2024-02-05',
-      status: 'Published',
-    }),
-    new ResultGeneration({
-      id: 6,
-      exam_name: 'Quarterly Exam',
-      course: 'School',
-      semester: 'Class 10',
-      result_date: '2024-07-01',
-      status: 'Pending',
-    }),
-  ];
+  private httpClient = inject(HttpClient);
 
-  dataChange: BehaviorSubject<ResultGeneration[]> = new BehaviorSubject<
-    ResultGeneration[]
-  >([]);
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
-  constructor() {}
+  dataChange: BehaviorSubject<ResultGeneration[]> = new BehaviorSubject<ResultGeneration[]>([]);
+  dialogData!: ResultGeneration;
 
   get data(): ResultGeneration[] {
     return this.dataChange.value;
   }
 
-  getAllResultGenerations(): Observable<ResultGeneration[]> {
-    this.dataChange.next(this.staticData);
-    return of(this.staticData);
+  getDialogData(): ResultGeneration {
+    return this.dialogData;
   }
 
-  addResultGeneration(
-    resultGeneration: ResultGeneration
-  ): Observable<ResultGeneration> {
-    this.staticData.push(resultGeneration);
-    this.dataChange.next(this.staticData);
-    return of(resultGeneration);
-  }
-
-  updateResultGeneration(
-    resultGeneration: ResultGeneration
-  ): Observable<ResultGeneration> {
-    const index = this.staticData.findIndex(
-      (it) => it.id === resultGeneration.id
-    );
-    if (index !== -1) {
-      this.staticData[index] = resultGeneration;
-      this.dataChange.next(this.staticData);
-    }
-    return of(resultGeneration);
-  }
-
-  deleteResultGeneration(id: number): Observable<number> {
-    const index = this.staticData.findIndex((it) => it.id === id);
-    if (index !== -1) {
-      this.staticData.splice(index, 1);
-      this.dataChange.next(this.staticData);
-    }
-    return of(id);
-  }
-
-  deleteMultipleResultGenerations(ids: number[]): Observable<number[]> {
-    ids.forEach((id) => {
-      const index = this.staticData.findIndex((it) => it.id === id);
-      if (index !== -1) {
-        this.staticData.splice(index, 1);
-      }
+  private mapGraphQLToModel(item: any): ResultGeneration {
+    return new ResultGeneration({
+      id: item.id,
+      exam_name: item.examName || '',
+      course: item.course || '',
+      semester: item.semester || '',
+      result_date: item.resultDate || '',
+      status: item.status || '',
     });
-    this.dataChange.next(this.staticData);
-    return of(ids);
+  }
+
+  getAllResultGenerations(): Observable<ResultGeneration[]> {
+    const body = {
+      query: `
+        query GetResultGenerations {
+          resultGenerations {
+            id
+            examName
+            course
+            semester
+            resultDate
+            status
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch result generations');
+        }
+        const list = res.data.resultGenerations || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  addResultGeneration(resultGeneration: ResultGeneration): Observable<ResultGeneration> {
+    const body = {
+      query: `
+        mutation CreateResultGeneration($input: CreateResultGenerationInput!) {
+          createResultGeneration(input: $input) {
+            id
+            examName
+            course
+            semester
+            resultDate
+            status
+          }
+        }
+      `,
+      variables: {
+        input: {
+          examName: resultGeneration.exam_name,
+          course: resultGeneration.course,
+          semester: resultGeneration.semester,
+          resultDate: resultGeneration.result_date,
+          status: resultGeneration.status,
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create result generation');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createResultGeneration);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  updateResultGeneration(resultGeneration: ResultGeneration): Observable<ResultGeneration> {
+    const body = {
+      query: `
+        mutation UpdateResultGeneration($input: UpdateResultGenerationInput!) {
+          updateResultGeneration(input: $input) {
+            id
+            examName
+            course
+            semester
+            resultDate
+            status
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(resultGeneration.id),
+          examName: resultGeneration.exam_name,
+          course: resultGeneration.course,
+          semester: resultGeneration.semester,
+          resultDate: resultGeneration.result_date,
+          status: resultGeneration.status,
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update result generation');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateResultGeneration);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  deleteResultGeneration(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteResultGeneration($id: String!) {
+          deleteResultGeneration(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete result generation');
+        }
+        return res.data.deleteResultGeneration;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

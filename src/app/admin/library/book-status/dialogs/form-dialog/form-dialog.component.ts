@@ -25,7 +25,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { formatDate } from '@angular/common';
 
 export interface DialogData {
-  id: number;
+  id: string | number;
   action: string;
   bookStatus: BookStatus;
 }
@@ -75,6 +75,15 @@ export class BookStatusFormComponent {
   }
 
   createContactForm(): UntypedFormGroup {
+    const formatDateHelper = (dateStr: string, formatStr: string) => {
+      if (!dateStr) return '';
+      try {
+        return formatDate(dateStr, formatStr, 'en');
+      } catch (e) {
+        return '';
+      }
+    };
+
     return this.fb.group({
       bookStatusID: [this.bookStatus.bookStatusID],
       bookID: [this.bookStatus.bookID, [Validators.required]],
@@ -84,19 +93,19 @@ export class BookStatusFormComponent {
         [Validators.required, Validators.maxLength(50)],
       ],
       dateUpdated: [
-        formatDate(this.bookStatus.dateUpdated, 'yyyy-MM-dd HH:mm:ss', 'en'),
+        formatDateHelper(this.bookStatus.dateUpdated, 'yyyy-MM-dd HH:mm:ss'),
       ],
       lastCheckedOutDate: [
-        formatDate(this.bookStatus.lastCheckedOutDate, 'yyyy-MM-dd', 'en'),
+        formatDateHelper(this.bookStatus.lastCheckedOutDate, 'yyyy-MM-dd'),
       ],
-      dueDate: [formatDate(this.bookStatus.dueDate, 'yyyy-MM-dd', 'en')],
+      dueDate: [formatDateHelper(this.bookStatus.dueDate, 'yyyy-MM-dd')],
       checkedOutBy: [this.bookStatus.checkedOutBy, [Validators.maxLength(100)]],
       reservedBy: [this.bookStatus.reservedBy, [Validators.maxLength(100)]],
       condition: [
         this.bookStatus.condition || 'Good',
         [Validators.maxLength(50)],
       ],
-      returnDate: [formatDate(this.bookStatus.returnDate, 'yyyy-MM-dd', 'en')],
+      returnDate: [formatDateHelper(this.bookStatus.returnDate, 'yyyy-MM-dd')],
       notes: [this.bookStatus.notes, [Validators.maxLength(500)]],
     });
   }
@@ -120,7 +129,6 @@ export class BookStatusFormComponent {
           },
           error: (error) => {
             console.error('Update Error:', error);
-            // Handle error appropriately
           },
         });
       } else {
@@ -130,7 +138,6 @@ export class BookStatusFormComponent {
           },
           error: (error) => {
             console.error('Add Error:', error);
-            // Handle error appropriately
           },
         });
       }

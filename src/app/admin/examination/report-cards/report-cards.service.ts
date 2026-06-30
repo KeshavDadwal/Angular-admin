@@ -1,141 +1,185 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { ReportCard, ReportCardData } from './report-cards.model';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
+import { ReportCard } from './report-cards.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ReportCardsService {
-  private readonly staticData: any[] = [
-    new ReportCard({
-      id: 1,
-      student_name: 'John Doe',
-      roll_no: 'CS101',
-      exam_name: 'Mid-Term Jan 2024',
-      total_marks: 450,
-      percentage: 90,
-      grade: 'A+',
-      result: 'Pass',
-    }),
-    new ReportCard({
-      id: 2,
-      student_name: 'Jane Smith',
-      roll_no: 'CS102',
-      exam_name: 'Mid-Term Jan 2024',
-      total_marks: 420,
-      percentage: 84,
-      grade: 'A',
-      result: 'Pass',
-    }),
-    new ReportCard({
-      id: 3,
-      student_name: 'Robert Brown',
-      roll_no: 'CS103',
-      exam_name: 'Mid-Term Jan 2024',
-      total_marks: 380,
-      percentage: 76,
-      grade: 'B+',
-      result: 'Pass',
-    }),
-    new ReportCard({
-      id: 4,
-      student_name: 'Emily Davis',
-      roll_no: 'CS104',
-      exam_name: 'Mid-Term Jan 2024',
-      total_marks: 350,
-      percentage: 70,
-      grade: 'B',
-      result: 'Pass',
-    }),
-    new ReportCard({
-      id: 5,
-      student_name: 'Michael Wilson',
-      roll_no: 'CS105',
-      exam_name: 'Mid-Term Jan 2024',
-      total_marks: 280,
-      percentage: 56,
-      grade: 'C',
-      result: 'Pass',
-    }),
-    new ReportCard({
-      id: 6,
-      student_name: 'Sarah Miller',
-      roll_no: 'ME201',
-      exam_name: 'Final Exam May 2024',
-      total_marks: 480,
-      percentage: 96,
-      grade: 'O',
-      result: 'Pass',
-    }),
-    new ReportCard({
-      id: 7,
-      student_name: 'David Taylor',
-      roll_no: 'ME202',
-      exam_name: 'Final Exam May 2024',
-      total_marks: 410,
-      percentage: 82,
-      grade: 'A',
-      result: 'Pass',
-    }),
-    new ReportCard({
-      id: 8,
-      student_name: 'Linda Garcia',
-      roll_no: 'ME203',
-      exam_name: 'Final Exam May 2024',
-      total_marks: 150,
-      percentage: 30,
-      grade: 'F',
-      result: 'Fail',
-    }),
-  ];
+  private httpClient = inject(HttpClient);
 
-  dataChange: BehaviorSubject<ReportCard[]> = new BehaviorSubject<ReportCard[]>(
-    []
-  );
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
-  constructor() {}
+  dataChange: BehaviorSubject<ReportCard[]> = new BehaviorSubject<ReportCard[]>([]);
+  dialogData!: ReportCard;
 
   get data(): ReportCard[] {
     return this.dataChange.value;
   }
 
+  getDialogData(): ReportCard {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): ReportCard {
+    return new ReportCard({
+      id: item.id,
+      student_name: item.studentName || '',
+      roll_no: item.rollNo || '',
+      exam_name: item.examName || '',
+      total_marks: item.totalMarks !== undefined ? item.totalMarks : 0,
+      percentage: item.percentage !== undefined ? item.percentage : 0,
+      grade: item.grade || '',
+      result: item.result || '',
+    });
+  }
+
   getAllReportCards(): Observable<ReportCard[]> {
-    this.dataChange.next(this.staticData);
-    return of(this.staticData);
+    const body = {
+      query: `
+        query GetReportCards {
+          reportCards {
+            id
+            studentName
+            rollNo
+            examName
+            totalMarks
+            percentage
+            grade
+            result
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch report cards');
+        }
+        const list = res.data.reportCards || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   addReportCard(reportCard: ReportCard): Observable<ReportCard> {
-    this.staticData.push(reportCard);
-    this.dataChange.next(this.staticData);
-    return of(reportCard);
+    const body = {
+      query: `
+        mutation CreateReportCard($input: CreateReportCardInput!) {
+          createReportCard(input: $input) {
+            id
+            studentName
+            rollNo
+            examName
+            totalMarks
+            percentage
+            grade
+            result
+          }
+        }
+      `,
+      variables: {
+        input: {
+          studentName: reportCard.student_name,
+          rollNo: reportCard.roll_no,
+          examName: reportCard.exam_name,
+          totalMarks: Number(reportCard.total_marks),
+          percentage: Number(reportCard.percentage),
+          grade: reportCard.grade,
+          result: reportCard.result,
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create report card');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createReportCard);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   updateReportCard(reportCard: ReportCard): Observable<ReportCard> {
-    const index = this.staticData.findIndex((it) => it.id === reportCard.id);
-    if (index !== -1) {
-      this.staticData[index] = reportCard;
-      this.dataChange.next(this.staticData);
-    }
-    return of(reportCard);
-  }
-
-  deleteReportCard(id: number): Observable<number> {
-    const index = this.staticData.findIndex((it) => it.id === id);
-    if (index !== -1) {
-      this.staticData.splice(index, 1);
-      this.dataChange.next(this.staticData);
-    }
-    return of(id);
-  }
-
-  deleteMultipleReportCards(ids: number[]): Observable<number[]> {
-    ids.forEach((id) => {
-      const index = this.staticData.findIndex((it) => it.id === id);
-      if (index !== -1) {
-        this.staticData.splice(index, 1);
+    const body = {
+      query: `
+        mutation UpdateReportCard($input: UpdateReportCardInput!) {
+          updateReportCard(input: $input) {
+            id
+            studentName
+            rollNo
+            examName
+            totalMarks
+            percentage
+            grade
+            result
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(reportCard.id),
+          studentName: reportCard.student_name,
+          rollNo: reportCard.roll_no,
+          examName: reportCard.exam_name,
+          totalMarks: Number(reportCard.total_marks),
+          percentage: Number(reportCard.percentage),
+          grade: reportCard.grade,
+          result: reportCard.result,
+        }
       }
-    });
-    this.dataChange.next(this.staticData);
-    return of(ids);
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update report card');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateReportCard);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  deleteReportCard(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteReportCard($id: String!) {
+          deleteReportCard(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete report card');
+        }
+        return res.data.deleteReportCard;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

@@ -38,12 +38,7 @@ export class BookStatusComponent implements OnInit, OnDestroy {
 
   columnDefinitions: ColumnDefinition[] = [
     { def: 'select', label: 'Checkbox', type: 'check', visible: true },
-    {
-      def: 'bookStatusID',
-      label: 'Book Status ID',
-      type: 'text',
-      visible: false,
-    },
+    { def: 'bookStatusID', label: 'Book Status ID', type: 'text', visible: false },
     { def: 'bookID', label: 'Book ID', type: 'text', visible: true },
     { def: 'bookName', label: 'Book Name', type: 'text', visible: true },
     {
@@ -60,19 +55,9 @@ export class BookStatusComponent implements OnInit, OnDestroy {
       },
     },
     { def: 'dateUpdated', label: 'Date Updated', type: 'date', visible: true },
-    {
-      def: 'lastCheckedOutDate',
-      label: 'Last Checked Out',
-      type: 'date',
-      visible: true,
-    },
+    { def: 'lastCheckedOutDate', label: 'Last Checked Out', type: 'date', visible: true },
     { def: 'dueDate', label: 'Due Date', type: 'date', visible: true },
-    {
-      def: 'checkedOutBy',
-      label: 'Checked Out By',
-      type: 'text',
-      visible: true,
-    },
+    { def: 'checkedOutBy', label: 'Checked Out By', type: 'text', visible: true },
     { def: 'reservedBy', label: 'Reserved By', type: 'text', visible: true },
     { def: 'condition', label: 'Condition', type: 'text', visible: true },
     { def: 'returnDate', label: 'Return Date', type: 'date', visible: true },
@@ -108,7 +93,7 @@ export class BookStatusComponent implements OnInit, OnDestroy {
   loadData() {
     this.isLoading = true;
     this.bookStatusService.getBookStatuses().subscribe({
-      next: (data) => {
+      next: (data: BookStatus[]) => {
         this.dataSource.data = data;
         this.isLoading = false;
         this.dataSource.filterPredicate = (data: BookStatus, filter: string) =>
@@ -116,7 +101,7 @@ export class BookStatusComponent implements OnInit, OnDestroy {
             (value) => value && value.toString().toLowerCase().includes(filter)
           );
       },
-      error: (err) => {
+      error: (err: Error) => {
         console.error(err);
         this.isLoading = false;
       },
@@ -132,7 +117,8 @@ export class BookStatusComponent implements OnInit, OnDestroy {
   }
 
   openDialog(action: 'add' | 'edit', data?: BookStatus) {
-    const varDirection: Direction = this.localStorageService.get('isRtl') === 'true' ? 'rtl' : 'ltr';
+    const varDirection: Direction =
+      this.localStorageService.get('isRtl') === 'true' ? 'rtl' : 'ltr';
     const dialogRef = this.dialog.open(BookStatusFormComponent, {
       width: '60vw',
       maxWidth: '100vw',
@@ -172,29 +158,41 @@ export class BookStatusComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(BookStatusDeleteComponent, {
       data: row,
     });
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.dataSource.data = this.dataSource.data.filter(
-          (record) => record.bookStatusID !== row.bookStatusID
-        );
-        this.showNotification(
-          'snackbar-danger',
-          'Delete Record Successfully...!!!',
-          'bottom',
-          'center'
-        );
+        this.bookStatusService.deleteBookStatus(row.bookStatusID).subscribe({
+          next: () => {
+            this.dataSource.data = this.dataSource.data.filter(
+              (record) => record.bookStatusID !== row.bookStatusID
+            );
+            this.showNotification(
+              'snackbar-danger',
+              'Delete Record Successfully...!!!',
+              'bottom',
+              'center'
+            );
+          },
+          error: (error: Error) => {
+            console.error('Delete Error:', error);
+          },
+        });
       }
     });
   }
 
   handleBulkDelete(selectedRows: BookStatus[]) {
-    const totalSelect = selectedRows.length;
+    const ids = selectedRows.map((r) => r.bookStatusID);
+    ids.forEach((id) => {
+      this.bookStatusService.deleteBookStatus(id).subscribe({
+        error: (err: Error) => console.error('Bulk delete error:', err),
+      });
+    });
     this.dataSource.data = this.dataSource.data.filter(
       (item) => !selectedRows.includes(item)
     );
     this.showNotification(
       'snackbar-danger',
-      `${totalSelect} Record(s) Deleted Successfully...!!!`,
+      `${ids.length} Record(s) Deleted Successfully...!!!`,
       'bottom',
       'center'
     );

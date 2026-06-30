@@ -24,7 +24,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string | number;
   action: string;
   allAssets: AllAssets;
 }
@@ -109,7 +109,6 @@ export class AllAssetsFormComponent {
           },
           error: (error) => {
             console.error('Update Error:', error);
-            // Handle error appropriately
           },
         });
       } else {
@@ -119,7 +118,6 @@ export class AllAssetsFormComponent {
           },
           error: (error) => {
             console.error('Add Error:', error);
-            // Handle error appropriately
           },
         });
       }

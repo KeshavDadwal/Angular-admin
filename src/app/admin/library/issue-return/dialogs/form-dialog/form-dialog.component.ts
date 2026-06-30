@@ -11,7 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 
 export interface DialogData {
-  id: number;
+  id: string | number;
   action: string;
   issueReturn: IssueReturn;
 }
@@ -75,12 +75,22 @@ export class FormDialogComponent {
     if (this.issueReturnForm.valid) {
       const issueReturnData = this.issueReturnForm.getRawValue();
       if (this.action === 'edit') {
-        this.issueReturnService.updateIssueReturn(issueReturnData).subscribe(() => {
-          this.dialogRef.close(issueReturnData);
+        this.issueReturnService.updateIssueReturn(issueReturnData).subscribe({
+          next: (response) => {
+            this.dialogRef.close(response);
+          },
+          error: (err: Error) => {
+            console.error('Update Error:', err);
+          }
         });
       } else {
-        this.issueReturnService.addIssueReturn(issueReturnData).subscribe(() => {
-          this.dialogRef.close(issueReturnData);
+        this.issueReturnService.addIssueReturn(issueReturnData).subscribe({
+          next: (response) => {
+            this.dialogRef.close(response);
+          },
+          error: (err: Error) => {
+            console.error('Add Error:', err);
+          }
         });
       }
     }
@@ -90,3 +100,4 @@ export class FormDialogComponent {
     this.dialogRef.close();
   }
 }
+
