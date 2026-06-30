@@ -10,7 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 
 export interface DialogData {
-  id: number;
+  id: string | number;
   action: string;
   hallAllocation: HallAllocation;
 }
@@ -71,12 +71,22 @@ export class FormDialogComponent {
     if (this.hallAllocationForm.valid) {
       const hallAllocationData = this.hallAllocationForm.getRawValue();
       if (this.action === 'edit') {
-        this.hallAllocationService.updateHallAllocation(hallAllocationData).subscribe(() => {
-          this.dialogRef.close(hallAllocationData);
+        this.hallAllocationService.updateHallAllocation(hallAllocationData).subscribe({
+          next: (response: any) => {
+            this.dialogRef.close(response);
+          },
+          error: (error: any) => {
+            console.error('Update Error:', error);
+          }
         });
       } else {
-        this.hallAllocationService.addHallAllocation(hallAllocationData).subscribe(() => {
-          this.dialogRef.close(hallAllocationData);
+        this.hallAllocationService.addHallAllocation(hallAllocationData).subscribe({
+          next: (response: any) => {
+            this.dialogRef.close(response);
+          },
+          error: (error: any) => {
+            console.error('Add Error:', error);
+          }
         });
       }
     }

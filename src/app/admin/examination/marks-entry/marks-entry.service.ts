@@ -1,181 +1,185 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
 import { MarksEntry } from './marks-entry.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MarksEntryService {
-  private readonly staticData: any[] = [
-    {
-      id: 1,
-      exam_name: 'Mid-Term Jan 2024',
-      student_name: 'John Doe',
-      roll_no: 'CS101',
-      subject: 'Mathematics',
-      marks_obtained: 85,
-      max_marks: 100,
-      status: 'Passed',
-    },
-    {
-      id: 2,
-      exam_name: 'Mid-Term Jan 2024',
-      student_name: 'Jane Smith',
-      roll_no: 'CS102',
-      subject: 'Mathematics',
-      marks_obtained: 92,
-      max_marks: 100,
-      status: 'Passed',
-    },
-    {
-      id: 3,
-      exam_name: 'Mid-Term Jan 2024',
-      student_name: 'Robert Brown',
-      roll_no: 'CS103',
-      subject: 'Mathematics',
-      marks_obtained: 45,
-      max_marks: 100,
-      status: 'Passed',
-    },
-    {
-      id: 4,
-      exam_name: 'Mid-Term Jan 2024',
-      student_name: 'Emily Davis',
-      roll_no: 'CS104',
-      subject: 'Physics',
-      marks_obtained: 78,
-      max_marks: 100,
-      status: 'Passed',
-    },
-    {
-      id: 5,
-      exam_name: 'Mid-Term Jan 2024',
-      student_name: 'Michael Wilson',
-      roll_no: 'CS105',
-      subject: 'Physics',
-      marks_obtained: 25,
-      max_marks: 100,
-      status: 'Failed',
-    },
-    {
-      id: 6,
-      exam_name: 'Final Exam May 2024',
-      student_name: 'Sarah Miller',
-      roll_no: 'ME201',
-      subject: 'Thermodynamics',
-      marks_obtained: 88,
-      max_marks: 100,
-      status: 'Passed',
-    },
-    {
-      id: 7,
-      exam_name: 'Final Exam May 2024',
-      student_name: 'David Taylor',
-      roll_no: 'ME202',
-      subject: 'Thermodynamics',
-      marks_obtained: 95,
-      max_marks: 100,
-      status: 'Passed',
-    },
-    {
-      id: 8,
-      exam_name: 'Final Exam May 2024',
-      student_name: 'Linda Garcia',
-      roll_no: 'ME203',
-      subject: 'Thermodynamics',
-      marks_obtained: 38,
-      max_marks: 100,
-      status: 'Passed',
-    },
-    {
-      id: 9,
-      exam_name: 'Internal Assessment 1',
-      student_name: 'James Anderson',
-      roll_no: 'EC301',
-      subject: 'Digital Logic',
-      marks_obtained: 18,
-      max_marks: 20,
-      status: 'Passed',
-    },
-    {
-      id: 10,
-      exam_name: 'Internal Assessment 1',
-      student_name: 'Barbara Thomas',
-      roll_no: 'EC302',
-      subject: 'Digital Logic',
-      marks_obtained: 15,
-      max_marks: 20,
-      status: 'Passed',
-    },
-    {
-      id: 11,
-      exam_name: 'Quarterly Exam',
-      student_name: 'William Moore',
-      roll_no: 'S101',
-      subject: 'Science',
-      marks_obtained: 65,
-      max_marks: 100,
-      status: 'Passed',
-    },
-    {
-      id: 12,
-      exam_name: 'Quarterly Exam',
-      student_name: 'Elizabeth Jackson',
-      roll_no: 'S102',
-      subject: 'Science',
-      marks_obtained: 72,
-      max_marks: 100,
-      status: 'Passed',
-    },
-  ];
+  private httpClient = inject(HttpClient);
 
-  dataChange: BehaviorSubject<MarksEntry[]> = new BehaviorSubject<MarksEntry[]>(
-    []
-  );
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
-  constructor() {}
+  dataChange: BehaviorSubject<MarksEntry[]> = new BehaviorSubject<MarksEntry[]>([]);
+  dialogData!: MarksEntry;
 
   get data(): MarksEntry[] {
     return this.dataChange.value;
   }
 
+  getDialogData(): MarksEntry {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): MarksEntry {
+    return new MarksEntry({
+      id: item.id,
+      exam_name: item.examName || '',
+      student_name: item.studentName || '',
+      roll_no: item.rollNo || '',
+      subject: item.subject || '',
+      marks_obtained: item.marksObtained !== undefined ? item.marksObtained : 0,
+      max_marks: item.maxMarks !== undefined ? item.maxMarks : 100,
+      status: item.status || ''
+    });
+  }
+
   getAllMarksEntries(): Observable<MarksEntry[]> {
-    this.dataChange.next(this.staticData);
-    return of(this.staticData);
+    const body = {
+      query: `
+        query GetMarksEntries {
+          marksEntries {
+            id
+            examName
+            studentName
+            rollNo
+            subject
+            marksObtained
+            maxMarks
+            status
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch marks entries');
+        }
+        const list = res.data.marksEntries || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   addMarksEntry(marksEntry: MarksEntry): Observable<MarksEntry> {
-    this.staticData.push(marksEntry);
-    this.dataChange.next(this.staticData);
-    return of(marksEntry);
+    const body = {
+      query: `
+        mutation CreateMarksEntry($input: CreateMarksEntryInput!) {
+          createMarksEntry(input: $input) {
+            id
+            examName
+            studentName
+            rollNo
+            subject
+            marksObtained
+            maxMarks
+            status
+          }
+        }
+      `,
+      variables: {
+        input: {
+          examName: marksEntry.exam_name,
+          studentName: marksEntry.student_name,
+          rollNo: marksEntry.roll_no,
+          subject: marksEntry.subject,
+          marksObtained: Number(marksEntry.marks_obtained),
+          maxMarks: Number(marksEntry.max_marks),
+          status: marksEntry.status
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create marks entry record');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createMarksEntry);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   updateMarksEntry(marksEntry: MarksEntry): Observable<MarksEntry> {
-    const index = this.staticData.findIndex((it) => it.id === marksEntry.id);
-    if (index !== -1) {
-      this.staticData[index] = marksEntry;
-      this.dataChange.next(this.staticData);
-    }
-    return of(marksEntry);
-  }
-
-  deleteMarksEntry(id: number): Observable<number> {
-    const index = this.staticData.findIndex((it) => it.id === id);
-    if (index !== -1) {
-      this.staticData.splice(index, 1);
-      this.dataChange.next(this.staticData);
-    }
-    return of(id);
-  }
-
-  deleteMultipleMarksEntries(ids: number[]): Observable<number[]> {
-    ids.forEach((id) => {
-      const index = this.staticData.findIndex((it) => it.id === id);
-      if (index !== -1) {
-        this.staticData.splice(index, 1);
+    const body = {
+      query: `
+        mutation UpdateMarksEntry($input: UpdateMarksEntryInput!) {
+          updateMarksEntry(input: $input) {
+            id
+            examName
+            studentName
+            rollNo
+            subject
+            marksObtained
+            maxMarks
+            status
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(marksEntry.id),
+          examName: marksEntry.exam_name,
+          studentName: marksEntry.student_name,
+          rollNo: marksEntry.roll_no,
+          subject: marksEntry.subject,
+          marksObtained: Number(marksEntry.marks_obtained),
+          maxMarks: Number(marksEntry.max_marks),
+          status: marksEntry.status
+        }
       }
-    });
-    this.dataChange.next(this.staticData);
-    return of(ids);
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update marks entry record');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateMarksEntry);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  deleteMarksEntry(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteMarksEntry($id: String!) {
+          deleteMarksEntry(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete marks entry record');
+        }
+        return res.data.deleteMarksEntry;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

@@ -10,7 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 
 export interface DialogData {
-  id: number;
+  id: string | number;
   action: string;
   marksEntry: MarksEntry;
 }
@@ -73,12 +73,22 @@ export class FormDialogComponent {
     if (this.marksEntryForm.valid) {
       const marksEntryData = this.marksEntryForm.getRawValue();
       if (this.action === 'edit') {
-        this.marksEntryService.updateMarksEntry(marksEntryData).subscribe(() => {
-          this.dialogRef.close(marksEntryData);
+        this.marksEntryService.updateMarksEntry(marksEntryData).subscribe({
+          next: (response: any) => {
+            this.dialogRef.close(response);
+          },
+          error: (error: any) => {
+            console.error('Update Error:', error);
+          }
         });
       } else {
-        this.marksEntryService.addMarksEntry(marksEntryData).subscribe(() => {
-          this.dialogRef.close(marksEntryData);
+        this.marksEntryService.addMarksEntry(marksEntryData).subscribe({
+          next: (response: any) => {
+            this.dialogRef.close(response);
+          },
+          error: (error: any) => {
+            console.error('Add Error:', error);
+          }
         });
       }
     }
