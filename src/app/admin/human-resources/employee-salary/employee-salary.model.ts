@@ -1,5 +1,5 @@
 export class EmployeeSalary {
-  id: number;
+  id: string;
   img: string;
   name: string;
   email: string;
@@ -12,8 +12,8 @@ export class EmployeeSalary {
   deductions: string;
   netSalary: string;
 
-  constructor(employeeSalary: EmployeeSalary) {
-    this.id = employeeSalary.id || this.getRandomID();
+  constructor(employeeSalary: Partial<EmployeeSalary>) {
+    this.id = employeeSalary.id || '';
     this.img = employeeSalary.img || 'assets/images/user/new.jpg';
     this.name = employeeSalary.name || '';
     this.email = employeeSalary.email || '';
@@ -25,12 +25,5 @@ export class EmployeeSalary {
     this.bonus = employeeSalary.bonus || '';
     this.deductions = employeeSalary.deductions || '';
     this.netSalary = employeeSalary.netSalary || '';
-  }
-
-  public getRandomID(): number {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
-    };
-    return S4() + S4();
   }
 }

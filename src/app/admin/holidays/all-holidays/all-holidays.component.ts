@@ -72,20 +72,25 @@ export class AllHolidaysComponent implements OnInit, OnDestroy {
 
   columnDefinitions: ColumnDefinition[] = [
     { def: 'select', label: 'Checkbox', type: 'check', visible: true },
-    { def: 'title', label: 'Title', type: 'text', visible: true },
-    { def: 'start_date', label: 'Start Date', type: 'date', visible: true },
-    { def: 'end_date', label: 'End Date', type: 'date', visible: true },
-    { def: 'type', label: 'Type', type: 'text', visible: true },
+    { def: 'holiday_name', label: 'Holiday Name', type: 'text', visible: true },
+    { def: 'date', label: 'Date', type: 'date', visible: true },
     { def: 'location', label: 'Location', type: 'text', visible: true },
-    { def: 'status', label: 'Status', type: 'text', visible: true },
-    { def: 'created_at', label: 'Created At', type: 'date', visible: false },
-    { def: 'updated_at', label: 'Updated At', type: 'date', visible: false },
+    { def: 'shift', label: 'Shift', type: 'text', visible: true },
+    { def: 'holiday_type', label: 'Type', type: 'text', visible: true },
     {
-      def: 'is_recurring',
-      label: 'Recurring',
-      type: 'text',
-      visible: false,
+      def: 'approval_status',
+      label: 'Status',
+      type: 'status',
+      visible: true,
+      statusBadgeMap: {
+        Approved: 'badge badge-solid-green',
+        Rejected: 'badge badge-solid-red',
+        Pending: 'badge badge-solid-orange',
+      },
     },
+    { def: 'details', label: 'Details', type: 'text', visible: false },
+    { def: 'created_by', label: 'Created By', type: 'text', visible: false },
+    { def: 'creation_date', label: 'Creation Date', type: 'date', visible: false },
     { def: 'actions', label: 'Actions', type: 'actionBtn', visible: true },
   ];
 
@@ -110,12 +115,16 @@ export class AllHolidaysComponent implements OnInit, OnDestroy {
   }
 
   loadData() {
+    this.isLoading = true;
     this.holidayService.getAllHolidays().subscribe({
       next: (data) => {
         this.dataSource.data = data;
         this.isLoading = false;
       },
-      error: (err) => console.error(err),
+      error: (err) => {
+        console.error(err);
+        this.isLoading = false;
+      },
     });
   }
 

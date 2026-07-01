@@ -24,27 +24,27 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   staff: Staff;
 }
 
 @Component({
-    selector: 'app-all-staff-form',
-    templateUrl: './form-dialog.component.html',
-    styleUrls: ['./form-dialog.component.scss'],
-    imports: [
-        MatButtonModule,
-        MatIconModule,
-        MatDialogContent,
-        FormsModule,
-        ReactiveFormsModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatSelectModule,
-        MatDatepickerModule,
-        MatDialogClose,
-    ]
+  selector: 'app-all-staff-form',
+  templateUrl: './form-dialog.component.html',
+  styleUrls: ['./form-dialog.component.scss'],
+  imports: [
+    MatButtonModule,
+    MatIconModule,
+    MatDialogContent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatDialogClose,
+  ],
 })
 export class AllStaffFormComponent {
   dialogRef = inject<MatDialogRef<AllStaffFormComponent>>(MatDialogRef);
@@ -69,6 +69,15 @@ export class AllStaffFormComponent {
     this.staffForm = this.createStaffForm();
   }
 
+  private safeDateFormat(dateStr: string): string {
+    if (!dateStr) return '';
+    try {
+      return formatDate(dateStr, 'yyyy-MM-dd', 'en');
+    } catch {
+      return '';
+    }
+  }
+
   // Create form group with validators
   createStaffForm(): UntypedFormGroup {
     return this.fb.group({
@@ -82,14 +91,14 @@ export class AllStaffFormComponent {
       department: [this.staff.department, [Validators.required]],
       status: [this.staff.status, [Validators.required]],
       joining_date: [
-        formatDate(this.staff.joining_date, 'yyyy-MM-dd', 'en'),
+        this.safeDateFormat(this.staff.joining_date),
         [Validators.required],
       ],
       salary: [this.staff.salary],
       experience: [this.staff.experience],
       role: [this.staff.role],
       date_of_birth: [
-        formatDate(this.staff.date_of_birth, 'yyyy-MM-dd', 'en'),
+        this.safeDateFormat(this.staff.date_of_birth),
         [Validators.required],
       ],
       gender: [this.staff.gender, [Validators.required]],
@@ -116,7 +125,7 @@ export class AllStaffFormComponent {
       if (this.action === 'edit') {
         this.staffService.updateStaff(formData).subscribe({
           next: (response) => {
-            this.dialogRef.close(response); // Close dialog and pass response
+            this.dialogRef.close(response);
           },
           error: (error) => {
             console.error('Update Error:', error);
@@ -125,7 +134,7 @@ export class AllStaffFormComponent {
       } else {
         this.staffService.addStaff(formData).subscribe({
           next: (response) => {
-            this.dialogRef.close(response); // Close dialog and pass response
+            this.dialogRef.close(response);
           },
           error: (error) => {
             console.error('Add Error:', error);

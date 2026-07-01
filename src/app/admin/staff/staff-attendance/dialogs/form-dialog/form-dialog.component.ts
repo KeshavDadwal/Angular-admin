@@ -24,28 +24,28 @@ import { StaffAttendance } from '../../staff-attendance.model';
 import { StaffAttendanceService } from '../../staff-attendance.service';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   staffAttendance: StaffAttendance;
 }
 
 @Component({
-    selector: 'app-staff-attendance-form',
-    templateUrl: './form-dialog.component.html',
-    styleUrls: ['./form-dialog.component.scss'],
-    imports: [
-        MatButtonModule,
-        MatIconModule,
-        MatDialogContent,
-        FormsModule,
-        ReactiveFormsModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatSelectModule,
-        MatOptionModule,
-        MatDatepickerModule,
-        MatDialogClose,
-    ]
+  selector: 'app-staff-attendance-form',
+  templateUrl: './form-dialog.component.html',
+  styleUrls: ['./form-dialog.component.scss'],
+  imports: [
+    MatButtonModule,
+    MatIconModule,
+    MatDialogContent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatOptionModule,
+    MatDatepickerModule,
+    MatDialogClose,
+  ],
 })
 export class StaffAttendanceFormComponent {
   dialogRef = inject<MatDialogRef<StaffAttendanceFormComponent>>(MatDialogRef);
@@ -60,51 +60,41 @@ export class StaffAttendanceFormComponent {
 
   constructor() {
     const data = this.data;
-
-    // Set the defaults
     this.action = data.action;
     this.dialogTitle =
-      this.action === 'edit' ? data.staffAttendance.name : 'New Student';
+      this.action === 'edit' ? data.staffAttendance.name : 'New Attendance';
     this.staffAttendance =
       this.action === 'edit' ? data.staffAttendance : new StaffAttendance({});
-    this.staffForm = this.createStudentForm();
+    this.staffForm = this.createStaffForm();
   }
 
-  createStudentForm(): UntypedFormGroup {
+  createStaffForm(): UntypedFormGroup {
     return this.fb.group({
-      id: [this.staffAttendance.id],
-      img: [this.staffAttendance.img],
-      name: [this.staffAttendance.name, [Validators.required]],
-      employee_id: [this.staffAttendance.employee_id, [Validators.required]],
-      designation: [this.staffAttendance.designation, [Validators.required]],
-      date: [this.staffAttendance.date, [Validators.required]],
-      check_in: [this.staffAttendance.check_in, [Validators.required]],
-      break: [this.staffAttendance.break, [Validators.required]],
-      check_out: [this.staffAttendance.check_out, [Validators.required]],
-      total: [this.staffAttendance.total, [Validators.required]],
-      shift: [this.staffAttendance.shift],
-      late_arrival: [this.staffAttendance.late_arrival],
-      early_departure: [this.staffAttendance.early_departure],
-      absence_reason: [this.staffAttendance.absence_reason],
-      overtime: [this.staffAttendance.overtime],
-      total_breaks: [this.staffAttendance.total_breaks],
-      remarks: [this.staffAttendance.remarks],
-      attendance_status: [
-        this.staffAttendance.attendance_status,
-        [Validators.required],
-      ],
-      department: [this.staffAttendance.department, [Validators.required]], // Kept department
+      id:               [this.staffAttendance.id],
+      img:              [this.staffAttendance.img],
+      name:             [this.staffAttendance.name,             [Validators.required]],
+      employee_id:      [this.staffAttendance.employee_id],
+      designation:      [this.staffAttendance.designation,      [Validators.required]],
+      date:             [this.staffAttendance.date,             [Validators.required]],
+      check_in:         [this.staffAttendance.check_in,         [Validators.required]],
+      break:            [this.staffAttendance.break,            [Validators.required]],
+      check_out:        [this.staffAttendance.check_out,        [Validators.required]],
+      total:            [this.staffAttendance.total,            [Validators.required]],
+      shift:            [this.staffAttendance.shift],
+      late_arrival:     [this.staffAttendance.late_arrival],
+      early_departure:  [this.staffAttendance.early_departure],
+      absence_reason:   [this.staffAttendance.absence_reason],
+      overtime:         [this.staffAttendance.overtime],
+      total_breaks:     [this.staffAttendance.total_breaks],
+      remarks:          [this.staffAttendance.remarks],
+      attendance_status:[this.staffAttendance.attendance_status,[Validators.required]],
+      department:       [this.staffAttendance.department,       [Validators.required]],
     });
   }
 
   getErrorMessage(control: UntypedFormControl): string {
-    if (control.hasError('required')) {
-      return 'This field is required';
-    } else if (control.hasError('email')) {
-      return 'Please enter a valid email';
-    } else if (control.hasError('pattern')) {
-      return 'Invalid mobile number';
-    }
+    if (control.hasError('required')) return 'This field is required';
+    if (control.hasError('email'))    return 'Please enter a valid email';
     return '';
   }
 
@@ -113,30 +103,20 @@ export class StaffAttendanceFormComponent {
       const formData = this.staffForm.getRawValue();
       if (this.action === 'edit') {
         this.staffAttendanceService.updateStaffAttendance(formData).subscribe({
-          next: (response) => {
-            this.dialogRef.close(response);
-          },
-          error: (error) => {
-            console.error('Update Error:', error);
-            // Optionally display an error message to the user
-          },
+          next: (response) => this.dialogRef.close(response),
+          error: (error)   => console.error('Update Error:', error),
         });
       } else {
         this.staffAttendanceService.addStaffAttendance(formData).subscribe({
-          next: (response) => {
-            this.dialogRef.close(response);
-          },
-          error: (error) => {
-            console.error('Add Error:', error);
-            // Optionally display an error message to the user
-          },
+          next: (response) => this.dialogRef.close(response),
+          error: (error)   => console.error('Add Error:', error),
         });
       }
     }
   }
 
   onNoClick(): void {
-    this.staffForm.reset(); // Reset the form
+    this.staffForm.reset();
     this.dialogRef.close();
   }
 }

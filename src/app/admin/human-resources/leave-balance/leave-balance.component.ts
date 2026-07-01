@@ -69,12 +69,20 @@ export class LeaveBalanceComponent implements OnInit, OnDestroy {
   }
 
   loadData() {
+    this.isLoading = true;
     this.leaveBalanceService.getAllLeaveBalances().subscribe({
       next: (data) => {
         this.dataSource.data = data;
         this.isLoading = false;
+        this.dataSource.filterPredicate = (row: LeaveBalance, filter: string) =>
+          Object.values(row).some((value) =>
+            value ? value.toString().toLowerCase().includes(filter) : false
+          );
       },
-      error: (err) => console.error(err),
+      error: (err) => {
+        console.error(err);
+        this.isLoading = false;
+      },
     });
   }
 
@@ -129,15 +137,20 @@ export class LeaveBalanceComponent implements OnInit, OnDestroy {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.dataSource.data = this.dataSource.data.filter(
-          (record) => record.id !== row.id
-        );
-        this.showNotification(
-          'snackbar-danger',
-          'Delete Record Successfully...!!!',
-          'bottom',
-          'center'
-        );
+        this.leaveBalanceService.deleteLeaveBalance(row.id).subscribe({
+          next: () => {
+            this.dataSource.data = this.dataSource.data.filter(
+              (record) => record.id !== row.id
+            );
+            this.showNotification(
+              'snackbar-danger',
+              'Delete Record Successfully...!!!',
+              'bottom',
+              'center'
+            );
+          },
+          error: (err) => console.error(err),
+        });
       }
     });
   }
@@ -174,15 +187,20 @@ export class LeaveBalanceComponent implements OnInit, OnDestroy {
   }
 
   handleBulkDelete(selectedRows: LeaveBalance[]) {
-    const totalSelect = selectedRows.length;
-    this.dataSource.data = this.dataSource.data.filter(
-      (item) => !selectedRows.includes(item)
-    );
-    this.showNotification(
-      'snackbar-danger',
-      `${totalSelect} Record(s) Deleted Successfully...!!!`,
-      'bottom',
-      'center'
-    );
+    const ids = selectedRows.map((r) => r.id);
+    this.leaveBalanceService.deleteMultipleLeaveBalances(ids).subscribe({
+      next: () => {
+        this.dataSource.data = this.dataSource.data.filter(
+          (item) => !selectedRows.includes(item)
+        );
+        this.showNotification(
+          'snackbar-danger',
+          `${ids.length} Record(s) Deleted Successfully...!!!`,
+          'bottom',
+          'center'
+        );
+      },
+      error: (err) => console.error(err),
+    });
   }
 }

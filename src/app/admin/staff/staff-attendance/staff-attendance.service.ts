@@ -1,91 +1,153 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { StaffAttendance } from './staff-attendance.model';
 
-@Injectable({
-  providedIn: 'root',
-})
+const GQL_URL = 'http://localhost:8080/query';
+
+@Injectable({ providedIn: 'root' })
 export class StaffAttendanceService {
-  private httpClient = inject(HttpClient);
+  private http = inject(HttpClient);
 
-  private readonly API_URL = 'assets/data/staff-attendance.json';
-  dataChange: BehaviorSubject<StaffAttendance[]> = new BehaviorSubject<
-    StaffAttendance[]
-  >([]);
+  private mapToModel(sa: any): StaffAttendance {
+    return new StaffAttendance({
+      id:               sa.id,
+      img:              sa.img,
+      name:             sa.name,
+      employee_id:      sa.employeeId,
+      designation:      sa.designation,
+      date:             sa.date,
+      check_in:         sa.checkIn,
+      break:            sa.breakTime,
+      check_out:        sa.checkOut,
+      total:            sa.total,
+      shift:            sa.shift,
+      late_arrival:     sa.lateArrival,
+      early_departure:  sa.earlyDeparture,
+      absence_reason:   sa.absenceReason,
+      overtime:         sa.overtime,
+      total_breaks:     sa.totalBreaks,
+      remarks:          sa.remarks,
+      attendance_status: sa.attendanceStatus,
+      department:       sa.department,
+    });
+  }
 
-  /** CRUD METHODS */
-
-  /** GET: Fetch all staff attendance records */
   getAllStaffAttendances(): Observable<StaffAttendance[]> {
-    // Local mock data response
-    return this.httpClient.get<StaffAttendance[]>(this.API_URL).pipe(
-      map((data) => {
-        this.dataChange.next(data); // Update the BehaviorSubject with the new data
-        return data; // Return the fetched data
-      }),
-      catchError(this.handleError)
-    );
-
-    // Commented API call
-    // return this.httpClient.get<StaffAttendance[]>(this.API_URL).pipe(
-    //   map((data) => {
-    //     this.dataChange.next(data); // Update the BehaviorSubject with the new data
-    //     return data; // Return the fetched data
-    //   }),
-    //   catchError(this.handleError)
-    // );
-  }
-
-  /** POST: Add a new staff attendance record */
-  addStaffAttendance(attendance: StaffAttendance): Observable<StaffAttendance> {
-    // Simulate adding staff attendance
-    return of(attendance).pipe(
-      map((_response) => {
-        return attendance; // Return the added attendance data
-      }),
+    const query = `{
+      staffAttendanceList {
+        id img name employeeId designation date
+        checkIn breakTime checkOut total shift
+        lateArrival earlyDeparture absenceReason overtime
+        totalBreaks remarks attendanceStatus department
+      }
+    }`;
+    return this.http.post<any>(GQL_URL, { query }).pipe(
+      map((res) => res.data.staffAttendanceList.map((s: any) => this.mapToModel(s))),
       catchError(this.handleError)
     );
   }
 
-  /** PUT: Update an existing staff attendance data */
-  updateStaffAttendance(
-    attendance: StaffAttendance
-  ): Observable<StaffAttendance> {
-    // Simulate updating staff attendance
-    return of(attendance).pipe(
-      map((_response) => {
-        return attendance; // Return the updated attendance data
-      }),
+  addStaffAttendance(sa: StaffAttendance): Observable<StaffAttendance> {
+    const mutation = `
+      mutation CreateStaffAttendance($input: CreateStaffAttendanceInput!) {
+        createStaffAttendance(input: $input) {
+          id img name employeeId designation date
+          checkIn breakTime checkOut total shift
+          lateArrival earlyDeparture absenceReason overtime
+          totalBreaks remarks attendanceStatus department
+        }
+      }`;
+    const variables = {
+      input: {
+        img:             sa.img,
+        name:            sa.name,
+        employeeId:      sa.employee_id,
+        designation:     sa.designation,
+        date:            sa.date,
+        checkIn:         sa.check_in,
+        breakTime:       sa.break,
+        checkOut:        sa.check_out,
+        total:           sa.total,
+        shift:           sa.shift,
+        lateArrival:     sa.late_arrival,
+        earlyDeparture:  sa.early_departure,
+        absenceReason:   sa.absence_reason,
+        overtime:        sa.overtime,
+        totalBreaks:     sa.total_breaks,
+        remarks:         sa.remarks,
+        attendanceStatus: sa.attendance_status,
+        department:      sa.department,
+      },
+    };
+    return this.http.post<any>(GQL_URL, { query: mutation, variables }).pipe(
+      map((res) => this.mapToModel(res.data.createStaffAttendance)),
       catchError(this.handleError)
     );
   }
 
-  /** DELETE: Remove a staff attendance record by ID */
-  deleteStaffAttendance(id: number): Observable<number> {
-    // Local mock data response
-    return of(id).pipe(
-      map(() => {
-        return id; // Return the ID of the deleted attendance record
-      }),
+  updateStaffAttendance(sa: StaffAttendance): Observable<StaffAttendance> {
+    const mutation = `
+      mutation UpdateStaffAttendance($input: UpdateStaffAttendanceInput!) {
+        updateStaffAttendance(input: $input) {
+          id img name employeeId designation date
+          checkIn breakTime checkOut total shift
+          lateArrival earlyDeparture absenceReason overtime
+          totalBreaks remarks attendanceStatus department
+        }
+      }`;
+    const variables = {
+      input: {
+        id:              sa.id,
+        img:             sa.img,
+        name:            sa.name,
+        employeeId:      sa.employee_id,
+        designation:     sa.designation,
+        date:            sa.date,
+        checkIn:         sa.check_in,
+        breakTime:       sa.break,
+        checkOut:        sa.check_out,
+        total:           sa.total,
+        shift:           sa.shift,
+        lateArrival:     sa.late_arrival,
+        earlyDeparture:  sa.early_departure,
+        absenceReason:   sa.absence_reason,
+        overtime:        sa.overtime,
+        totalBreaks:     sa.total_breaks,
+        remarks:         sa.remarks,
+        attendanceStatus: sa.attendance_status,
+        department:      sa.department,
+      },
+    };
+    return this.http.post<any>(GQL_URL, { query: mutation, variables }).pipe(
+      map((res) => this.mapToModel(res.data.updateStaffAttendance)),
       catchError(this.handleError)
     );
-
-    // Commented API call
-    // return this.httpClient.delete<void>(`${this.API_URL}`).pipe(
-    //   map(() => {
-    //     return id; // Return the ID of the deleted attendance record
-    //   }),
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** Handle Http operation that failed */
-  private handleError(error: HttpErrorResponse) {
-    console.error('An error occurred:', error.message);
-    return throwError(
-      () => new Error('Something went wrong; please try again later.')
+  deleteStaffAttendance(id: string): Observable<string> {
+    const mutation = `
+      mutation DeleteStaffAttendance($id: String!) {
+        deleteStaffAttendance(id: $id)
+      }`;
+    return this.http.post<any>(GQL_URL, { query: mutation, variables: { id } }).pipe(
+      map((res) => res.data.deleteStaffAttendance as string),
+      catchError(this.handleError)
     );
+  }
+
+  deleteMultipleStaffAttendances(ids: string[]): Observable<string[]> {
+    return new Observable((observer) => {
+      const deletions = ids.map((id) => this.deleteStaffAttendance(id).toPromise());
+      Promise.all(deletions)
+        .then(() => { observer.next(ids); observer.complete(); })
+        .catch((err) => observer.error(err));
+    });
+  }
+
+  private handleError(error: any) {
+    console.error('StaffAttendanceService error:', error);
+    return throwError(() => new Error('Something went wrong; please try again later.'));
   }
 }

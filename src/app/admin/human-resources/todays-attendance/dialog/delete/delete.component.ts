@@ -11,7 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { TodaysAttendanceService } from '../../todays-attendance.service';
 
 export interface DialogData {
-  id: number;
+  id: string;
   name: string;
   first_in: string;
   last_out: string;
@@ -37,13 +37,10 @@ export class TodayDeleteComponent {
   confirmDelete(): void {
     this.todaysAttendanceService.deleteToday(this.data.id).subscribe({
       next: (response) => {
-        // console.log('Delete Response:', response);
-        this.dialogRef.close(response); // Close with the response data
-        // Handle successful deletion, e.g., refresh the table or show a notification
+        this.dialogRef.close(response);
       },
       error: (error) => {
         console.error('Delete Error:', error);
-        // Handle the error appropriately
       },
     });
   }

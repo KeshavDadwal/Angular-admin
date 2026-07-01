@@ -37,49 +37,24 @@ export class StaffAttendanceComponent implements OnInit, OnDestroy {
   private localStorageService = inject(LocalStorageService);
 
   columnDefinitions: ColumnDefinition[] = [
-    { def: 'select', label: 'Checkbox', type: 'check', visible: true },
-    { def: 'id', label: 'ID', type: 'text', visible: false },
-    { def: 'employee_id', label: 'Employee ID', type: 'text', visible: true },
-    {
-      def: 'name',
-      label: 'Name',
-      type: 'nameWithImage',
-      visible: true,
-    },
-    { def: 'designation', label: 'Designation', type: 'text', visible: true },
-    { def: 'date', label: 'Date', type: 'date', visible: true },
-    { def: 'check_in', label: 'Check In', type: 'text', visible: true },
-    { def: 'break', label: 'Break', type: 'text', visible: true },
-    { def: 'check_out', label: 'Check Out', type: 'text', visible: true },
-    { def: 'total', label: 'Total Hours', type: 'text', visible: true },
-    { def: 'department', label: 'Department', type: 'text', visible: true },
-    { def: 'shift', label: 'Shift', type: 'text', visible: true },
-    {
-      def: 'late_arrival',
-      label: 'Late Arrival',
-      type: 'text',
-      visible: false,
-    },
-    {
-      def: 'early_departure',
-      label: 'Early Departure',
-      type: 'text',
-      visible: false,
-    },
-    {
-      def: 'absence_reason',
-      label: 'Absence Reason',
-      type: 'text',
-      visible: false,
-    },
-    { def: 'overtime', label: 'Overtime', type: 'text', visible: false },
-    {
-      def: 'total_breaks',
-      label: 'Total Breaks',
-      type: 'text',
-      visible: false,
-    },
-    { def: 'remarks', label: 'Remarks', type: 'text', visible: false },
+    { def: 'select',           label: 'Checkbox',          type: 'check',         visible: true },
+    { def: 'id',               label: 'ID',                type: 'text',          visible: false },
+    { def: 'employee_id',      label: 'Employee ID',       type: 'text',          visible: true },
+    { def: 'name',             label: 'Name',              type: 'nameWithImage', visible: true },
+    { def: 'designation',      label: 'Designation',       type: 'text',          visible: true },
+    { def: 'date',             label: 'Date',              type: 'date',          visible: true },
+    { def: 'check_in',         label: 'Check In',          type: 'text',          visible: true },
+    { def: 'break',            label: 'Break',             type: 'text',          visible: true },
+    { def: 'check_out',        label: 'Check Out',         type: 'text',          visible: true },
+    { def: 'total',            label: 'Total Hours',       type: 'text',          visible: true },
+    { def: 'department',       label: 'Department',        type: 'text',          visible: true },
+    { def: 'shift',            label: 'Shift',             type: 'text',          visible: true },
+    { def: 'late_arrival',     label: 'Late Arrival',      type: 'text',          visible: false },
+    { def: 'early_departure',  label: 'Early Departure',   type: 'text',          visible: false },
+    { def: 'absence_reason',   label: 'Absence Reason',    type: 'text',          visible: false },
+    { def: 'overtime',         label: 'Overtime',          type: 'text',          visible: false },
+    { def: 'total_breaks',     label: 'Total Breaks',      type: 'text',          visible: false },
+    { def: 'remarks',          label: 'Remarks',           type: 'text',          visible: false },
     {
       def: 'attendance_status',
       label: 'Attendance Status',
@@ -87,7 +62,7 @@ export class StaffAttendanceComponent implements OnInit, OnDestroy {
       visible: true,
       statusBadgeMap: {
         Present: 'badge badge-solid-green',
-        Absent: 'badge badge-solid-orange',
+        Absent:  'badge badge-solid-orange',
       },
     },
     { def: 'actions', label: 'Actions', type: 'actionBtn', visible: true },
@@ -124,12 +99,9 @@ export class StaffAttendanceComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.dataSource.data = data;
         this.isLoading = false;
-        this.dataSource.filterPredicate = (
-          data: StaffAttendance,
-          filter: string
-        ) =>
-          Object.values(data).some((value) =>
-            value.toString().toLowerCase().includes(filter)
+        this.dataSource.filterPredicate = (row: StaffAttendance, filter: string) =>
+          Object.values(row).some((v) =>
+            v ? v.toString().toLowerCase().includes(filter) : false
           );
       },
       error: (err) => {
@@ -148,7 +120,8 @@ export class StaffAttendanceComponent implements OnInit, OnDestroy {
   }
 
   openDialog(action: 'add' | 'edit', data?: StaffAttendance) {
-    const varDirection: Direction = this.localStorageService.get('isRtl') === 'true' ? 'rtl' : 'ltr';
+    const varDirection: Direction =
+      this.localStorageService.get('isRtl') === 'true' ? 'rtl' : 'ltr';
     const dialogRef = this.dialog.open(StaffAttendanceFormComponent, {
       width: '60vw',
       maxWidth: '100vw',
@@ -158,7 +131,6 @@ export class StaffAttendanceComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(result);
       if (result) {
         if (action === 'add') {
           this.dataSource.data = [result, ...this.dataSource.data];
@@ -191,30 +163,40 @@ export class StaffAttendanceComponent implements OnInit, OnDestroy {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.dataSource.data = this.dataSource.data.filter(
-          (record) => record.id !== row.id
-        );
-        this.showNotification(
-          'snackbar-danger',
-          'Delete Record Successfully...!!!',
-          'bottom',
-          'center'
-        );
+        this.staffAttendanceService.deleteStaffAttendance(row.id).subscribe({
+          next: () => {
+            this.dataSource.data = this.dataSource.data.filter(
+              (record) => record.id !== row.id
+            );
+            this.showNotification(
+              'snackbar-danger',
+              'Delete Record Successfully...!!!',
+              'bottom',
+              'center'
+            );
+          },
+          error: (err) => console.error('Delete error:', err),
+        });
       }
     });
   }
 
   handleBulkDelete(selectedRows: StaffAttendance[]) {
-    const totalSelect = selectedRows.length;
-    this.dataSource.data = this.dataSource.data.filter(
-      (item) => !selectedRows.includes(item)
-    );
-    this.showNotification(
-      'snackbar-danger',
-      `${totalSelect} Record(s) Deleted Successfully...!!!`,
-      'bottom',
-      'center'
-    );
+    const ids = selectedRows.map((r) => r.id);
+    this.staffAttendanceService.deleteMultipleStaffAttendances(ids).subscribe({
+      next: () => {
+        this.dataSource.data = this.dataSource.data.filter(
+          (item) => !selectedRows.includes(item)
+        );
+        this.showNotification(
+          'snackbar-danger',
+          `${ids.length} Record(s) Deleted Successfully...!!!`,
+          'bottom',
+          'center'
+        );
+      },
+      error: (err) => console.error('Bulk delete error:', err),
+    });
   }
 
   showNotification(

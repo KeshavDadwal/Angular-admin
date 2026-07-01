@@ -22,7 +22,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   employeeSalary: EmployeeSalary;
 }
@@ -108,11 +108,11 @@ export class EmployeeSalaryFormComponent {
 
   // Calculate net salary
   private calculateNetSalary(): void {
-    const salary = this.employeeSalaryForm.get('salary')?.value || 0;
-    const bonus = this.employeeSalaryForm.get('bonus')?.value || 0;
-    const deductions = this.employeeSalaryForm.get('deductions')?.value || 0;
+    const salary = parseFloat(this.employeeSalaryForm.get('salary')?.value) || 0;
+    const bonus = parseFloat(this.employeeSalaryForm.get('bonus')?.value) || 0;
+    const deductions = parseFloat(this.employeeSalaryForm.get('deductions')?.value) || 0;
     const netSalary = salary + bonus - deductions;
-    this.employeeSalaryForm.get('netSalary')?.setValue(netSalary);
+    this.employeeSalaryForm.get('netSalary')?.setValue(String(netSalary), { emitEvent: false });
   }
 
   // Error message handling for all fields
@@ -138,7 +138,6 @@ export class EmployeeSalaryFormComponent {
           },
           error: (error) => {
             console.error('Update Error:', error);
-            // Optionally show an error message to the user
           },
         });
       } else {
@@ -148,7 +147,6 @@ export class EmployeeSalaryFormComponent {
           },
           error: (error) => {
             console.error('Add Error:', error);
-            // Optionally show an error message to the user
           },
         });
       }

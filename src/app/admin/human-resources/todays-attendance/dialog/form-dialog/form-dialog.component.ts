@@ -22,7 +22,7 @@ import { TodaysAttendance } from '../../todays-attendance..model';
 import { TodaysAttendanceService } from '../../todays-attendance.service';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   todaysAttendance: TodaysAttendance;
 }
@@ -65,7 +65,7 @@ export class TodayFormComponent {
         ? data.todaysAttendance
         : new TodaysAttendance({} as TodaysAttendance);
     this.dialogTitle =
-      this.action === 'edit' ? `${this.todaysAttendance.name}` : 'New Entry'; // Updated title for clarity
+      this.action === 'edit' ? `${this.todaysAttendance.name}` : 'New Entry';
     this.todayForm = this.createTodayForm();
   }
 
@@ -88,7 +88,6 @@ export class TodayFormComponent {
     if (control?.hasError('required')) {
       return 'Required field';
     }
-    // Add other validations if necessary
     return '';
   }
 
@@ -102,7 +101,6 @@ export class TodayFormComponent {
           },
           error: (error) => {
             console.error('Update Error:', error);
-            // Optionally show an error message to the user
           },
         });
       } else {
@@ -112,7 +110,6 @@ export class TodayFormComponent {
           },
           error: (error) => {
             console.error('Add Error:', error);
-            // Optionally show an error message to the user
           },
         });
       }

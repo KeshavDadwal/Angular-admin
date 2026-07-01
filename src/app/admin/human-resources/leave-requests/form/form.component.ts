@@ -10,6 +10,7 @@ import {
   Validators,
   UntypedFormGroup,
   UntypedFormBuilder,
+  UntypedFormControl,
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
@@ -30,30 +31,30 @@ import {
 } from '@angular/material/snack-bar';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   leaves: Leaves;
 }
 
 @Component({
-    selector: 'app-leave-request-form',
-    templateUrl: './form.component.html',
-    styleUrls: ['./form.component.scss'],
-    imports: [
-        MatButtonModule,
-        MatIconModule,
-        MatDialogContent,
-        FormsModule,
-        ReactiveFormsModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatDatepickerModule,
-        MatSelectModule,
-        MatOptionModule,
-        MatDialogClose,
-        MatCardModule,
-        DatePipe,
-    ]
+  selector: 'app-leave-request-form',
+  templateUrl: './form.component.html',
+  styleUrls: ['./form.component.scss'],
+  imports: [
+    MatButtonModule,
+    MatIconModule,
+    MatDialogContent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatSelectModule,
+    MatOptionModule,
+    MatDialogClose,
+    MatCardModule,
+    DatePipe,
+  ],
 })
 export class LeaveRequestFormComponent {
   dialogRef = inject<MatDialogRef<LeaveRequestFormComponent>>(MatDialogRef);
@@ -70,10 +71,18 @@ export class LeaveRequestFormComponent {
 
   constructor() {
     const data = this.data;
-
     this.action = data.action;
     this.leaves = data.leaves || new Leaves({} as Leaves);
     this.setupForm();
+  }
+
+  private safeDateFormat(dateStr: string): string {
+    if (!dateStr) return '';
+    try {
+      return formatDate(dateStr, 'yyyy-MM-dd', 'en');
+    } catch {
+      return '';
+    }
   }
 
   private setupForm(): void {
@@ -99,32 +108,30 @@ export class LeaveRequestFormComponent {
     return this.fb.group({
       id: [this.leaves.id],
       img: [this.leaves.img],
-      name: [this.leaves.name],
+      name: [this.leaves.name, [Validators.required]],
       employeeId: [this.leaves.employeeId, [Validators.required]],
       department: [this.leaves.department, [Validators.required]],
       type: [this.leaves.type, [Validators.required]],
       from: [
-        formatDate(this.leaves.from, 'yyyy-MM-dd', 'en'),
+        this.safeDateFormat(this.leaves.from),
         [Validators.required],
       ],
       leaveTo: [
-        formatDate(this.leaves.leaveTo, 'yyyy-MM-dd', 'en'),
+        this.safeDateFormat(this.leaves.leaveTo),
         [Validators.required],
       ],
-      noOfDays: [this.leaves.noOfDays],
+      noOfDays: [this.leaves.noOfDays, [Validators.required]],
       durationType: [this.leaves.durationType, [Validators.required]],
-      status: [this.leaves.status],
+      status: [this.leaves.status || 'Pending'],
       reason: [this.leaves.reason],
       note: [this.leaves.note],
       requestedOn: [
-        formatDate(this.leaves.requestedOn, 'yyyy-MM-dd', 'en'),
+        this.safeDateFormat(this.leaves.requestedOn),
         [Validators.required],
       ],
       approvedBy: [this.leaves.approvedBy],
       approvalDate: [
-        this.leaves.approvalDate
-          ? formatDate(this.leaves.approvalDate, 'yyyy-MM-dd', 'en')
-          : '',
+        this.safeDateFormat(this.leaves.approvalDate),
       ],
     });
   }
@@ -149,7 +156,6 @@ export class LeaveRequestFormComponent {
           },
           error: (error) => {
             console.error('Update Error:', error);
-            // Optionally show an error message to the user
           },
         });
       } else {
@@ -159,7 +165,6 @@ export class LeaveRequestFormComponent {
           },
           error: (error) => {
             console.error('Add Error:', error);
-            // Optionally show an error message to the user
           },
         });
       }
@@ -171,28 +176,47 @@ export class LeaveRequestFormComponent {
   }
 
   approve(): void {
-    // Open the snack bar with the success message
-    this.showNotification(
-      'snackbar-success',
-      'Leave request approved!',
-      'bottom',
-      'center'
-    );
-
-    // Optionally close the dialog if approval is successful
-    this.dialogRef.close('approved');
+    this.leavesForm.patchValue({
+      status: 'Approved',
+      approvedBy: 'Admin', // Default admin approval
+      approvalDate: formatDate(new Date(), 'yyyy-MM-dd', 'en')
+    });
+    this.leavesService.updateLeaves(this.leavesForm.getRawValue()).subscribe({
+      next: (response) => {
+        this.showNotification(
+          'snackbar-success',
+          'Leave request approved!',
+          'bottom',
+          'center'
+        );
+        this.dialogRef.close(response);
+      },
+      error: (error) => {
+        console.error('Approve Error:', error);
+      }
+    });
   }
 
   reject(): void {
-    this.showNotification(
-      'snackbar-danger',
-      'Leave request rejected',
-      'bottom',
-      'center'
-    );
-
-    // Close the dialog with rejection status
-    this.dialogRef.close('rejected');
+    this.leavesForm.patchValue({
+      status: 'Rejected',
+      approvedBy: 'Admin',
+      approvalDate: formatDate(new Date(), 'yyyy-MM-dd', 'en')
+    });
+    this.leavesService.updateLeaves(this.leavesForm.getRawValue()).subscribe({
+      next: (response) => {
+        this.showNotification(
+          'snackbar-danger',
+          'Leave request rejected',
+          'bottom',
+          'center'
+        );
+        this.dialogRef.close(response);
+      },
+      error: (error) => {
+        console.error('Reject Error:', error);
+      }
+    });
   }
 
   showNotification(

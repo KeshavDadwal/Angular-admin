@@ -17,8 +17,7 @@ export class Staff {
   gender: string;
 
   constructor(staff: Partial<Staff>) {
-    // Use Partial to allow optional fields
-    this.id = staff.id || this.getRandomID();
+    this.id = staff.id || '';
     this.img = staff.img || 'assets/images/user/new.jpg';
     this.name = staff.name || '';
     this.email = staff.email || '';
@@ -34,12 +33,5 @@ export class Staff {
     this.date_of_birth =
       staff.date_of_birth || formatDate(new Date(), 'yyyy-MM-dd', 'en');
     this.gender = staff.gender || '';
-  }
-
-  public getRandomID(): string {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
-    };
-    return S4().toString() + S4().toString();
   }
 }

@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { Holiday } from './holiday.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -10,72 +11,187 @@ import { Holiday } from './holiday.model';
 export class HolidayService {
   private httpClient = inject(HttpClient);
 
-  private readonly API_URL = 'assets/data/holiday.json';
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
+
   dataChange: BehaviorSubject<Holiday[]> = new BehaviorSubject<Holiday[]>([]);
+  dialogData!: Holiday;
 
-  /** CRUD METHODS */
+  get data(): Holiday[] {
+    return this.dataChange.value;
+  }
 
-  /** GET: Fetch all holidays */
+  getDialogData(): Holiday {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): Holiday {
+    return new Holiday({
+      id: item.id,
+      holiday_name: item.holidayName || '',
+      date: item.date ? item.date.split('T')[0] : '',
+      location: item.location || '',
+      shift: item.shift || '',
+      details: item.details || '',
+      holiday_type: item.holidayType || '',
+      created_by: item.createdBy || '',
+      creation_date: item.creationDate ? item.creationDate.split('T')[0] : '',
+      approval_status: item.approvalStatus || '',
+    });
+  }
+
   getAllHolidays(): Observable<Holiday[]> {
-    return this.httpClient.get<Holiday[]>(this.API_URL).pipe(
-      map((data) => {
-        this.dataChange.next(data);
-        return data;
+    const body = {
+      query: `
+        query GetHolidays {
+          holidays {
+            id
+            holidayName
+            date
+            location
+            shift
+            details
+            holidayType
+            createdBy
+            creationDate
+            approvalStatus
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch holidays');
+        }
+        const list = res.data.holidays || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
       }),
       catchError(this.handleError)
     );
   }
 
-  /** POST: Add a new holiday */
   addHoliday(holiday: Holiday): Observable<Holiday> {
-    // Simulating the addition of a holiday
-    return of(holiday).pipe(
-      map(() => holiday), // Return the added holiday
+    const body = {
+      query: `
+        mutation CreateHoliday($input: CreateHolidayInput!) {
+          createHoliday(input: $input) {
+            id
+            holidayName
+            date
+            location
+            shift
+            details
+            holidayType
+            createdBy
+            creationDate
+            approvalStatus
+          }
+        }
+      `,
+      variables: {
+        input: {
+          holidayName: holiday.holiday_name,
+          date: holiday.date,
+          location: holiday.location,
+          shift: holiday.shift,
+          details: holiday.details,
+          holidayType: holiday.holiday_type,
+          createdBy: holiday.created_by,
+          creationDate: holiday.creation_date,
+          approvalStatus: holiday.approval_status,
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create holiday');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createHoliday);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
       catchError(this.handleError)
     );
-
-    // Uncomment for real API call
-    // return this.httpClient.post<Holiday>(this.API_URL, holiday).pipe(
-    //   map(() => holiday), // Return the added holiday
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** PUT: Update an existing holiday */
   updateHoliday(holiday: Holiday): Observable<Holiday> {
-    // Simulating the update of a holiday
-    return of(holiday).pipe(
-      map(() => holiday), // Return the updated holiday
+    const body = {
+      query: `
+        mutation UpdateHoliday($input: UpdateHolidayInput!) {
+          updateHoliday(input: $input) {
+            id
+            holidayName
+            date
+            location
+            shift
+            details
+            holidayType
+            createdBy
+            creationDate
+            approvalStatus
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(holiday.id),
+          holidayName: holiday.holiday_name,
+          date: holiday.date,
+          location: holiday.location,
+          shift: holiday.shift,
+          details: holiday.details,
+          holidayType: holiday.holiday_type,
+          createdBy: holiday.created_by,
+          creationDate: holiday.creation_date,
+          approvalStatus: holiday.approval_status,
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update holiday');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateHoliday);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
       catchError(this.handleError)
     );
-
-    // Uncomment for real API call
-    // return this.httpClient.put<Holiday>(`${this.API_URL}`, holiday).pipe(
-    //   map(() => holiday), // Return the updated holiday
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** DELETE: Remove a holiday by ID */
-  deleteHoliday(id: number): Observable<number> {
-    // Simulating the deletion of a holiday
-    return of(id).pipe(
-      map(() => id), // Return the ID of the deleted holiday
+  deleteHoliday(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteHoliday($id: String!) {
+          deleteHoliday(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete holiday');
+        }
+        return res.data.deleteHoliday;
+      }),
       catchError(this.handleError)
     );
-
-    // Uncomment for real API call
-    // return this.httpClient.delete<void>(`${this.API_URL}`).pipe(
-    //   map(() => id), // Return the ID of the deleted holiday
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** Handle Http operation that failed */
-  private handleError(error: HttpErrorResponse) {
-    console.error('An error occurred:', error.message);
-    return throwError(
-      () => new Error('Something went wrong; please try again later.')
-    );
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

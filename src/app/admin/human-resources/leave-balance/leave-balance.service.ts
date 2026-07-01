@@ -1,99 +1,125 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError, map } from 'rxjs';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { LeaveBalance } from './leave-balance.model';
+
+const GQL_URL = 'http://localhost:8080/query';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LeaveBalanceService {
-  private httpClient = inject(HttpClient);
+  private http = inject(HttpClient);
 
-  private readonly API_URL = 'assets/data/leave-balance.json';
-  private dataChange: BehaviorSubject<LeaveBalance[]> = new BehaviorSubject<
-    LeaveBalance[]
-  >([]);
-
-  get data(): LeaveBalance[] {
-    return this.dataChange.value;
+  private mapToModel(lb: any): LeaveBalance {
+    return new LeaveBalance({
+      id: lb.id,
+      img: lb.img,
+      name: lb.name,
+      prev: lb.prev,
+      current: lb.current,
+      total: lb.total,
+      used: lb.used,
+      accepted: lb.accepted,
+      rejected: lb.rejected,
+      expired: lb.expired,
+      carryOver: lb.carryOver,
+    });
   }
 
-  /** GET: Fetch all leave balances */
   getAllLeaveBalances(): Observable<LeaveBalance[]> {
-    return this.httpClient
-      .get<LeaveBalance[]>(this.API_URL)
-      .pipe(catchError(this.handleError));
+    const query = `{
+      leaveBalances {
+        id img name prev current total used accepted rejected expired carryOver
+      }
+    }`;
+    return this.http.post<any>(GQL_URL, { query }).pipe(
+      map((res) => res.data.leaveBalances.map((x: any) => this.mapToModel(x))),
+      catchError(this.handleError)
+    );
   }
 
-  /** POST: Add a new leave balance */
   addLeaveBalance(leaveBalance: LeaveBalance): Observable<LeaveBalance> {
-    // Simulate adding the leave balance to the local data array
-    return of(leaveBalance).pipe(
-      map((_response) => {
-        return leaveBalance; // return the newly added leave balance
-      }),
+    const mutation = `
+      mutation CreateLeaveBalance($input: CreateLeaveBalanceInput!) {
+        createLeaveBalance(input: $input) {
+          id img name prev current total used accepted rejected expired carryOver
+        }
+      }`;
+    const variables = {
+      input: {
+        img: leaveBalance.img,
+        name: leaveBalance.name,
+        prev: leaveBalance.prev,
+        current: leaveBalance.current,
+        total: leaveBalance.total,
+        used: leaveBalance.used,
+        accepted: leaveBalance.accepted,
+        rejected: leaveBalance.rejected,
+        expired: leaveBalance.expired,
+        carryOver: leaveBalance.carryOver,
+      },
+    };
+    return this.http.post<any>(GQL_URL, { query: mutation, variables }).pipe(
+      map((res) => this.mapToModel(res.data.createLeaveBalance)),
       catchError(this.handleError)
     );
-
-    // API call to add the leave balance
-    // return this.httpClient
-    //   .post<LeaveBalance>(this.API_URL, leaveBalance)
-    //   .pipe(
-    //     map(() => {
-    //       return leaveBalance; // return the newly added leave balance
-    //     }),
-    //     catchError(this.handleError)
-    //   );
   }
 
-  /** PUT: Update an existing leave balance */
   updateLeaveBalance(leaveBalance: LeaveBalance): Observable<LeaveBalance> {
-    // Simulate updating the leave balance in the local data array
-    return of(leaveBalance).pipe(
-      map((response) => {
-        return response; // return the updated leave balance
-      }),
+    const mutation = `
+      mutation UpdateLeaveBalance($input: UpdateLeaveBalanceInput!) {
+        updateLeaveBalance(input: $input) {
+          id img name prev current total used accepted rejected expired carryOver
+        }
+      }`;
+    const variables = {
+      input: {
+        id: leaveBalance.id,
+        img: leaveBalance.img,
+        name: leaveBalance.name,
+        prev: leaveBalance.prev,
+        current: leaveBalance.current,
+        total: leaveBalance.total,
+        used: leaveBalance.used,
+        accepted: leaveBalance.accepted,
+        rejected: leaveBalance.rejected,
+        expired: leaveBalance.expired,
+        carryOver: leaveBalance.carryOver,
+      },
+    };
+    return this.http.post<any>(GQL_URL, { query: mutation, variables }).pipe(
+      map((res) => this.mapToModel(res.data.updateLeaveBalance)),
       catchError(this.handleError)
     );
-
-    // API call to update the leave balance
-    // return this.httpClient
-    //   .put<LeaveBalance>(`${this.API_URL}`, leaveBalance)
-    //   .pipe(
-    //     map(() => {
-    //       return leaveBalance; // return the updated leave balance
-    //     }),
-    //     catchError(this.handleError)
-    //   );
   }
 
-  /** DELETE: Remove a leave balance by ID */
-  deleteLeaveBalance(id: number): Observable<number> {
-    // Simulate deleting the leave balance from the local data array
-    return of(id).pipe(
-      map((_response) => {
-        return id; // return the ID of the deleted leave balance
-      }),
+  deleteLeaveBalance(id: string): Observable<string> {
+    const mutation = `
+      mutation DeleteLeaveBalance($id: String!) {
+        deleteLeaveBalance(id: $id)
+      }`;
+    return this.http.post<any>(GQL_URL, { query: mutation, variables: { id } }).pipe(
+      map((res) => res.data.deleteLeaveBalance as string),
       catchError(this.handleError)
     );
-
-    // API call to delete the leave balance
-    // return this.httpClient
-    //   .delete<void>(`${this.API_URL}`)
-    //   .pipe(
-    //     map(() => {
-    //       return id; // return the ID of the deleted leave balance
-    //     }),
-    //     catchError(this.handleError)
-    //   );
   }
 
-  /** Handle Http operation that failed */
-  private handleError(error: HttpErrorResponse): Observable<never> {
-    console.error('An error occurred:', error.message);
-    return throwError(
-      () => new Error('Something went wrong; please try again later.')
-    );
+  deleteMultipleLeaveBalances(ids: string[]): Observable<string[]> {
+    return new Observable((observer) => {
+      const deletions = ids.map((id) => this.deleteLeaveBalance(id).toPromise());
+      Promise.all(deletions)
+        .then(() => {
+          observer.next(ids);
+          observer.complete();
+        })
+        .catch((err) => observer.error(err));
+    });
+  }
+
+  private handleError(error: any) {
+    console.error('LeaveBalanceService error:', error);
+    return throwError(() => new Error('Something went wrong; please try again later.'));
   }
 }

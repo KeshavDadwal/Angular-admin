@@ -1,42 +1,27 @@
 import { formatDate } from '@angular/common';
 
 export class Holiday {
-  id: number;
-  title: string;
-  start_date: string;
-  end_date: string;
-  type: string;
-  description: string;
+  id: string;
+  holiday_name: string;
+  date: string;
   location: string;
-  created_at: string;
-  updated_at: string;
-  is_recurring: string;
-  status: string;
+  shift: string;
+  details: string;
+  holiday_type: string;
+  created_by: string;
+  creation_date: string;
+  approval_status: string;
 
   constructor(holiday: Partial<Holiday>) {
-    this.id = holiday.id || this.getRandomID();
-    this.title = holiday.title || '';
-    this.start_date =
-      holiday.start_date || formatDate(new Date(), 'yyyy-MM-dd', 'en');
-    this.end_date =
-      holiday.end_date || formatDate(new Date(), 'yyyy-MM-dd', 'en');
-    this.type = holiday.type || '';
-    this.description = holiday.description || '';
-    this.location = holiday.location || 'Global';
-    this.created_at =
-      holiday.created_at ||
-      formatDate(new Date(), 'yyyy-MM-ddTHH:mm:ssZ', 'en');
-    this.updated_at =
-      holiday.updated_at ||
-      formatDate(new Date(), 'yyyy-MM-ddTHH:mm:ssZ', 'en');
-    this.is_recurring = holiday.is_recurring || 'No';
-    this.status = holiday.status || 'Active';
-  }
-
-  public getRandomID(): number {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
-    };
-    return S4() + S4();
+    this.id = holiday.id || '';
+    this.holiday_name = holiday.holiday_name || '';
+    this.date = holiday.date || formatDate(new Date(), 'yyyy-MM-dd', 'en');
+    this.location = holiday.location || 'All Locations';
+    this.shift = holiday.shift || 'All Shifts';
+    this.details = holiday.details || '';
+    this.holiday_type = holiday.holiday_type || '';
+    this.created_by = holiday.created_by || 'Admin';
+    this.creation_date = holiday.creation_date || formatDate(new Date(), 'yyyy-MM-dd', 'en');
+    this.approval_status = holiday.approval_status || 'Pending';
   }
 }

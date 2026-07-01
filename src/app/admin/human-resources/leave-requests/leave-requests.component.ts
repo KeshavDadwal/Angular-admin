@@ -85,6 +85,14 @@ export class LeaveRequestsComponent implements OnInit, OnDestroy {
   isLoading = true;
   private destroy$ = new Subject<void>();
 
+  breadscrums = [
+    {
+      title: 'Leave Requests',
+      items: ['Human Resources'],
+      active: 'Leave Requests',
+    },
+  ];
+
   ngOnInit() {
     this.loadData();
   }
@@ -104,9 +112,9 @@ export class LeaveRequestsComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.dataSource.data = data;
         this.isLoading = false;
-        this.dataSource.filterPredicate = (data: Leaves, filter: string) =>
-          Object.values(data).some((value) =>
-            value.toString().toLowerCase().includes(filter)
+        this.dataSource.filterPredicate = (row: Leaves, filter: string) =>
+          Object.values(row).some((value) =>
+            value ? value.toString().toLowerCase().includes(filter) : false
           );
       },
       error: (err) => {
@@ -125,13 +133,19 @@ export class LeaveRequestsComponent implements OnInit, OnDestroy {
   }
 
   detailsCall(row: Leaves) {
-    this.dialog.open(LeaveRequestFormComponent, {
+    const dialogRef = this.dialog.open(LeaveRequestFormComponent, {
       data: {
         leaves: row,
         action: 'details',
       },
       width: '60vw',
       maxWidth: '100vw',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.updateRecord(result);
+      }
     });
   }
 
@@ -178,30 +192,44 @@ export class LeaveRequestsComponent implements OnInit, OnDestroy {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.dataSource.data = this.dataSource.data.filter(
-          (record) => record.id !== row.id
-        );
-        this.showNotification(
-          'snackbar-danger',
-          'Delete Record Successfully...!!!',
-          'bottom',
-          'center'
-        );
+        this.leavesService.deleteLeaves(row.id).subscribe({
+          next: () => {
+            this.dataSource.data = this.dataSource.data.filter(
+              (record) => record.id !== row.id
+            );
+            this.showNotification(
+              'snackbar-danger',
+              'Delete Record Successfully...!!!',
+              'bottom',
+              'center'
+            );
+          },
+          error: (err) => {
+            console.error('Delete error:', err);
+          }
+        });
       }
     });
   }
 
   handleBulkDelete(selectedRows: Leaves[]) {
-    const totalSelect = selectedRows.length;
-    this.dataSource.data = this.dataSource.data.filter(
-      (item) => !selectedRows.includes(item)
-    );
-    this.showNotification(
-      'snackbar-danger',
-      `${totalSelect} Record(s) Deleted Successfully...!!!`,
-      'bottom',
-      'center'
-    );
+    const ids = selectedRows.map((r) => r.id);
+    this.leavesService.deleteMultipleLeaves(ids).subscribe({
+      next: () => {
+        this.dataSource.data = this.dataSource.data.filter(
+          (item) => !selectedRows.includes(item)
+        );
+        this.showNotification(
+          'snackbar-danger',
+          `${ids.length} Record(s) Deleted Successfully...!!!`,
+          'bottom',
+          'center'
+        );
+      },
+      error: (err) => {
+        console.error('Bulk delete error:', err);
+      }
+    });
   }
 
   showNotification(

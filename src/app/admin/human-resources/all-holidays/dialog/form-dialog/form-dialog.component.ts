@@ -22,27 +22,27 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   allHoliday: AllHoliday;
 }
 
 @Component({
-    selector: 'app-all-holidays-form',
-    templateUrl: './form-dialog.component.html',
-    styleUrls: ['./form-dialog.component.scss'],
-    imports: [
-        MatButtonModule,
-        MatIconModule,
-        MatDialogContent,
-        FormsModule,
-        ReactiveFormsModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatSelectModule,
-        MatDatepickerModule,
-        MatDialogClose,
-    ]
+  selector: 'app-all-holidays-form',
+  templateUrl: './form-dialog.component.html',
+  styleUrls: ['./form-dialog.component.scss'],
+  imports: [
+    MatButtonModule,
+    MatIconModule,
+    MatDialogContent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatDialogClose,
+  ]
 })
 export class AllHolidaysFormComponent {
   dialogRef = inject<MatDialogRef<AllHolidaysFormComponent>>(MatDialogRef);
@@ -102,7 +102,6 @@ export class AllHolidaysFormComponent {
           },
           error: (error) => {
             console.error('Update Error:', error);
-            // Optionally show an error message to the user
           },
         });
       } else {
@@ -112,7 +111,6 @@ export class AllHolidaysFormComponent {
           },
           error: (error) => {
             console.error('Add Error:', error);
-            // Optionally show an error message to the user
           },
         });
       }

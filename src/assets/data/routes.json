@@ -567,48 +567,6 @@
           "submenu": []
         },
         {
-          "path": "/admin/staff/add-staff",
-          "title": "MENUITEMS.STAFF.LIST.ADD-STAFF",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/staff/edit-staff",
-          "title": "MENUITEMS.STAFF.LIST.EDIT-STAFF",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/staff/about-staff",
-          "title": "MENUITEMS.STAFF.LIST.ABOUT-STAFF",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
           "path": "/admin/staff/staff-attendance",
           "title": "MENUITEMS.STAFF.LIST.STAFF-ATTENDANCE",
           "iconType": "",
@@ -708,50 +666,8 @@
           "submenu": []
         },
         {
-          "path": "/admin/human-resources/attendance-detail",
-          "title": "MENUITEMS.HR.LIST.ATTENDANCE-DETAIL",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/human-resources/attendance-sheet",
-          "title": "MENUITEMS.HR.LIST.ATTENDANCE-SHEET",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
           "path": "/admin/human-resources/employee-salary",
           "title": "MENUITEMS.HR.LIST.EMPLOYEE-SALARY",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/human-resources/payslip",
-          "title": "MENUITEMS.HR.LIST.PAYSLIP",
           "iconType": "",
           "icon": "",
           "class": "ml-menu",

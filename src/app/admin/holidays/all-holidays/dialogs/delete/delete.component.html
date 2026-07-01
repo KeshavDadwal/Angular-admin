@@ -3,16 +3,11 @@
     <div mat-dialog-content>
         <ul class="clearfix">
             <li>
-                <p><span class="font-weight-bold"> Name: </span>{{ data.title }}</p>
+                <p><span class="font-weight-bold"> Name: </span>{{ data.holiday_name }}</p>
             </li>
             <li>
                 <p>
-                    <span class="font-weight-bold">Start Date: </span>{{ data.start_date | date: 'MM/dd/yyyy' }}
-                </p>
-            </li>
-            <li>
-                <p>
-                    <span class="font-weight-bold">End Date: </span>{{ data.end_date | date: 'MM/dd/yyyy' }}
+                    <span class="font-weight-bold">Date: </span>{{ data.date | date: 'MM/dd/yyyy' }}
                 </p>
             </li>
         </ul>

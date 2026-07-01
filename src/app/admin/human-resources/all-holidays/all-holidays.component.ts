@@ -79,12 +79,16 @@ export class AllHolidayComponent implements OnInit, OnDestroy {
   }
 
   loadData() {
+    this.isLoading = true;
     this.holidayService.getAllHolidays().subscribe({
       next: (data) => {
         this.dataSource.data = data;
         this.isLoading = false;
       },
-      error: (err) => console.error(err),
+      error: (err) => {
+        console.error(err);
+        this.isLoading = false;
+      },
     });
   }
 

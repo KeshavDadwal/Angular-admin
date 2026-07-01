@@ -10,7 +10,7 @@ import { StaffService } from '../../staff.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   name: string;
   designation: string;
   mobile: string;
@@ -35,16 +35,14 @@ export class AllStaffDeleteComponent {
   onNoClick(): void {
     this.dialogRef.close();
   }
+
   confirmDelete(): void {
     this.staffService.deleteStaff(this.data.id).subscribe({
       next: (response) => {
-        // Handle successful deletion
-        this.dialogRef.close(response); // Close the dialog with the response
-        // Optionally, handle other UI actions like refreshing a list
+        this.dialogRef.close(response);
       },
       error: (error) => {
         console.error('Delete Error:', error);
-        // Handle error appropriately
       },
     });
   }

@@ -1,62 +1,140 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of, throwError, map } from 'rxjs';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { Leaves } from './leaves.model';
+
+const GQL_URL = 'http://localhost:8080/query';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LeavesService {
-  private httpClient = inject(HttpClient);
+  private http = inject(HttpClient);
 
-  private readonly API_URL = 'assets/data/leaves.json';
+  private mapToModel(lr: any): Leaves {
+    return new Leaves({
+      id: lr.id,
+      img: lr.img,
+      name: lr.name,
+      employeeId: lr.employeeId,
+      department: lr.department,
+      type: lr.type,
+      from: lr.from,
+      leaveTo: lr.leaveTo,
+      noOfDays: lr.noOfDays,
+      durationType: lr.durationType,
+      status: lr.status,
+      reason: lr.reason,
+      note: lr.note,
+      requestedOn: lr.requestedOn,
+      approvedBy: lr.approvedBy,
+      approvalDate: lr.approvalDate,
+    });
+  }
 
-  /** GET: Fetch all leaves */
   getAllLeaves(): Observable<Leaves[]> {
-    return this.httpClient
-      .get<Leaves[]>(this.API_URL)
-      .pipe(catchError(this.handleError));
+    const query = `{
+      leaveRequests {
+        id img name employeeId department type from leaveTo noOfDays durationType status reason note requestedOn approvedBy approvalDate
+      }
+    }`;
+    return this.http.post<any>(GQL_URL, { query }).pipe(
+      map((res) => res.data.leaveRequests.map((x: any) => this.mapToModel(x))),
+      catchError(this.handleError)
+    );
   }
 
-  /** POST: Add a new leave */
   addLeaves(leaves: Leaves): Observable<Leaves> {
-    // Simulate adding the leave to the local data array
-    return of(leaves).pipe(
-      map((_response) => {
-        return leaves; // return the newly added leave
-      }),
+    const mutation = `
+      mutation CreateLeaveRequest($input: CreateLeaveRequestInput!) {
+        createLeaveRequest(input: $input) {
+          id img name employeeId department type from leaveTo noOfDays durationType status reason note requestedOn approvedBy approvalDate
+        }
+      }`;
+    const variables = {
+      input: {
+        img: leaves.img,
+        name: leaves.name,
+        employeeId: leaves.employeeId,
+        department: leaves.department,
+        type: leaves.type,
+        from: leaves.from,
+        leaveTo: leaves.leaveTo,
+        noOfDays: leaves.noOfDays,
+        durationType: leaves.durationType,
+        status: leaves.status,
+        reason: leaves.reason,
+        note: leaves.note,
+        requestedOn: leaves.requestedOn,
+        approvedBy: leaves.approvedBy,
+        approvalDate: leaves.approvalDate,
+      },
+    };
+    return this.http.post<any>(GQL_URL, { query: mutation, variables }).pipe(
+      map((res) => this.mapToModel(res.data.createLeaveRequest)),
       catchError(this.handleError)
     );
   }
 
-  /** PUT: Update an existing leave */
   updateLeaves(leaves: Leaves): Observable<Leaves> {
-    // Simulate updating the leave in the local data array
-    return of(leaves).pipe(
-      map((_response) => {
-        return leaves; // return the updated leave
-      }),
+    const mutation = `
+      mutation UpdateLeaveRequest($input: UpdateLeaveRequestInput!) {
+        updateLeaveRequest(input: $input) {
+          id img name employeeId department type from leaveTo noOfDays durationType status reason note requestedOn approvedBy approvalDate
+        }
+      }`;
+    const variables = {
+      input: {
+        id: leaves.id,
+        img: leaves.img,
+        name: leaves.name,
+        employeeId: leaves.employeeId,
+        department: leaves.department,
+        type: leaves.type,
+        from: leaves.from,
+        leaveTo: leaves.leaveTo,
+        noOfDays: leaves.noOfDays,
+        durationType: leaves.durationType,
+        status: leaves.status,
+        reason: leaves.reason,
+        note: leaves.note,
+        requestedOn: leaves.requestedOn,
+        approvedBy: leaves.approvedBy,
+        approvalDate: leaves.approvalDate,
+      },
+    };
+    return this.http.post<any>(GQL_URL, { query: mutation, variables }).pipe(
+      map((res) => this.mapToModel(res.data.updateLeaveRequest)),
       catchError(this.handleError)
     );
   }
 
-  /** DELETE: Remove a leave by ID */
-  deleteLeaves(id: number): Observable<number> {
-    // Simulate deleting the leave from the local data array
-    return of(id).pipe(
-      map((_response) => {
-        return id; // return the ID of the deleted leave
-      }),
+  deleteLeaves(id: string): Observable<string> {
+    const mutation = `
+      mutation DeleteLeaveRequest($id: String!) {
+        deleteLeaveRequest(id: $id)
+      }`;
+    return this.http.post<any>(GQL_URL, { query: mutation, variables: { id } }).pipe(
+      map((res) => res.data.deleteLeaveRequest as string),
       catchError(this.handleError)
     );
   }
 
-  /** Handle Http operation that failed */
-  private handleError(error: HttpErrorResponse): Observable<never> {
-    console.error('An error occurred:', error.message);
-    return throwError(
-      () => new Error('Something went wrong; please try again later.')
-    );
+  deleteMultipleLeaves(ids: string[]): Observable<string[]> {
+    return new Observable((observer) => {
+      const deletions = ids.map((id) => this.deleteLeaves(id).toPromise());
+      Promise.all(deletions)
+        .then(() => {
+          observer.next(ids);
+          observer.complete();
+        })
+        .catch((err) => observer.error(err));
+    });
+  }
+
+  private handleError(error: any) {
+    console.error('LeavesService error:', error);
+    return throwError(() => new Error('Something went wrong; please try again later.'));
   }
 }

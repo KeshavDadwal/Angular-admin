@@ -11,10 +11,10 @@ import { DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
-  title: string;
-  start_date: string;
-  end_date: string;
+  id: string;
+  holiday_name: string;
+  date: string;
+  holiday_type: string;
 }
 
 @Component({
@@ -34,21 +34,17 @@ export class AllHolidaysDeleteComponent {
   data = inject<DialogData>(MAT_DIALOG_DATA);
   holidayService = inject(HolidayService);
 
-
   onNoClick(): void {
-    this.dialogRef.close(); // Close the dialog without action
+    this.dialogRef.close();
   }
 
   confirmDelete(): void {
     this.holidayService.deleteHoliday(this.data.id).subscribe({
       next: (response) => {
-        // Handle successful deletion
-        this.dialogRef.close(response); // Close the dialog with the response
-        // Optionally, refresh a list or show a notification
+        this.dialogRef.close(response);
       },
       error: (error) => {
         console.error('Delete Error:', error);
-        // Handle error appropriately
       },
     });
   }

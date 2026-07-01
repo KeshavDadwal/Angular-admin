@@ -1,5 +1,5 @@
 export class StaffAttendance {
-  id: number;
+  id: string;
   img: string;
   name: string;
   employee_id: string;
@@ -19,32 +19,25 @@ export class StaffAttendance {
   attendance_status: string;
   department: string;
 
-  constructor(staffAttendance: Partial<StaffAttendance>) {
-    this.id = staffAttendance.id || this.getRandomID();
-    this.img = staffAttendance.img || 'assets/images/user/new.jpg';
-    this.name = staffAttendance.name || '';
-    this.employee_id = staffAttendance.employee_id || '';
-    this.designation = staffAttendance.designation || '';
-    this.date = staffAttendance.date || '';
-    this.check_in = staffAttendance.check_in || '';
-    this.break = staffAttendance.break || '';
-    this.check_out = staffAttendance.check_out || '';
-    this.total = staffAttendance.total || '';
-    this.shift = staffAttendance.shift || '';
-    this.late_arrival = staffAttendance.late_arrival || '';
-    this.early_departure = staffAttendance.early_departure || '';
-    this.absence_reason = staffAttendance.absence_reason || '';
-    this.overtime = staffAttendance.overtime || '';
-    this.total_breaks = staffAttendance.total_breaks || '';
-    this.remarks = staffAttendance.remarks || '';
-    this.attendance_status = staffAttendance.attendance_status || '';
-    this.department = staffAttendance.department || '';
-  }
-
-  public getRandomID(): number {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
-    };
-    return S4() + S4();
+  constructor(sa: Partial<StaffAttendance>) {
+    this.id              = sa.id              || '';
+    this.img             = sa.img             || 'assets/images/user/new.jpg';
+    this.name            = sa.name            || '';
+    this.employee_id     = sa.employee_id     || '';
+    this.designation     = sa.designation     || '';
+    this.date            = sa.date            || '';
+    this.check_in        = sa.check_in        || '';
+    this.break           = sa.break           || '';
+    this.check_out       = sa.check_out       || '';
+    this.total           = sa.total           || '';
+    this.shift           = sa.shift           || '';
+    this.late_arrival    = sa.late_arrival    || '';
+    this.early_departure = sa.early_departure || '';
+    this.absence_reason  = sa.absence_reason  || '';
+    this.overtime        = sa.overtime        || '';
+    this.total_breaks    = sa.total_breaks    || '';
+    this.remarks         = sa.remarks         || '';
+    this.attendance_status = sa.attendance_status || '';
+    this.department      = sa.department      || '';
   }
 }

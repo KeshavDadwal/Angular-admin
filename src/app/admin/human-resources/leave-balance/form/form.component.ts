@@ -24,29 +24,29 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   leaveBalance: LeaveBalance;
 }
 
 @Component({
-    selector: 'app-leave-balance-form',
-    templateUrl: './form.component.html',
-    styleUrls: ['./form.component.scss'],
-    imports: [
-        MatButtonModule,
-        MatIconModule,
-        MatDialogContent,
-        FormsModule,
-        ReactiveFormsModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatDatepickerModule,
-        MatSelectModule,
-        MatOptionModule,
-        MatDialogClose,
-        MatCardModule,
-    ]
+  selector: 'app-leave-balance-form',
+  templateUrl: './form.component.html',
+  styleUrls: ['./form.component.scss'],
+  imports: [
+    MatButtonModule,
+    MatIconModule,
+    MatDialogContent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatSelectModule,
+    MatOptionModule,
+    MatDialogClose,
+    MatCardModule,
+  ],
 })
 export class LeaveBalanceFormComponent {
   dialogRef = inject<MatDialogRef<LeaveBalanceFormComponent>>(MatDialogRef);
@@ -62,7 +62,6 @@ export class LeaveBalanceFormComponent {
 
   constructor() {
     const data = this.data;
-
     this.action = data.action;
     this.leaveBalance =
       data.leaveBalance || new LeaveBalance({} as LeaveBalance);
@@ -88,7 +87,7 @@ export class LeaveBalanceFormComponent {
     return this.fb.group({
       id: [this.leaveBalance.id],
       img: [this.leaveBalance.img],
-      name: [this.leaveBalance.name],
+      name: [this.leaveBalance.name, [Validators.required]],
       prev: [this.leaveBalance.prev, [Validators.required]],
       current: [this.leaveBalance.current, [Validators.required]],
       total: [this.leaveBalance.total, [Validators.required]],
@@ -122,7 +121,6 @@ export class LeaveBalanceFormComponent {
             },
             error: (error) => {
               console.error('Update Error:', error);
-              // Optionally show an error message to the user
             },
           });
       } else {
@@ -132,7 +130,6 @@ export class LeaveBalanceFormComponent {
           },
           error: (error) => {
             console.error('Add Error:', error);
-            // Optionally show an error message to the user
           },
         });
       }

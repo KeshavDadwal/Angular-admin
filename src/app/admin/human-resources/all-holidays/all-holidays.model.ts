@@ -1,7 +1,7 @@
 import { formatDate } from '@angular/common';
 
 export class AllHoliday {
-  id: number;
+  id: string;
   holidayName: string;
   shift: string;
   details: string;
@@ -13,7 +13,7 @@ export class AllHoliday {
   approvalStatus: string;
 
   constructor(holiday: Partial<AllHoliday>) {
-    this.id = holiday.id || this.getRandomID();
+    this.id = holiday.id || '';
     this.holidayName = holiday.holidayName || '';
     this.shift = holiday.shift || '';
     this.details = holiday.details || '';
@@ -24,12 +24,5 @@ export class AllHoliday {
     this.creationDate =
       holiday.creationDate || formatDate(new Date(), 'yyyy-MM-dd', 'en');
     this.approvalStatus = holiday.approvalStatus || '';
-  }
-
-  public getRandomID(): number {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
-    };
-    return S4() + S4();
   }
 }

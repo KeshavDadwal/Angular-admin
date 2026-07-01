@@ -11,7 +11,7 @@ import { LeaveTypesService } from '../leave-types.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   leave_name: string;
   type: string;
   leave_unit: string;
@@ -37,13 +37,10 @@ export class LeaveRequestDeleteComponent {
   confirmDelete(): void {
     this.leaveTypesService.deleteLeaveType(this.data.id).subscribe({
       next: (response) => {
-        // console.log('Delete Response:', response);
-        this.dialogRef.close(response); // Close with the response data
-        // Handle successful deletion, e.g., refresh the table or show a notification
+        this.dialogRef.close(response);
       },
       error: (error) => {
         console.error('Delete Error:', error);
-        // Handle the error appropriately
       },
     });
   }

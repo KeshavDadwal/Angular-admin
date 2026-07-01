@@ -115,6 +115,7 @@ export class EmployeeSalaryComponent implements OnInit, OnDestroy {
   }
 
   loadData() {
+    this.isLoading = true;
     this.employeeSalaryService.getAllEmployeeSalaries().subscribe({
       next: (data) => {
         this.dataSource.data = data;
@@ -128,14 +129,21 @@ export class EmployeeSalaryComponent implements OnInit, OnDestroy {
             value.toString().toLowerCase().includes(filter)
           );
       },
-      error: (err) => console.error(err),
+      error: (err) => {
+        console.error(err);
+        this.isLoading = false;
+      },
     });
   }
 
   private refreshTable() {
-    this.paginator.pageIndex = 0;
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    if (this.paginator) {
+      this.paginator.pageIndex = 0;
+      this.dataSource.paginator = this.paginator;
+    }
+    if (this.sort) {
+      this.dataSource.sort = this.sort;
+    }
   }
 
   applyFilter(event: Event) {

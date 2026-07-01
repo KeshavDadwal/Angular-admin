@@ -118,12 +118,16 @@ export class LeaveTypesComponent implements OnInit, OnDestroy {
   }
 
   loadData() {
+    this.isLoading = true;
     this.leaveTypesService.getAllLeaveTypes().subscribe({
       next: (data) => {
         this.dataSource.data = data;
         this.isLoading = false;
       },
-      error: (err) => console.error(err),
+      error: (err) => {
+        console.error(err);
+        this.isLoading = false;
+      },
     });
   }
 
