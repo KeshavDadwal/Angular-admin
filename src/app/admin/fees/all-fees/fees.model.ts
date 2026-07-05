@@ -1,7 +1,5 @@
-import { formatDate } from '@angular/common';
-
 export class Fees {
-  id: number;
+  id: string;
   rollNo: string;
   studentName: string;
   class: string;
@@ -19,31 +17,21 @@ export class Fees {
   notes: string;
 
   constructor(fees: Partial<Fees>) {
-    this.id = fees.id || this.getRandomID();
+    this.id = fees.id || '';
     this.rollNo = fees.rollNo || '';
     this.studentName = fees.studentName || '';
     this.class = fees.class || 'N/A';
     this.feesType = fees.feesType || '';
     this.invoiceNo = fees.invoiceNo || '';
-    this.paymentDueDate =
-      fees.paymentDueDate || formatDate(new Date(), 'yyyy-MM-dd', 'en');
+    this.paymentDueDate = fees.paymentDueDate || '';
     this.paymentDate = fees.paymentDate || '';
     this.paymentType = fees.paymentType || '';
     this.status = fees.status || '';
     this.amount = fees.amount || '';
     this.lateFee = fees.lateFee || '0$';
     this.discount = fees.discount || '0$';
-    this.createdAt =
-      fees.createdAt || formatDate(new Date(), 'yyyy-MM-dd', 'en');
-    this.updatedAt =
-      fees.updatedAt || formatDate(new Date(), 'yyyy-MM-dd', 'en');
+    this.createdAt = fees.createdAt || '';
+    this.updatedAt = fees.updatedAt || '';
     this.notes = fees.notes || 'N/A';
-  }
-
-  public getRandomID(): number {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
-    };
-    return S4() + S4();
   }
 }

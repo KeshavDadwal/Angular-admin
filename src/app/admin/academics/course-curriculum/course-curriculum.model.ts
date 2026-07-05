@@ -1,5 +1,5 @@
 export class CourseCurriculum {
-  id: number;
+  id: string;
   courseName: string;
   className: string;
   subjectName: string;
@@ -8,16 +8,14 @@ export class CourseCurriculum {
   duration: string;
   referenceMaterial: string;
 
-  constructor(courseCurriculum: CourseCurriculum) {
-    {
-      this.id = courseCurriculum.id || 0;
-      this.courseName = courseCurriculum.courseName || '';
-      this.className = courseCurriculum.className || '';
-      this.subjectName = courseCurriculum.subjectName || '';
-      this.description = courseCurriculum.description || '';
-      this.status = courseCurriculum.status || '';
-      this.duration = courseCurriculum.duration || '';
-      this.referenceMaterial = courseCurriculum.referenceMaterial || '';
-    }
+  constructor(courseCurriculum: Partial<CourseCurriculum> = {}) {
+    this.id = courseCurriculum.id || '';
+    this.courseName = courseCurriculum.courseName || '';
+    this.className = courseCurriculum.className || '';
+    this.subjectName = courseCurriculum.subjectName || '';
+    this.description = courseCurriculum.description || '';
+    this.status = courseCurriculum.status || 'Active';
+    this.duration = courseCurriculum.duration || '';
+    this.referenceMaterial = courseCurriculum.referenceMaterial || '';
   }
 }

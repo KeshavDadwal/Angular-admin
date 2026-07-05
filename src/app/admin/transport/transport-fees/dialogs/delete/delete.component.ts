@@ -1,5 +1,5 @@
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogContent, MatDialogClose, MatDialogActions, MatDialogTitle } from '@angular/material/dialog';
-import { Component, Inject, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TransportFeeService } from '../../transport-fees.service';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -17,16 +17,18 @@ import { MatButtonModule } from '@angular/material/button';
   ],
 })
 export class FeesDeleteComponent {
+  dialogRef = inject<MatDialogRef<FeesDeleteComponent>>(MatDialogRef);
+  data = inject(MAT_DIALOG_DATA);
   feeService = inject(TransportFeeService);
 
-  constructor(
-    public dialogRef: MatDialogRef<FeesDeleteComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
-
   confirmDelete(): void {
-    this.feeService.deleteFee(this.data.id).subscribe(() => {
-      this.dialogRef.close(1);
+    this.feeService.deleteFee(this.data.id).subscribe({
+      next: (response) => {
+        this.dialogRef.close(response);
+      },
+      error: (error) => {
+        console.error('Delete Error:', error);
+      },
     });
   }
 }

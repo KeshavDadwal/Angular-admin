@@ -1,5 +1,5 @@
 export interface IExamReport {
-  id: number;
+  id: string;
   img: string;
   examName: string;
   className: string;
@@ -13,7 +13,7 @@ export interface IExamReport {
 }
 
 export class ExamReport implements IExamReport {
-  id: number;
+  id: string;
   img: string;
   examName: string;
   className: string;
@@ -25,8 +25,8 @@ export class ExamReport implements IExamReport {
   date: string;
   status: string;
 
-  constructor(report: Partial<ExamReport>) {
-    this.id = report.id || this.getRandomID();
+  constructor(report: Partial<ExamReport> = {}) {
+    this.id = report.id || '';
     this.img = report.img || 'assets/images/user/new.jpg';
     this.examName = report.examName || '';
     this.className = report.className || '';
@@ -37,12 +37,5 @@ export class ExamReport implements IExamReport {
     this.generatedBy = report.generatedBy || '';
     this.date = report.date || '';
     this.status = report.status || '';
-  }
-
-  public getRandomID(): number {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
-    };
-    return S4() + S4();
   }
 }

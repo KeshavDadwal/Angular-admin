@@ -1,81 +1,190 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { Department } from './department.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DepartmentService {
   private httpClient = inject(HttpClient);
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
-  private readonly API_URL = 'assets/data/department.json';
-  dataChange: BehaviorSubject<Department[]> = new BehaviorSubject<Department[]>(
-    []
-  );
+  dataChange: BehaviorSubject<Department[]> = new BehaviorSubject<Department[]>([]);
+  dialogData!: Department;
 
-  /** GET: Fetch all departments */
+  get data(): Department[] {
+    return this.dataChange.value;
+  }
+
+  getDialogData(): Department {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): Department {
+    return new Department({
+      id: item.id,
+      img: item.img || 'assets/images/user/new.jpg',
+      department_name: item.department_name || '',
+      hod: item.hod || '',
+      phone: item.phone || '',
+      email: item.email || '',
+      student_capacity: item.student_capacity || '',
+      establishedYear: item.establishedYear || '',
+      totalFaculty: item.totalFaculty || '',
+    });
+  }
+
   getAllDepartments(): Observable<Department[]> {
-    return this.httpClient.get<Department[]>(this.API_URL).pipe(
-      map((data) => {
-        this.dataChange.next(data);
-        return data;
+    const body = {
+      query: `
+        query GetDepartmentsList {
+          departmentsList {
+            id
+            img
+            department_name
+            hod
+            phone
+            email
+            student_capacity
+            establishedYear
+            totalFaculty
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch departments');
+        }
+        const list = res.data.departmentsList || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
       }),
       catchError(this.handleError)
     );
   }
 
-  /** POST: Add a new department */
   addDepartment(department: Department): Observable<Department> {
-    // Add the new department to the data array
-    return of(department).pipe(
-      map((response) => {
-        return response; // return the added department
+    const body = {
+      query: `
+        mutation CreateDepartment($input: CreateDepartmentCustomInput!) {
+          createDepartment(input: $input) {
+            id
+            img
+            department_name
+            hod
+            phone
+            email
+            student_capacity
+            establishedYear
+            totalFaculty
+          }
+        }
+      `,
+      variables: {
+        input: {
+          img: department.img || 'assets/images/user/new.jpg',
+          department_name: department.department_name,
+          hod: department.hod,
+          phone: department.phone,
+          email: department.email,
+          student_capacity: String(department.student_capacity),
+          establishedYear: String(department.establishedYear),
+          totalFaculty: String(department.totalFaculty),
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create department');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createDepartment);
+        this.dialogData = newRecord;
+        return newRecord;
       }),
       catchError(this.handleError)
     );
   }
 
-  /** PUT: Update an existing department */
   updateDepartment(department: Department): Observable<Department> {
-    // Update the department in the data array
-    return of(department).pipe(
-      map((response) => {
-        return response; // return updated department
+    const body = {
+      query: `
+        mutation UpdateDepartment($input: UpdateDepartmentCustomInput!) {
+          updateDepartment(input: $input) {
+            id
+            img
+            department_name
+            hod
+            phone
+            email
+            student_capacity
+            establishedYear
+            totalFaculty
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(department.id),
+          img: department.img || 'assets/images/user/new.jpg',
+          department_name: department.department_name,
+          hod: department.hod,
+          phone: department.phone,
+          email: department.email,
+          student_capacity: String(department.student_capacity),
+          establishedYear: String(department.establishedYear),
+          totalFaculty: String(department.totalFaculty),
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update department');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateDepartment);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
       }),
       catchError(this.handleError)
     );
-
-    // API call to update the department
-    // return this.httpClient.put<Department>(`${this.API_URL}`, department).pipe(
-    //   map(() => department), // return department from API
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** DELETE: Remove a department by ID */
-  deleteDepartment(id: number): Observable<number> {
-    // Return the ID of the deleted department
-    return of(id).pipe(
-      map((_response) => {
-        return id; // return the ID of the deleted department
+  deleteDepartment(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteDepartment($id: String!) {
+          deleteDepartment(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete department');
+        }
+        return res.data.deleteDepartment;
       }),
       catchError(this.handleError)
     );
-
-    // API call to delete the department
-    // return this.httpClient.delete<void>(`${this.API_URL}`).pipe(
-    //   map(() => id), // return the ID of the deleted department
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** Handle Http operation that failed */
-  private handleError(error: HttpErrorResponse) {
-    console.error('An error occurred:', error.message);
-    return throwError(
-      () => new Error('Something went wrong; please try again later.')
-    );
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

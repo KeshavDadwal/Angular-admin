@@ -10,7 +10,7 @@ import { AssignmentService } from '../../assignment.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   className: string;
   subjectName: string;
 }

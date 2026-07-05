@@ -1,5 +1,5 @@
 export interface INoticeBoard {
-  id: number;
+  id: string;
   img: string;
   title: string;
   postedBy: string;
@@ -12,7 +12,7 @@ export interface INoticeBoard {
 }
 
 export class NoticeBoard implements INoticeBoard {
-  id: number;
+  id: string;
   img: string;
   title: string;
   postedBy: string;
@@ -24,7 +24,7 @@ export class NoticeBoard implements INoticeBoard {
   targetAudience: string;
 
   constructor(noticeBoard: Partial<NoticeBoard>) {
-    this.id = noticeBoard.id || this.getRandomID();
+    this.id = noticeBoard.id || '';
     this.img = noticeBoard.img || 'assets/images/user/new.jpg';
     this.title = noticeBoard.title || '';
     this.postedBy = noticeBoard.postedBy || '';
@@ -34,12 +34,5 @@ export class NoticeBoard implements INoticeBoard {
     this.status = noticeBoard.status || '';
     this.description = noticeBoard.description || '';
     this.targetAudience = noticeBoard.targetAudience || '';
-  }
-
-  public getRandomID(): number {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
-    };
-    return S4() + S4();
   }
 }

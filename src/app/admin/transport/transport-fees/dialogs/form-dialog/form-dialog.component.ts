@@ -1,6 +1,6 @@
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogContent, MatDialogClose } from '@angular/material/dialog';
-import { Component, Inject, inject } from '@angular/core';
-import { UntypedFormControl, UntypedFormGroup, UntypedFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TransportFee } from '../../transport-fees.model';
 import { TransportFeeService } from '../../transport-fees.service';
 import { MatInputModule } from '@angular/material/input';
@@ -11,7 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   fee: TransportFee;
 }
@@ -35,24 +35,24 @@ export interface DialogData {
   ],
 })
 export class FeesFormComponent {
+  dialogRef = inject<MatDialogRef<FeesFormComponent>>(MatDialogRef);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+  feeService = inject(TransportFeeService);
+  private fb = inject(UntypedFormBuilder);
+
   action: string;
   dialogTitle: string;
   feeForm: UntypedFormGroup;
   fee: TransportFee;
-  feeService = inject(TransportFeeService);
-  private fb = inject(UntypedFormBuilder);
 
-  constructor(
-    public dialogRef: MatDialogRef<FeesFormComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData
-  ) {
-    this.action = data.action;
+  constructor() {
+    this.action = this.data.action;
     if (this.action === 'edit') {
       this.dialogTitle = 'Edit Fee';
-      this.fee = data.fee;
+      this.fee = this.data.fee;
     } else {
       this.dialogTitle = 'New Fee';
-      this.fee = new TransportFee({} as TransportFee);
+      this.fee = new TransportFee({});
     }
     this.feeForm = this.createContactForm();
   }
@@ -75,12 +75,22 @@ export class FeesFormComponent {
   submit() {
     if (this.feeForm.valid) {
       if (this.action === 'edit') {
-        this.feeService.updateFee(this.feeForm.getRawValue()).subscribe(() => {
-          this.dialogRef.close(1);
+        this.feeService.updateFee(this.feeForm.getRawValue()).subscribe({
+          next: (response) => {
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            console.error('Update Error:', error);
+          },
         });
       } else {
-        this.feeService.addFee(this.feeForm.getRawValue()).subscribe(() => {
-          this.dialogRef.close(1);
+        this.feeService.addFee(this.feeForm.getRawValue()).subscribe({
+          next: (response) => {
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            console.error('Add Error:', error);
+          },
         });
       }
     }

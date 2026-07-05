@@ -1,5 +1,5 @@
 export class Driver {
-  id: number;
+  id: string;
   driver_name: string;
   license_no: string;
   phone: string;
@@ -9,8 +9,8 @@ export class Driver {
   status: string;
   img: string;
 
-  constructor(driver: Driver) {
-    this.id = driver.id || this.getRandomID();
+  constructor(driver: Partial<Driver>) {
+    this.id = driver.id || '';
     this.driver_name = driver.driver_name || '';
     this.license_no = driver.license_no || '';
     this.phone = driver.phone || '';
@@ -19,12 +19,5 @@ export class Driver {
     this.experience = driver.experience || '';
     this.status = driver.status || '';
     this.img = driver.img || 'assets/images/user/user1.jpg';
-  }
-
-  public getRandomID(): number {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
-    };
-    return S4() + S4();
   }
 }

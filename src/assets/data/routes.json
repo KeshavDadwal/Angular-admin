@@ -792,34 +792,6 @@
             ""
           ],
           "submenu": []
-        },
-        {
-          "path": "/admin/holidays/add-holiday",
-          "title": "MENUITEMS.HOLIDAY.LIST.ADD-HOLIDAY",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/holidays/edit-holiday",
-          "title": "MENUITEMS.HOLIDAY.LIST.EDIT-HOLIDAY",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
         }
       ]
     },
@@ -908,34 +880,6 @@
           "submenu": []
         },
         {
-          "path": "/admin/fees/add-fees",
-          "title": "MENUITEMS.FEES.LIST.ADD-FEES",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/fees/edit-fees",
-          "title": "MENUITEMS.FEES.LIST.EDIT-FEES",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
           "path": "/admin/fees/fees-type",
           "title": "MENUITEMS.FEES.LIST.FEES-TYPE",
           "iconType": "",
@@ -952,20 +896,6 @@
         {
           "path": "/admin/fees/fees-discount",
           "title": "MENUITEMS.FEES.LIST.FEES-DISCOUNT",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/fees/fee-receipt",
-          "title": "MENUITEMS.FEES.LIST.FEE-RECEIPT",
           "iconType": "",
           "icon": "",
           "class": "ml-menu",
@@ -995,20 +925,6 @@
         {
           "path": "/admin/class/class-list",
           "title": "MENUITEMS.CLASS.LIST.CLASS-LIST",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            "ADMIN"
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/class/class-timetable",
-          "title": "MENUITEMS.CLASS.LIST.CLASS-TIMETABLE",
           "iconType": "",
           "icon": "",
           "class": "ml-menu",
@@ -1236,34 +1152,6 @@
         {
           "path": "/admin/departments/all-departments",
           "title": "MENUITEMS.DEPARTMENTS.LIST.ALL-DEPARTMENT",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/departments/add-department",
-          "title": "MENUITEMS.DEPARTMENTS.LIST.ADD-DEPARTMENT",
-          "iconType": "",
-          "icon": "",
-          "class": "ml-menu",
-          "groupTitle": false,
-          "badge": "",
-          "badgeClass": "",
-          "role": [
-            ""
-          ],
-          "submenu": []
-        },
-        {
-          "path": "/admin/departments/edit-department",
-          "title": "MENUITEMS.DEPARTMENTS.LIST.EDIT-DEPARTMENT",
           "iconType": "",
           "icon": "",
           "class": "ml-menu",

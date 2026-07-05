@@ -1,5 +1,5 @@
 export class TransportRoute {
-  id: number;
+  id: string;
   route_name: string;
   start_point: string;
   end_point: string;
@@ -8,8 +8,8 @@ export class TransportRoute {
   route_fees: string;
   status: string;
 
-  constructor(route: TransportRoute) {
-    this.id = route.id || this.getRandomID();
+  constructor(route: Partial<TransportRoute>) {
+    this.id = route.id || '';
     this.route_name = route.route_name || '';
     this.start_point = route.start_point || '';
     this.end_point = route.end_point || '';
@@ -17,12 +17,5 @@ export class TransportRoute {
     this.vehicle_no = route.vehicle_no || '';
     this.route_fees = route.route_fees || '';
     this.status = route.status || '';
-  }
-
-  public getRandomID(): number {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
-    };
-    return S4() + S4();
   }
 }

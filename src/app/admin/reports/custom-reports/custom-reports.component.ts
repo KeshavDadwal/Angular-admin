@@ -118,8 +118,15 @@ export class CustomReportsComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(CustomReportDeleteComponent, { data: row });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.dataSource.data = this.dataSource.data.filter((record) => record.id !== row.id);
-        this.showNotification('snackbar-danger', 'Delete Record Successfully...!!!', 'bottom', 'center');
+        this.customReportService.deleteCustomReport(row.id).subscribe({
+          next: () => {
+            this.dataSource.data = this.dataSource.data.filter((record) => record.id !== row.id);
+            this.showNotification('snackbar-danger', 'Delete Record Successfully...!!!', 'bottom', 'center');
+          },
+          error: (err) => {
+            console.error('Delete Error:', err);
+          }
+        });
       }
     });
   }

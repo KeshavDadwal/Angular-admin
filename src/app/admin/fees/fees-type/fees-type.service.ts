@@ -1,16 +1,16 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { FeesType } from './fees-type.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FeesTypeService {
   private httpClient = inject(HttpClient);
-
-  private readonly API_URL = 'assets/data/fees-type.json';
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
   dataChange: BehaviorSubject<FeesType[]> = new BehaviorSubject<FeesType[]>([]);
   dialogData!: FeesType;
@@ -23,83 +23,180 @@ export class FeesTypeService {
     return this.dialogData;
   }
 
-  /** CRUD METHODS */
+  private mapGraphQLToModel(item: any): FeesType {
+    return new FeesType({
+      feeTypeId: item.feeTypeId,
+      feeTypeName: item.feeTypeName || '',
+      category: item.category || '',
+      description: item.description || '',
+      amount: Number(item.amount) || 0,
+      applicableClasses: item.applicableClasses || '',
+      frequency: item.frequency || '',
+      status: item.status || 'Active',
+      createdBy: item.createdBy || '',
+      createdDate: item.createdDate ? item.createdDate.split('T')[0] : '',
+      lastUpdated: item.lastUpdated ? item.lastUpdated.split('T')[0] : '',
+    });
+  }
 
-  /** GET: Fetch all fees types */
   getAllFeesTypes(): Observable<FeesType[]> {
-    return this.httpClient.get<FeesType[]>(this.API_URL).pipe(
-      map((data) => {
-        this.dataChange.next(data);
-        return data;
+    const body = {
+      query: `
+        query GetFeesTypesList {
+          feesTypesList {
+            feeTypeId
+            feeTypeName
+            category
+            description
+            amount
+            applicableClasses
+            frequency
+            status
+            createdBy
+            createdDate
+            lastUpdated
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch fees types');
+        }
+        const list = res.data.feesTypesList || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
       }),
       catchError(this.handleError)
     );
   }
 
-  /** POST: Add a new fees type */
   addFeesType(feesType: FeesType): Observable<FeesType> {
-    // Simulate adding the fees type
-    return of(feesType).pipe(
-      map((response) => {
-        this.dialogData = feesType;
-        return response; // Return the added fees type
+    const body = {
+      query: `
+        mutation CreateFeesType($input: CreateFeesTypeInput!) {
+          createFeesType(input: $input) {
+            feeTypeId
+            feeTypeName
+            category
+            description
+            amount
+            applicableClasses
+            frequency
+            status
+            createdBy
+            createdDate
+            lastUpdated
+          }
+        }
+      `,
+      variables: {
+        input: {
+          feeTypeName: feesType.feeTypeName,
+          category: feesType.category,
+          description: feesType.description,
+          amount: Number(feesType.amount),
+          applicableClasses: feesType.applicableClasses,
+          frequency: feesType.frequency,
+          status: feesType.status,
+          createdBy: feesType.createdBy,
+          createdDate: feesType.createdDate || '',
+          lastUpdated: feesType.lastUpdated || '',
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create fees type');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createFeesType);
+        this.dialogData = newRecord;
+        return newRecord;
       }),
       catchError(this.handleError)
     );
-
-    // API call to add the fees type
-    // return this.httpClient.post<FeesType>(this.API_URL, feesType).pipe(
-    //   map(() => {
-    //     this.dialogData = feesType;
-    //     return feesType;
-    //   }),
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** PUT: Update an existing fees type */
   updateFeesType(feesType: FeesType): Observable<FeesType> {
-    // Simulate updating the fees type
-    return of(feesType).pipe(
-      map((response) => {
-        this.dialogData = feesType;
-        return response; // Return the updated fees type
+    const body = {
+      query: `
+        mutation UpdateFeesType($input: UpdateFeesTypeInput!) {
+          updateFeesType(input: $input) {
+            feeTypeId
+            feeTypeName
+            category
+            description
+            amount
+            applicableClasses
+            frequency
+            status
+            createdBy
+            createdDate
+            lastUpdated
+          }
+        }
+      `,
+      variables: {
+        input: {
+          feeTypeId: String(feesType.feeTypeId),
+          feeTypeName: feesType.feeTypeName,
+          category: feesType.category,
+          description: feesType.description,
+          amount: Number(feesType.amount),
+          applicableClasses: feesType.applicableClasses,
+          frequency: feesType.frequency,
+          status: feesType.status,
+          createdBy: feesType.createdBy,
+          createdDate: feesType.createdDate || '',
+          lastUpdated: feesType.lastUpdated || '',
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update fees type');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateFeesType);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
       }),
       catchError(this.handleError)
     );
-
-    // API call to update the fees type
-    // return this.httpClient.put<FeesType>(`${this.API_URL}`, feesType).pipe(
-    //   map(() => {
-    //     this.dialogData = feesType;
-    //     return feesType;
-    //   }),
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** DELETE: Remove a fees type by ID */
-  deleteFeesType(id: number): Observable<number> {
-    // Simulate deleting the fees type by ID
-    return of(id).pipe(
-      map(() => {
-        return id; // Return the ID of the deleted fees type
+  deleteFeesType(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteFeesType($id: String!) {
+          deleteFeesType(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete fees type');
+        }
+        return res.data.deleteFeesType;
       }),
       catchError(this.handleError)
     );
-
-    // API call to delete the fees type
-    // return this.httpClient.delete<void>(`${this.API_URL}`).pipe(
-    //   map(() => id), // Return the ID of the deleted fees type
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** Handle Http operation that failed */
-  private handleError(error: HttpErrorResponse) {
-    console.error('An error occurred:', error.message);
-    return throwError(
-      () => new Error('Something went wrong; please try again later.')
-    );
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

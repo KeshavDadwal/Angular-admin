@@ -1,21 +1,9 @@
-import {
-  MAT_DIALOG_DATA,
-  MatDialogRef,
-  MatDialogContent,
-  MatDialogClose,
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogContent, MatDialogClose } from '@angular/material/dialog';
 import { Component, inject } from '@angular/core';
 import { FeesTypeService } from '../../fees-type.service';
-import {
-  UntypedFormControl,
-  Validators,
-  UntypedFormGroup,
-  UntypedFormBuilder,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FeesType } from '../../fees-type.model';
-import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { MAT_DATE_LOCALE, MatOptionModule } from '@angular/material/core';
 import { formatDate } from '@angular/common';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
@@ -25,7 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   feesType: FeesType;
 }
@@ -35,6 +23,7 @@ export interface DialogData {
   templateUrl: './form-dialog.component.html',
   styleUrls: ['./form-dialog.component.scss'],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }],
+  standalone: true,
   imports: [
     MatButtonModule,
     MatIconModule,
@@ -43,6 +32,7 @@ export interface DialogData {
     ReactiveFormsModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatOptionModule,
     MatInputModule,
     MatDatepickerModule,
     MatDialogClose,
@@ -61,18 +51,12 @@ export class AllFeesTypesFormComponent {
 
   constructor() {
     const data = this.data;
-
-    // Set defaults
     this.action = data.action;
-    this.dialogTitle =
-      this.action === 'edit' ? data.feesType.feeTypeName : 'New Fee Type';
+    this.dialogTitle = this.action === 'edit' ? data.feesType.feeTypeName : 'New Fee Type';
     this.feesType = this.action === 'edit' ? data.feesType : new FeesType({});
-
-    // Create the feesType form
     this.feesTypeForm = this.createFeesTypeForm();
   }
 
-  // Create feesType form with validators
   createFeesTypeForm(): UntypedFormGroup {
     return this.fb.group({
       feeTypeId: [this.feesType.feeTypeId],
@@ -101,29 +85,27 @@ export class AllFeesTypesFormComponent {
         this.feesType.status || 'Active',
         [Validators.required, Validators.maxLength(50)],
       ],
-      createdBy: [this.feesType.createdBy, [Validators.maxLength(100)]],
+      createdBy: [this.feesType.createdBy || 'Admin', [Validators.maxLength(100)]],
       createdDate: [
-        formatDate(this.feesType.createdDate, 'yyyy-MM-dd HH:mm:ss', 'en'),
+        this.feesType.createdDate
+          ? formatDate(this.feesType.createdDate, 'yyyy-MM-dd', 'en')
+          : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
       ],
       lastUpdated: [
-        formatDate(this.feesType.lastUpdated, 'yyyy-MM-dd HH:mm:ss', 'en'),
+        this.feesType.lastUpdated
+          ? formatDate(this.feesType.lastUpdated, 'yyyy-MM-dd', 'en')
+          : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
       ],
     });
   }
 
-  // Handle error messages for form fields
-  getErrorMessage(control: UntypedFormControl): string {
-    return control.hasError('required') ? 'Required field' : '';
-  }
-
-  // Submit form data
   submit(): void {
     if (this.feesTypeForm.valid) {
       const formData = this.feesTypeForm.getRawValue();
       if (this.action === 'edit') {
         this.feesTypeService.updateFeesType(formData).subscribe({
           next: (response) => {
-            this.dialogRef.close(response); // Close dialog and pass response
+            this.dialogRef.close(response);
           },
           error: (error) => {
             console.error('Update Error:', error);
@@ -132,7 +114,7 @@ export class AllFeesTypesFormComponent {
       } else {
         this.feesTypeService.addFeesType(formData).subscribe({
           next: (response) => {
-            this.dialogRef.close(response); // Close dialog and pass response
+            this.dialogRef.close(response);
           },
           error: (error) => {
             console.error('Add Error:', error);
@@ -142,12 +124,10 @@ export class AllFeesTypesFormComponent {
     }
   }
 
-  // Close the dialog without submitting
   onNoClick(): void {
     this.dialogRef.close();
   }
 
-  // Confirm and add or update feesType
   public confirmAdd(): void {
     this.submit();
   }

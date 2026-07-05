@@ -24,7 +24,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   assignment: Assignment;
 }

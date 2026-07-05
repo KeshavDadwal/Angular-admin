@@ -1,20 +1,18 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { FeesDiscount } from './fees-discount.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FeesDiscountService {
   private httpClient = inject(HttpClient);
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
-  private readonly API_URL = 'assets/data/fees-discount.json';
-
-  dataChange: BehaviorSubject<FeesDiscount[]> = new BehaviorSubject<
-    FeesDiscount[]
-  >([]);
+  dataChange: BehaviorSubject<FeesDiscount[]> = new BehaviorSubject<FeesDiscount[]>([]);
   dialogData!: FeesDiscount;
 
   get data(): FeesDiscount[] {
@@ -25,83 +23,174 @@ export class FeesDiscountService {
     return this.dialogData;
   }
 
-  /** CRUD METHODS */
+  private mapGraphQLToModel(item: any): FeesDiscount {
+    return new FeesDiscount({
+      discountId: item.discountId,
+      discountType: item.discountType || '',
+      discountAmount: Number(item.discountAmount) || 0,
+      discountPercentage: Number(item.discountPercentage) || 0,
+      discountCode: item.discountCode || '',
+      startDate: item.startDate ? item.startDate.split('T')[0] : '',
+      endDate: item.endDate ? item.endDate.split('T')[0] : '',
+      appliedDate: item.appliedDate ? item.appliedDate.split('T')[0] : '',
+      status: item.status || 'Active',
+      remarks: item.remarks || '',
+    });
+  }
 
-  /** GET: Fetch all fees discounts */
   getAllFeesDiscounts(): Observable<FeesDiscount[]> {
-    return this.httpClient.get<FeesDiscount[]>(this.API_URL).pipe(
-      map((data) => {
-        this.dataChange.next(data);
-        return data;
+    const body = {
+      query: `
+        query GetFeesDiscountsList {
+          feesDiscountsList {
+            discountId
+            discountType
+            discountAmount
+            discountPercentage
+            discountCode
+            startDate
+            endDate
+            appliedDate
+            status
+            remarks
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch fees discounts');
+        }
+        const list = res.data.feesDiscountsList || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
       }),
       catchError(this.handleError)
     );
   }
 
-  /** POST: Add a new fees discount */
   addFeesDiscount(feesDiscount: FeesDiscount): Observable<FeesDiscount> {
-    // Simulate adding the fees discount
-    return of(feesDiscount).pipe(
-      map((response) => {
-        this.dialogData = feesDiscount;
-        return response; // Return the added fees discount
+    const body = {
+      query: `
+        mutation CreateFeesDiscount($input: CreateFeesDiscountInput!) {
+          createFeesDiscount(input: $input) {
+            discountId
+            discountType
+            discountAmount
+            discountPercentage
+            discountCode
+            startDate
+            endDate
+            appliedDate
+            status
+            remarks
+          }
+        }
+      `,
+      variables: {
+        input: {
+          discountType: feesDiscount.discountType,
+          discountAmount: Number(feesDiscount.discountAmount),
+          discountPercentage: Number(feesDiscount.discountPercentage),
+          discountCode: feesDiscount.discountCode,
+          startDate: feesDiscount.startDate || '',
+          endDate: feesDiscount.endDate || '',
+          appliedDate: feesDiscount.appliedDate || '',
+          status: feesDiscount.status,
+          remarks: feesDiscount.remarks,
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create fees discount');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createFeesDiscount);
+        this.dialogData = newRecord;
+        return newRecord;
       }),
       catchError(this.handleError)
     );
-
-    // API call to add the fees discount
-    // return this.httpClient.post<FeesDiscount>(this.API_URL, feesDiscount).pipe(
-    //   map(() => {
-    //     this.dialogData = feesDiscount;
-    //     return feesDiscount;
-    //   }),
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** PUT: Update an existing fees discount */
   updateFeesDiscount(feesDiscount: FeesDiscount): Observable<FeesDiscount> {
-    // Simulate updating the fees discount
-    return of(feesDiscount).pipe(
-      map((response) => {
-        this.dialogData = feesDiscount;
-        return response; // Return the updated fees discount
+    const body = {
+      query: `
+        mutation UpdateFeesDiscount($input: UpdateFeesDiscountInput!) {
+          updateFeesDiscount(input: $input) {
+            discountId
+            discountType
+            discountAmount
+            discountPercentage
+            discountCode
+            startDate
+            endDate
+            appliedDate
+            status
+            remarks
+          }
+        }
+      `,
+      variables: {
+        input: {
+          discountId: String(feesDiscount.discountId),
+          discountType: feesDiscount.discountType,
+          discountAmount: Number(feesDiscount.discountAmount),
+          discountPercentage: Number(feesDiscount.discountPercentage),
+          discountCode: feesDiscount.discountCode,
+          startDate: feesDiscount.startDate || '',
+          endDate: feesDiscount.endDate || '',
+          appliedDate: feesDiscount.appliedDate || '',
+          status: feesDiscount.status,
+          remarks: feesDiscount.remarks,
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update fees discount');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateFeesDiscount);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
       }),
       catchError(this.handleError)
     );
-
-    // API call to update the fees discount
-    // return this.httpClient.put<FeesDiscount>(`${this.API_URL}`, feesDiscount).pipe(
-    //   map(() => {
-    //     this.dialogData = feesDiscount;
-    //     return feesDiscount;
-    //   }),
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** DELETE: Remove a fees discount by ID */
-  deleteFeesDiscount(id: number): Observable<number> {
-    // Simulate deleting the fees discount by ID
-    return of(id).pipe(
-      map(() => {
-        return id; // Return the ID of the deleted fees discount
+  deleteFeesDiscount(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteFeesDiscount($id: String!) {
+          deleteFeesDiscount(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete fees discount');
+        }
+        return res.data.deleteFeesDiscount;
       }),
       catchError(this.handleError)
     );
-
-    // API call to delete the fees discount
-    // return this.httpClient.delete<void>(`${this.API_URL}`).pipe(
-    //   map(() => id), // Return the ID of the deleted fees discount
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** Handle Http operation that failed */
-  private handleError(error: HttpErrorResponse) {
-    console.error('An error occurred:', error.message);
-    return throwError(
-      () => new Error('Something went wrong; please try again later.')
-    );
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

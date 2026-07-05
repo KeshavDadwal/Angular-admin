@@ -1,21 +1,9 @@
-import {
-  MAT_DIALOG_DATA,
-  MatDialogRef,
-  MatDialogContent,
-  MatDialogClose,
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogContent, MatDialogClose } from '@angular/material/dialog';
 import { Component, inject } from '@angular/core';
 import { FeesDiscountService } from '../../fees-discount.service';
-import {
-  UntypedFormControl,
-  Validators,
-  UntypedFormGroup,
-  UntypedFormBuilder,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FeesDiscount } from '../../fees-discount.model';
-import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { MAT_DATE_LOCALE, MatOptionModule } from '@angular/material/core';
 import { formatDate } from '@angular/common';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
@@ -25,7 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   feesDiscount: FeesDiscount;
 }
@@ -35,6 +23,7 @@ export interface DialogData {
   templateUrl: './form-dialog.component.html',
   styleUrls: ['./form-dialog.component.scss'],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }],
+  standalone: true,
   imports: [
     MatButtonModule,
     MatIconModule,
@@ -43,6 +32,7 @@ export interface DialogData {
     ReactiveFormsModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatOptionModule,
     MatInputModule,
     MatDatepickerModule,
     MatDialogClose,
@@ -61,21 +51,12 @@ export class AllFeesDiscountsFormComponent {
 
   constructor() {
     const data = this.data;
-
-    // Set defaults
     this.action = data.action;
-    this.dialogTitle =
-      this.action === 'edit'
-        ? data.feesDiscount.discountType
-        : 'New Fee Discount';
-    this.feesDiscount =
-      this.action === 'edit' ? data.feesDiscount : new FeesDiscount({});
-
-    // Create the feesDiscount form
+    this.dialogTitle = this.action === 'edit' ? data.feesDiscount.discountType : 'New Fee Discount';
+    this.feesDiscount = this.action === 'edit' ? data.feesDiscount : new FeesDiscount({});
     this.feesDiscountForm = this.createFeesDiscountForm();
   }
 
-  // Create feesDiscount form with validators
   createFeesDiscountForm(): UntypedFormGroup {
     return this.fb.group({
       discountId: [this.feesDiscount.discountId],
@@ -96,15 +77,21 @@ export class AllFeesDiscountsFormComponent {
         [Validators.required, Validators.maxLength(20)],
       ],
       startDate: [
-        formatDate(this.feesDiscount.startDate, 'yyyy-MM-dd', 'en'),
+        this.feesDiscount.startDate
+          ? formatDate(this.feesDiscount.startDate, 'yyyy-MM-dd', 'en')
+          : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
         [Validators.required],
       ],
       endDate: [
-        formatDate(this.feesDiscount.endDate, 'yyyy-MM-dd', 'en'),
+        this.feesDiscount.endDate
+          ? formatDate(this.feesDiscount.endDate, 'yyyy-MM-dd', 'en')
+          : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
         [Validators.required],
       ],
       appliedDate: [
-        formatDate(this.feesDiscount.appliedDate, 'yyyy-MM-dd', 'en'),
+        this.feesDiscount.appliedDate
+          ? formatDate(this.feesDiscount.appliedDate, 'yyyy-MM-dd', 'en')
+          : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
       ],
       status: [
         this.feesDiscount.status || 'Active',
@@ -114,19 +101,13 @@ export class AllFeesDiscountsFormComponent {
     });
   }
 
-  // Handle error messages for form fields
-  getErrorMessage(control: UntypedFormControl): string {
-    return control.hasError('required') ? 'Required field' : '';
-  }
-
-  // Submit form data
   submit(): void {
     if (this.feesDiscountForm.valid) {
       const formData = this.feesDiscountForm.getRawValue();
       if (this.action === 'edit') {
         this.feesDiscountService.updateFeesDiscount(formData).subscribe({
           next: (response) => {
-            this.dialogRef.close(response); // Close dialog and pass response
+            this.dialogRef.close(response);
           },
           error: (error) => {
             console.error('Update Error:', error);
@@ -135,7 +116,7 @@ export class AllFeesDiscountsFormComponent {
       } else {
         this.feesDiscountService.addFeesDiscount(formData).subscribe({
           next: (response) => {
-            this.dialogRef.close(response); // Close dialog and pass response
+            this.dialogRef.close(response);
           },
           error: (error) => {
             console.error('Add Error:', error);
@@ -145,12 +126,10 @@ export class AllFeesDiscountsFormComponent {
     }
   }
 
-  // Close the dialog without submitting
   onNoClick(): void {
     this.dialogRef.close();
   }
 
-  // Confirm and add or update feesDiscount
   public confirmAdd(): void {
     this.submit();
   }

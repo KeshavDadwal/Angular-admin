@@ -25,7 +25,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   fees: Fees;
 }
@@ -35,6 +35,7 @@ export interface DialogData {
   templateUrl: './form-dialog.component.html',
   styleUrls: ['./form-dialog.component.scss'],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }],
+  standalone: true,
   imports: [
     MatButtonModule,
     MatIconModule,
@@ -83,7 +84,9 @@ export class AllFeesFormComponent {
       feesType: [this.fees.feesType, [Validators.required]],
       invoiceNo: [this.fees.invoiceNo, [Validators.required]],
       paymentDueDate: [
-        formatDate(this.fees.paymentDueDate, 'yyyy-MM-dd', 'en'),
+        this.fees.paymentDueDate
+          ? formatDate(this.fees.paymentDueDate, 'yyyy-MM-dd', 'en')
+          : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
         [Validators.required],
       ],
       paymentDate: [
@@ -96,12 +99,15 @@ export class AllFeesFormComponent {
       amount: [this.fees.amount, [Validators.required]],
       lateFee: [this.fees.lateFee],
       discount: [this.fees.discount],
-      createdAt: [formatDate(this.fees.createdAt, 'yyyy-MM-dd', 'en')],
+      createdAt: [
+        this.fees.createdAt
+          ? formatDate(this.fees.createdAt, 'yyyy-MM-dd', 'en')
+          : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+      ],
       updatedAt: [
         this.fees.updatedAt
           ? formatDate(this.fees.updatedAt, 'yyyy-MM-dd', 'en')
-          : null,
-        [Validators.required],
+          : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
       ],
       notes: [this.fees.notes],
     });

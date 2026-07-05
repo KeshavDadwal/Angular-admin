@@ -1,5 +1,5 @@
 export class Subjects {
-  id: number;
+  id: string;
   subjectName: string;
   subjectCode: string;
   subjectType: string;
@@ -7,15 +7,13 @@ export class Subjects {
   prerequisites: string;
   credits: string;
 
-  constructor(subjects: Subjects) {
-    {
-      this.id = subjects.id || 0;
-      this.subjectName = subjects.subjectName || '';
-      this.subjectCode = subjects.subjectCode || '';
-      this.subjectType = subjects.subjectType || '';
-      this.status = subjects.status || '';
-      this.prerequisites = subjects.prerequisites || '';
-      this.credits = subjects.credits || '';
-    }
+  constructor(subjects: Partial<Subjects> = {}) {
+    this.id = subjects.id || '';
+    this.subjectName = subjects.subjectName || '';
+    this.subjectCode = subjects.subjectCode || '';
+    this.subjectType = subjects.subjectType || 'Core';
+    this.status = subjects.status || 'Active';
+    this.prerequisites = subjects.prerequisites || '';
+    this.credits = subjects.credits || '';
   }
 }

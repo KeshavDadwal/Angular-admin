@@ -156,15 +156,22 @@ export class HostelFeesComponent implements OnInit, OnDestroy {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.dataSource.data = this.dataSource.data.filter(
-          (record) => record.id !== row.id
-        );
-        this.showNotification(
-          'snackbar-danger',
-          'Delete Record Successfully...!!!',
-          'bottom',
-          'center'
-        );
+        this.feesService.deleteFee(row.id).subscribe({
+          next: () => {
+            this.dataSource.data = this.dataSource.data.filter(
+              (record) => record.id !== row.id
+            );
+            this.showNotification(
+              'snackbar-danger',
+              'Delete Record Successfully...!!!',
+              'bottom',
+              'center'
+            );
+          },
+          error: (err) => {
+            console.error('Delete Error:', err);
+          }
+        });
       }
     });
   }

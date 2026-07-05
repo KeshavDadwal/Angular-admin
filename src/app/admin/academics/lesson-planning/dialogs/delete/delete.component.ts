@@ -10,7 +10,7 @@ import { LessonPlanningService } from '../../lesson-planning.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   lessonName: string;
 }
 

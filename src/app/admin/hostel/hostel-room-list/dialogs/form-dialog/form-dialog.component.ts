@@ -25,7 +25,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   hostelRoomList: HostelRoomList;
 }

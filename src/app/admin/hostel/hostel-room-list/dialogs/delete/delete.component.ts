@@ -10,7 +10,7 @@ import { HostelRoomListService } from '../../hostel-room-list.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  roomId: number;
+  roomId: string;
   roomNumber: string;
   roomType: string;
   capacity: string;

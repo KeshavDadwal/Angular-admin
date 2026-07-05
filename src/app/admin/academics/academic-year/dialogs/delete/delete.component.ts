@@ -10,7 +10,7 @@ import { AcademicYearService } from '../../academic-year.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   academicYear: string;
 }
 

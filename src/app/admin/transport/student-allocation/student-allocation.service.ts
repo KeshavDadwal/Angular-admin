@@ -1,196 +1,196 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { StudentAllocation } from './student-allocation.model';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
+import { StudentAllocation } from './student-allocation.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StudentAllocationService {
   private httpClient = inject(HttpClient);
-  private staticData: any[] = [
-    {
-      id: 1,
-      student_name: 'Alice Johnson',
-      student_id: 'STU001',
-      class_section: '10-A',
-      route_name: 'North Campus - Main Gate',
-      vehicle_no: 'VH-2021-001',
-      stop_point: 'Blue Circle',
-      allocation_date: '2023-08-15',
-      status: 'Active',
-      img: 'assets/images/user/user1.jpg',
-    },
-    {
-      id: 2,
-      student_name: 'Bob Smith',
-      student_id: 'STU002',
-      class_section: '9-B',
-      route_name: 'City Center - South Block',
-      vehicle_no: 'VH-2020-002',
-      stop_point: 'Green Park',
-      allocation_date: '2023-08-16',
-      status: 'Active',
-      img: 'assets/images/user/user2.jpg',
-    },
-    {
-      id: 3,
-      student_name: 'Charlie Brown',
-      student_id: 'STU003',
-      class_section: '11-C',
-      route_name: 'Airport Road - Science Wing',
-      vehicle_no: 'VH-2019-003',
-      stop_point: 'Red Cross',
-      allocation_date: '2023-08-17',
-      status: 'Inactive',
-      img: 'assets/images/user/user3.jpg',
-    },
-    {
-      id: 4,
-      student_name: 'Diana Prince',
-      student_id: 'STU004',
-      class_section: '8-A',
-      route_name: 'Green Valley - Arts College',
-      vehicle_no: 'VH-2022-004',
-      stop_point: 'Yellow House',
-      allocation_date: '2023-08-18',
-      status: 'Active',
-      img: 'assets/images/user/user4.jpg',
-    },
-    {
-      id: 5,
-      student_name: 'Ethan Hunt',
-      student_id: 'STU005',
-      class_section: '12-B',
-      route_name: 'Railway Station - Hostel Block',
-      vehicle_no: 'VH-2021-005',
-      stop_point: 'Black Square',
-      allocation_date: '2023-08-19',
-      status: 'Active',
-      img: 'assets/images/user/user5.jpg',
-    },
-    {
-      id: 6,
-      student_name: 'Fiona Gallagher',
-      student_id: 'STU006',
-      class_section: '10-B',
-      route_name: 'East Suburb - Library',
-      vehicle_no: 'VH-2018-006',
-      stop_point: 'White Bridge',
-      allocation_date: '2023-08-20',
-      status: 'Active',
-      img: 'assets/images/user/user6.jpg',
-    },
-    {
-      id: 7,
-      student_name: 'George Miller',
-      student_id: 'STU007',
-      class_section: '7-C',
-      route_name: 'West End - Sports Complex',
-      vehicle_no: 'VH-2023-007',
-      stop_point: 'Silver Road',
-      allocation_date: '2023-08-21',
-      status: 'Active',
-      img: 'assets/images/user/user7.jpg',
-    },
-    {
-      id: 8,
-      student_name: 'Hannah Abbott',
-      student_id: 'STU008',
-      class_section: '11-A',
-      route_name: 'Hill Top - Medical Center',
-      vehicle_no: 'VH-2020-008',
-      stop_point: 'Gold Hill',
-      allocation_date: '2023-08-22',
-      status: 'Active',
-      img: 'assets/images/user/user8.jpg',
-    },
-    {
-      id: 9,
-      student_name: 'Ian Wright',
-      student_id: 'STU009',
-      class_section: '9-A',
-      route_name: 'Market Square - Admin Block',
-      vehicle_no: 'VH-2017-009',
-      stop_point: 'Old Market',
-      allocation_date: '2023-08-23',
-      status: 'Active',
-      img: 'assets/images/user/user9.jpg',
-    },
-    {
-      id: 10,
-      student_name: 'Julia Roberts',
-      student_id: 'STU010',
-      class_section: '12-A',
-      route_name: 'Lake Side - Engineering Wing',
-      vehicle_no: 'VH-2021-010',
-      stop_point: 'Water Front',
-      allocation_date: '2023-08-24',
-      status: 'Active',
-      img: 'assets/images/user/user10.jpg',
-    },
-    {
-      id: 11,
-      student_name: 'Kevin Hart',
-      student_id: 'STU011',
-      class_section: '8-B',
-      route_name: 'Central Plaza - IT Center',
-      vehicle_no: 'VH-2022-011',
-      stop_point: 'Main Plaza',
-      allocation_date: '2023-08-25',
-      status: 'Active',
-      img: 'assets/images/user/user11.jpg',
-    },
-    {
-      id: 12,
-      student_name: 'Laura Palmer',
-      student_id: 'STU012',
-      class_section: '10-C',
-      route_name: 'Old Town - PG Hostel',
-      vehicle_no: 'VH-2019-012',
-      stop_point: 'North End',
-      allocation_date: '2023-08-26',
-      status: 'Active',
-      img: 'assets/images/user/user6.jpg',
-    },
-  ];
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
-  dataChange: BehaviorSubject<StudentAllocation[]> = new BehaviorSubject<
-    StudentAllocation[]
-  >([]);
+  dataChange: BehaviorSubject<StudentAllocation[]> = new BehaviorSubject<StudentAllocation[]>([]);
+  dialogData!: StudentAllocation;
 
   get data(): StudentAllocation[] {
     return this.dataChange.value;
   }
 
+  getDialogData(): StudentAllocation {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): StudentAllocation {
+    return new StudentAllocation({
+      id: item.id,
+      student_name: item.studentName || '',
+      student_id: item.studentId || '',
+      class_section: item.classSection || '',
+      route_name: item.routeName || '',
+      vehicle_no: item.vehicleNo || '',
+      stop_point: item.stopPoint || '',
+      allocation_date: item.allocationDate || '',
+      status: item.status || '',
+      img: item.img || 'assets/images/user/user1.jpg',
+    });
+  }
+
   getAllocations(): Observable<StudentAllocation[]> {
-    this.dataChange.next(this.staticData);
-    return of(this.staticData);
+    const body = {
+      query: `
+        query GetStudentAllocationsList {
+          studentAllocationsList {
+            id
+            studentName
+            studentId
+            classSection
+            routeName
+            vehicleNo
+            stopPoint
+            allocationDate
+            status
+            img
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch student allocations');
+        }
+        const list = res.data.studentAllocationsList || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   addAllocation(allocation: StudentAllocation): Observable<StudentAllocation> {
-    this.staticData.push(allocation);
-    this.dataChange.next(this.staticData);
-    return of(allocation);
+    const body = {
+      query: `
+        mutation CreateStudentAllocation($input: CreateStudentAllocationInput!) {
+          createStudentAllocation(input: $input) {
+            id
+            studentName
+            studentId
+            classSection
+            routeName
+            vehicleNo
+            stopPoint
+            allocationDate
+            status
+            img
+          }
+        }
+      `,
+      variables: {
+        input: {
+          studentName: allocation.student_name,
+          studentId: allocation.student_id,
+          classSection: allocation.class_section,
+          routeName: allocation.route_name,
+          vehicleNo: allocation.vehicle_no,
+          stopPoint: allocation.stop_point,
+          allocationDate: allocation.allocation_date || '',
+          status: allocation.status,
+          img: allocation.img || 'assets/images/user/user1.jpg',
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create student allocation');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createStudentAllocation);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
-  updateAllocation(
-    allocation: StudentAllocation
-  ): Observable<StudentAllocation> {
-    const index = this.staticData.findIndex((it) => it.id === allocation.id);
-    if (index !== -1) {
-      this.staticData[index] = allocation;
-      this.dataChange.next(this.staticData);
-    }
-    return of(allocation);
+  updateAllocation(allocation: StudentAllocation): Observable<StudentAllocation> {
+    const body = {
+      query: `
+        mutation UpdateStudentAllocation($input: UpdateStudentAllocationInput!) {
+          updateStudentAllocation(input: $input) {
+            id
+            studentName
+            studentId
+            classSection
+            routeName
+            vehicleNo
+            stopPoint
+            allocationDate
+            status
+            img
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(allocation.id),
+          studentName: allocation.student_name,
+          studentId: allocation.student_id,
+          classSection: allocation.class_section,
+          routeName: allocation.route_name,
+          vehicleNo: allocation.vehicle_no,
+          stopPoint: allocation.stop_point,
+          allocationDate: allocation.allocation_date || '',
+          status: allocation.status,
+          img: allocation.img || 'assets/images/user/user1.jpg',
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update student allocation');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateStudentAllocation);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
-  deleteAllocation(id: number): Observable<number> {
-    const index = this.staticData.findIndex((it) => it.id === id);
-    if (index !== -1) {
-      this.staticData.splice(index, 1);
-      this.dataChange.next(this.staticData);
-    }
-    return of(id);
+  deleteAllocation(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteStudentAllocation($id: String!) {
+          deleteStudentAllocation(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete student allocation');
+        }
+        return res.data.deleteStudentAllocation;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

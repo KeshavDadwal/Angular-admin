@@ -1,5 +1,5 @@
 export interface IAcademicReport {
-  id: number;
+  id: string;
   img: string;
   reportType: string;
   className: string;
@@ -12,7 +12,7 @@ export interface IAcademicReport {
 }
 
 export class AcademicReport implements IAcademicReport {
-  id: number;
+  id: string;
   img: string;
   reportType: string;
   className: string;
@@ -23,8 +23,8 @@ export class AcademicReport implements IAcademicReport {
   date: string;
   status: string;
 
-  constructor(report: Partial<AcademicReport>) {
-    this.id = report.id || this.getRandomID();
+  constructor(report: Partial<AcademicReport> = {}) {
+    this.id = report.id || '';
     this.img = report.img || 'assets/images/user/new.jpg';
     this.reportType = report.reportType || '';
     this.className = report.className || '';
@@ -34,12 +34,5 @@ export class AcademicReport implements IAcademicReport {
     this.generatedBy = report.generatedBy || '';
     this.date = report.date || '';
     this.status = report.status || '';
-  }
-
-  public getRandomID(): number {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
-    };
-    return S4() + S4();
   }
 }

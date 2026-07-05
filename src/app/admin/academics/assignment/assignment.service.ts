@@ -1,174 +1,190 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
 import { Assignment } from './assignment.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AssignmentService {
-  private assignments: Assignment[] = [
-    {
-      id: 1,
-      className: 'Class 1',
-      subjectName: 'Mathematics',
-      teacherName: 'John Doe',
-      assignmentDate: '2023-10-01',
-      status: 'Published',
-      title: 'Algebra Basics',
-      deadline: '2023-10-10',
-      details: 'Solve exercises 1 to 10.',
-    },
-    {
-      id: 2,
-      className: 'Class 2',
-      subjectName: 'Science',
-      teacherName: 'Jane Smith',
-      assignmentDate: '2023-10-02',
-      status: 'Draft',
-      title: 'Photosynthesis',
-      deadline: '2023-10-12',
-      details: 'Draw a diagram of photosynthesis.',
-    },
-    {
-      id: 3,
-      className: 'Class 3',
-      subjectName: 'English',
-      teacherName: 'Alice Brown',
-      assignmentDate: '2023-10-03',
-      status: 'Published',
-      title: 'Essay Writing',
-      deadline: '2023-10-15',
-      details: 'Write an essay on environment.',
-    },
-    {
-      id: 4,
-      className: 'Class 4',
-      subjectName: 'History',
-      teacherName: 'Bob White',
-      assignmentDate: '2023-10-04',
-      status: 'Published',
-      title: 'Ancient Civilizations',
-      deadline: '2023-10-20',
-      details: 'Research about Indus Valley.',
-    },
-    {
-      id: 5,
-      className: 'Class 5',
-      subjectName: 'Geography',
-      teacherName: 'Charlie Green',
-      assignmentDate: '2023-10-05',
-      status: 'Draft',
-      title: 'Map Reading',
-      deadline: '2023-10-22',
-      details: 'Identify major rivers in India.',
-    },
-    {
-      id: 6,
-      className: 'Class 6',
-      subjectName: 'Physics',
-      teacherName: 'David Black',
-      assignmentDate: '2023-10-06',
-      status: 'Published',
-      title: 'Newton Laws',
-      deadline: '2023-10-25',
-      details: 'Explain the three laws of motion.',
-    },
-    {
-      id: 7,
-      className: 'Class 7',
-      subjectName: 'Chemistry',
-      teacherName: 'Emma Watson',
-      assignmentDate: '2023-10-07',
-      status: 'Published',
-      title: 'Periodic Table',
-      deadline: '2023-10-28',
-      details: 'Memorize first 20 elements.',
-    },
-    {
-      id: 8,
-      className: 'Class 8',
-      subjectName: 'Biology',
-      teacherName: 'Frank Miller',
-      assignmentDate: '2023-10-08',
-      status: 'Draft',
-      title: 'Cell Structure',
-      deadline: '2023-10-30',
-      details: 'Describe plant and animal cells.',
-    },
-    {
-      id: 9,
-      className: 'Class 9',
-      subjectName: 'Computer Science',
-      teacherName: 'Grace Hopper',
-      assignmentDate: '2023-10-09',
-      status: 'Published',
-      title: 'Python Basics',
-      deadline: '2023-11-05',
-      details: 'Write a program for Fibonacci series.',
-    },
-    {
-      id: 10,
-      className: 'Class 10',
-      subjectName: 'Economics',
-      teacherName: 'Henry Ford',
-      assignmentDate: '2023-10-10',
-      status: 'Published',
-      title: 'Supply and Demand',
-      deadline: '2023-11-10',
-      details: 'Explain the law of demand.',
-    },
-    {
-      id: 11,
-      className: 'Class 11',
-      subjectName: 'Psychology',
-      teacherName: 'Isabel Bloom',
-      assignmentDate: '2023-10-11',
-      status: 'Draft',
-      title: 'Behavioral Science',
-      deadline: '2023-11-12',
-      details: 'Conduct a small survey.',
-    },
-    {
-      id: 12,
-      className: 'Class 12',
-      subjectName: 'Political Science',
-      teacherName: 'Jack Reacher',
-      assignmentDate: '2023-10-12',
-      status: 'Published',
-      title: 'Democracy',
-      deadline: '2023-11-15',
-      details: 'Discuss merits of democracy.',
-    },
-  ];
+  private httpClient = inject(HttpClient);
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
-  dataChange: BehaviorSubject<Assignment[]> = new BehaviorSubject<Assignment[]>(
-    []
-  );
+  dataChange: BehaviorSubject<Assignment[]> = new BehaviorSubject<Assignment[]>([]);
+  dialogData!: Assignment;
+
+  get data(): Assignment[] {
+    return this.dataChange.value;
+  }
+
+  getDialogData(): Assignment {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): Assignment {
+    return new Assignment({
+      id: item.id,
+      className: item.className || '',
+      subjectName: item.subjectName || '',
+      teacherName: item.teacherName || '',
+      assignmentDate: item.assignmentDate ? item.assignmentDate.split('T')[0] : '',
+      status: item.status || 'Active',
+      title: item.title || '',
+      deadline: item.deadline ? item.deadline.split('T')[0] : '',
+      details: item.details || '',
+    });
+  }
 
   getAllAssignments(): Observable<Assignment[]> {
-    this.dataChange.next(this.assignments);
-    return of(this.assignments);
+    const body = {
+      query: `
+        query GetAssignmentsList {
+          assignmentsList {
+            id
+            className
+            subjectName
+            teacherName
+            assignmentDate
+            status
+            title
+            deadline
+            details
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch assignments');
+        }
+        const list = res.data.assignmentsList || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   addAssignment(assignment: Assignment): Observable<Assignment> {
-    assignment.id = Math.max(...this.assignments.map((a) => a.id), 0) + 1;
-    this.assignments.push(assignment);
-    this.dataChange.next(this.assignments);
-    return of(assignment);
+    const body = {
+      query: `
+        mutation CreateAssignment($input: CreateAssignmentCustomInput!) {
+          createAssignment(input: $input) {
+            id
+            className
+            subjectName
+            teacherName
+            assignmentDate
+            status
+            title
+            deadline
+            details
+          }
+        }
+      `,
+      variables: {
+        input: {
+          className: assignment.className,
+          subjectName: assignment.subjectName,
+          teacherName: assignment.teacherName || '',
+          assignmentDate: assignment.assignmentDate || '',
+          status: assignment.status,
+          title: assignment.title,
+          deadline: assignment.deadline || '',
+          details: assignment.details || '',
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create assignment');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createAssignment);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   updateAssignment(assignment: Assignment): Observable<Assignment> {
-    const index = this.assignments.findIndex((a) => a.id === assignment.id);
-    if (index !== -1) {
-      this.assignments[index] = assignment;
-      this.dataChange.next(this.assignments);
-    }
-    return of(assignment);
+    const body = {
+      query: `
+        mutation UpdateAssignment($input: UpdateAssignmentCustomInput!) {
+          updateAssignment(input: $input) {
+            id
+            className
+            subjectName
+            teacherName
+            assignmentDate
+            status
+            title
+            deadline
+            details
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(assignment.id),
+          className: assignment.className,
+          subjectName: assignment.subjectName,
+          teacherName: assignment.teacherName || '',
+          assignmentDate: assignment.assignmentDate || '',
+          status: assignment.status,
+          title: assignment.title,
+          deadline: assignment.deadline || '',
+          details: assignment.details || '',
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update assignment');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateAssignment);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
-  deleteAssignment(id: number): Observable<number> {
-    this.assignments = this.assignments.filter((a) => a.id !== id);
-    this.dataChange.next(this.assignments);
-    return of(id);
+  deleteAssignment(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteAssignment($id: String!) {
+          deleteAssignment(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete assignment');
+        }
+        return res.data.deleteAssignment;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

@@ -10,7 +10,7 @@ import { SubjectsService } from '../../subjects.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   subjectName: string;
 }
 

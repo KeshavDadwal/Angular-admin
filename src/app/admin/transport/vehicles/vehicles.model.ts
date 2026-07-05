@@ -1,5 +1,5 @@
 export class Vehicle {
-  id: number;
+  id: string;
   vehicle_no: string;
   vehicle_model: string;
   year_made: string;
@@ -9,8 +9,8 @@ export class Vehicle {
   status: string;
   img: string;
 
-  constructor(vehicle: Vehicle) {
-    this.id = vehicle.id || this.getRandomID();
+  constructor(vehicle: Partial<Vehicle>) {
+    this.id = vehicle.id || '';
     this.vehicle_no = vehicle.vehicle_no || '';
     this.vehicle_model = vehicle.vehicle_model || '';
     this.year_made = vehicle.year_made || '';
@@ -19,12 +19,5 @@ export class Vehicle {
     this.vehicle_type = vehicle.vehicle_type || '';
     this.status = vehicle.status || '';
     this.img = vehicle.img || 'assets/images/user/user1.jpg';
-  }
-
-  public getRandomID(): number {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
-    };
-    return S4() + S4();
   }
 }

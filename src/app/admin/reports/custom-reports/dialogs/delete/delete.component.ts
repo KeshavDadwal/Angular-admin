@@ -4,7 +4,7 @@ import { CustomReportService } from '../../custom-report.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   reportName: string;
 }
 

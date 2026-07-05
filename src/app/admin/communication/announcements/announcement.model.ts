@@ -1,5 +1,5 @@
 export interface IAnnouncement {
-  id: number;
+  id: string;
   img: string;
   title: string;
   announcementType: string;
@@ -12,7 +12,7 @@ export interface IAnnouncement {
 }
 
 export class Announcement implements IAnnouncement {
-  id: number;
+  id: string;
   img: string;
   title: string;
   announcementType: string;
@@ -24,7 +24,7 @@ export class Announcement implements IAnnouncement {
   priority: string;
 
   constructor(announcement: Partial<Announcement>) {
-    this.id = announcement.id || this.getRandomID();
+    this.id = announcement.id || '';
     this.img = announcement.img || 'assets/images/user/new.jpg';
     this.title = announcement.title || '';
     this.announcementType = announcement.announcementType || '';
@@ -34,12 +34,5 @@ export class Announcement implements IAnnouncement {
     this.status = announcement.status || '';
     this.description = announcement.description || '';
     this.priority = announcement.priority || '';
-  }
-
-  public getRandomID(): number {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
-    };
-    return S4() + S4();
   }
 }

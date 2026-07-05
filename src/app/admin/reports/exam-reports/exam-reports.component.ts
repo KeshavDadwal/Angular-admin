@@ -121,8 +121,15 @@ export class ExamReportsComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(ExamReportDeleteComponent, { data: row });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.dataSource.data = this.dataSource.data.filter((record) => record.id !== row.id);
-        this.showNotification('snackbar-danger', 'Delete Record Successfully...!!!', 'bottom', 'center');
+        this.examReportService.deleteExamReport(row.id).subscribe({
+          next: () => {
+            this.dataSource.data = this.dataSource.data.filter((record) => record.id !== row.id);
+            this.showNotification('snackbar-danger', 'Delete Record Successfully...!!!', 'bottom', 'center');
+          },
+          error: (err) => {
+            console.error('Delete Error:', err);
+          }
+        });
       }
     });
   }

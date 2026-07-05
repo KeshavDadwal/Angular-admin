@@ -4,7 +4,7 @@ import { AcademicReportService } from '../../academic-report.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   reportType: string;
   className: string;
   subject: string;

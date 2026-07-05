@@ -1,58 +1,178 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
 import { AcademicYear } from './academic-year.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AcademicYearService {
-  private academicYears: AcademicYear[] = [
-    { id: 1, academicYear: '2020-21', status: 'Inactive', startDate: '2020-06-01', endDate: '2021-05-31', description: 'Academic Year 2020-21', department: 'All' },
-    { id: 2, academicYear: '2021-22', status: 'Inactive', startDate: '2021-06-01', endDate: '2022-05-31', description: 'Academic Year 2021-22', department: 'All' },
-    { id: 3, academicYear: '2022-23', status: 'Inactive', startDate: '2022-06-01', endDate: '2023-05-31', description: 'Academic Year 2022-23', department: 'All' },
-    { id: 4, academicYear: '2023-24', status: 'Active', startDate: '2023-06-01', endDate: '2024-05-31', description: 'Academic Year 2023-24', department: 'All' },
-    { id: 5, academicYear: '2024-25', status: 'Pending', startDate: '2024-06-01', endDate: '2025-05-31', description: 'Academic Year 2024-25', department: 'All' },
-    { id: 6, academicYear: '2025-26', status: 'Planned', startDate: '2025-06-01', endDate: '2026-05-31', description: 'Academic Year 2025-26', department: 'All' },
-    { id: 7, academicYear: '2019-20', status: 'Inactive', startDate: '2019-06-01', endDate: '2020-05-31', description: 'Academic Year 2019-20', department: 'All' },
-    { id: 8, academicYear: '2018-19', status: 'Inactive', startDate: '2018-06-01', endDate: '2019-05-31', description: 'Academic Year 2018-19', department: 'All' },
-    { id: 9, academicYear: '2017-18', status: 'Inactive', startDate: '2017-06-01', endDate: '2018-05-31', description: 'Academic Year 2017-18', department: 'All' },
-    { id: 10, academicYear: '2016-17', status: 'Inactive', startDate: '2016-06-01', endDate: '2017-05-31', description: 'Academic Year 2016-17', department: 'All' },
-    { id: 11, academicYear: '2015-16', status: 'Inactive', startDate: '2015-06-01', endDate: '2016-05-31', description: 'Academic Year 2015-16', department: 'All' },
-    { id: 12, academicYear: '2026-27', status: 'Planned', startDate: '2026-06-01', endDate: '2027-05-31', description: 'Academic Year 2026-27', department: 'All' },
-  ];
+  private httpClient = inject(HttpClient);
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
-  dataChange: BehaviorSubject<AcademicYear[]> = new BehaviorSubject<AcademicYear[]>(
-    []
-  );
+  dataChange: BehaviorSubject<AcademicYear[]> = new BehaviorSubject<AcademicYear[]>([]);
+  dialogData!: AcademicYear;
 
-  /** GET: Fetch all academic years */
+  get data(): AcademicYear[] {
+    return this.dataChange.value;
+  }
+
+  getDialogData(): AcademicYear {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): AcademicYear {
+    return new AcademicYear({
+      id: item.id,
+      academicYear: item.academicYear || '',
+      status: item.status || 'Active',
+      startDate: item.startDate ? item.startDate.split('T')[0] : '',
+      endDate: item.endDate ? item.endDate.split('T')[0] : '',
+      description: item.description || '',
+      department: item.department || 'All',
+    });
+  }
+
   getAllAcademicYears(): Observable<AcademicYear[]> {
-    this.dataChange.next(this.academicYears);
-    return of(this.academicYears);
+    const body = {
+      query: `
+        query GetAcademicYearList {
+          academicYearList {
+            id
+            academicYear
+            status
+            startDate
+            endDate
+            description
+            department
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch academic years');
+        }
+        const list = res.data.academicYearList || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
+      }),
+      catchError(this.handleError)
+    );
   }
 
-  /** POST: Add a new academic year */
   addAcademicYear(academicYear: AcademicYear): Observable<AcademicYear> {
-    academicYear.id = Math.max(...this.academicYears.map(y => y.id), 0) + 1;
-    this.academicYears.push(academicYear);
-    this.dataChange.next(this.academicYears);
-    return of(academicYear);
+    const body = {
+      query: `
+        mutation CreateAcademicYear($input: CreateAcademicYearCustomInput!) {
+          createAcademicYear(input: $input) {
+            id
+            academicYear
+            status
+            startDate
+            endDate
+            description
+            department
+          }
+        }
+      `,
+      variables: {
+        input: {
+          academicYear: academicYear.academicYear,
+          status: academicYear.status,
+          startDate: academicYear.startDate || '',
+          endDate: academicYear.endDate || '',
+          description: academicYear.description || '',
+          department: academicYear.department || 'All',
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create academic year');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createAcademicYear);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
-  /** PUT: Update an existing academic year */
   updateAcademicYear(academicYear: AcademicYear): Observable<AcademicYear> {
-    const index = this.academicYears.findIndex(y => y.id === academicYear.id);
-    if (index !== -1) {
-      this.academicYears[index] = academicYear;
-      this.dataChange.next(this.academicYears);
-    }
-    return of(academicYear);
+    const body = {
+      query: `
+        mutation UpdateAcademicYear($input: UpdateAcademicYearCustomInput!) {
+          updateAcademicYear(input: $input) {
+            id
+            academicYear
+            status
+            startDate
+            endDate
+            description
+            department
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(academicYear.id),
+          academicYear: academicYear.academicYear,
+          status: academicYear.status,
+          startDate: academicYear.startDate || '',
+          endDate: academicYear.endDate || '',
+          description: academicYear.description || '',
+          department: academicYear.department || 'All',
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update academic year');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateAcademicYear);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
-  /** DELETE: Remove an academic year by ID */
-  deleteAcademicYear(id: number): Observable<number> {
-    this.academicYears = this.academicYears.filter(y => y.id !== id);
-    this.dataChange.next(this.academicYears);
-    return of(id);
+  deleteAcademicYear(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteAcademicYear($id: String!) {
+          deleteAcademicYear(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete academic year');
+        }
+        return res.data.deleteAcademicYear;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

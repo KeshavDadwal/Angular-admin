@@ -1,6 +1,6 @@
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogContent, MatDialogClose } from '@angular/material/dialog';
-import { Component, Inject, inject } from '@angular/core';
-import { UntypedFormControl, UntypedFormGroup, UntypedFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Driver } from '../../drivers.model';
 import { DriverService } from '../../drivers.service';
 import { MatInputModule } from '@angular/material/input';
@@ -11,7 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   driver: Driver;
 }
@@ -35,24 +35,24 @@ export interface DialogData {
   ],
 })
 export class DriversFormComponent {
+  dialogRef = inject<MatDialogRef<DriversFormComponent>>(MatDialogRef);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+  driverService = inject(DriverService);
+  private fb = inject(UntypedFormBuilder);
+
   action: string;
   dialogTitle: string;
   driverForm: UntypedFormGroup;
   driver: Driver;
-  driverService = inject(DriverService);
-  private fb = inject(UntypedFormBuilder);
 
-  constructor(
-    public dialogRef: MatDialogRef<DriversFormComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData
-  ) {
-    this.action = data.action;
+  constructor() {
+    this.action = this.data.action;
     if (this.action === 'edit') {
       this.dialogTitle = 'Edit Driver';
-      this.driver = data.driver;
+      this.driver = this.data.driver;
     } else {
       this.dialogTitle = 'New Driver';
-      this.driver = new Driver({} as Driver);
+      this.driver = new Driver({});
     }
     this.driverForm = this.createContactForm();
   }
@@ -74,12 +74,22 @@ export class DriversFormComponent {
   submit() {
     if (this.driverForm.valid) {
       if (this.action === 'edit') {
-        this.driverService.updateDriver(this.driverForm.getRawValue()).subscribe(() => {
-          this.dialogRef.close(1);
+        this.driverService.updateDriver(this.driverForm.getRawValue()).subscribe({
+          next: (response) => {
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            console.error('Update Error:', error);
+          },
         });
       } else {
-        this.driverService.addDriver(this.driverForm.getRawValue()).subscribe(() => {
-          this.dialogRef.close(1);
+        this.driverService.addDriver(this.driverForm.getRawValue()).subscribe({
+          next: (response) => {
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            console.error('Add Error:', error);
+          },
         });
       }
     }

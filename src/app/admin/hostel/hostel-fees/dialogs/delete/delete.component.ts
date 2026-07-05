@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 export interface DialogData {
-  id: number;
+  id: string;
   student_name: string;
   student_id: string;
   amount: number;

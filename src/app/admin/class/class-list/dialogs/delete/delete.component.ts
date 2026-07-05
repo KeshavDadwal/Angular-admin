@@ -10,10 +10,10 @@ import { ClassListService } from '../../class-list.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  classId: number;
+  classId: string;
   className: string;
   classCode: string;
-  classCapacity: string;
+  classCapacity: number;
 }
 
 @Component({

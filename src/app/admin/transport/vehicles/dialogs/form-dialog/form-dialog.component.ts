@@ -1,6 +1,6 @@
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogContent, MatDialogClose } from '@angular/material/dialog';
-import { Component, Inject, inject } from '@angular/core';
-import { UntypedFormControl, UntypedFormGroup, UntypedFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Vehicle } from '../../vehicles.model';
 import { VehicleService } from '../../vehicles.service';
 import { MatInputModule } from '@angular/material/input';
@@ -10,7 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   vehicle: Vehicle;
 }
@@ -33,24 +33,24 @@ export interface DialogData {
   ],
 })
 export class VehiclesFormComponent {
+  dialogRef = inject<MatDialogRef<VehiclesFormComponent>>(MatDialogRef);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+  vehicleService = inject(VehicleService);
+  private fb = inject(UntypedFormBuilder);
+
   action: string;
   dialogTitle: string;
   vehicleForm: UntypedFormGroup;
   vehicle: Vehicle;
-  vehicleService = inject(VehicleService);
-  private fb = inject(UntypedFormBuilder);
 
-  constructor(
-    public dialogRef: MatDialogRef<VehiclesFormComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData
-  ) {
-    this.action = data.action;
+  constructor() {
+    this.action = this.data.action;
     if (this.action === 'edit') {
       this.dialogTitle = 'Edit Vehicle';
-      this.vehicle = data.vehicle;
+      this.vehicle = this.data.vehicle;
     } else {
       this.dialogTitle = 'New Vehicle';
-      this.vehicle = new Vehicle({} as Vehicle);
+      this.vehicle = new Vehicle({});
     }
     this.vehicleForm = this.createContactForm();
   }
@@ -72,12 +72,22 @@ export class VehiclesFormComponent {
   submit() {
     if (this.vehicleForm.valid) {
       if (this.action === 'edit') {
-        this.vehicleService.updateVehicle(this.vehicleForm.getRawValue()).subscribe(() => {
-          this.dialogRef.close(1);
+        this.vehicleService.updateVehicle(this.vehicleForm.getRawValue()).subscribe({
+          next: (response) => {
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            console.error('Update Error:', error);
+          },
         });
       } else {
-        this.vehicleService.addVehicle(this.vehicleForm.getRawValue()).subscribe(() => {
-          this.dialogRef.close(1);
+        this.vehicleService.addVehicle(this.vehicleForm.getRawValue()).subscribe({
+          next: (response) => {
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            console.error('Add Error:', error);
+          },
         });
       }
     }

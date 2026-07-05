@@ -1,33 +1,27 @@
-import {
-  MAT_DIALOG_DATA,
-  MatDialogRef,
-  MatDialogTitle,
-  MatDialogContent,
-  MatDialogActions,
-  MatDialogClose,
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogContent, MatDialogClose, MatDialogActions, MatDialogTitle } from '@angular/material/dialog';
 import { Component, inject } from '@angular/core';
 import { AnnouncementService } from '../../announcement.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   title: string;
   postedBy: string;
   announcementType: string;
 }
 
 @Component({
-    selector: 'app-announcement-delete',
-    templateUrl: './delete.component.html',
-    styleUrls: ['./delete.component.scss'],
-    imports: [
-        MatDialogTitle,
-        MatDialogContent,
-        MatDialogActions,
-        MatButtonModule,
-        MatDialogClose,
-    ]
+  selector: 'app-announcement-delete',
+  templateUrl: './delete.component.html',
+  styleUrls: ['./delete.component.scss'],
+  standalone: true,
+  imports: [
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+    MatButtonModule,
+    MatDialogClose,
+  ]
 })
 export class AnnouncementDeleteComponent {
   dialogRef = inject<MatDialogRef<AnnouncementDeleteComponent>>(MatDialogRef);

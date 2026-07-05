@@ -141,8 +141,16 @@ export class StudentAllocationComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result === 1) {
-        this.loadData();
+      if (result) {
+        if (action === 'add') {
+          this.dataSource.data = [result, ...this.dataSource.data];
+        } else {
+          const index = this.dataSource.data.findIndex((r) => r.id === result.id);
+          if (index !== -1) {
+            this.dataSource.data[index] = result;
+            this.dataSource._updateChangeSubscription();
+          }
+        }
         this.showNotification(
           action === 'add' ? 'snackbar-success' : 'black',
           `${action === 'add' ? 'Add' : 'Edit'} Record Successfully...!!!`,
@@ -161,8 +169,10 @@ export class StudentAllocationComponent implements OnInit, OnDestroy {
       direction: varDirection,
     });
     dialogRef.afterClosed().subscribe((result) => {
-      if (result === 1) {
-        this.loadData();
+      if (result) {
+        this.dataSource.data = this.dataSource.data.filter(
+          (record) => record.id !== row.id
+        );
         this.showNotification(
           'snackbar-danger',
           'Delete Record Successfully...!!!',

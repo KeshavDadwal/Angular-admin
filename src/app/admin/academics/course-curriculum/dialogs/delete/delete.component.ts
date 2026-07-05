@@ -10,7 +10,7 @@ import { CourseCurriculumService } from '../../course-curriculum.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   courseName: string;
 }
 

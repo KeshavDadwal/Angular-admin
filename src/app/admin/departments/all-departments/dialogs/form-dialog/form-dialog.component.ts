@@ -23,28 +23,28 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   department: Department;
 }
 
 @Component({
-    selector: 'app-departments-form',
-    templateUrl: './form-dialog.component.html',
-    styleUrls: ['./form-dialog.component.scss'],
-    providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }],
-    imports: [
-        MatButtonModule,
-        MatIconModule,
-        MatDialogContent,
-        FormsModule,
-        ReactiveFormsModule,
-        MatFormFieldModule,
-        MatSelectModule,
-        MatOptionModule,
-        MatInputModule,
-        MatDialogClose,
-    ]
+  selector: 'app-departments-form',
+  templateUrl: './form-dialog.component.html',
+  styleUrls: ['./form-dialog.component.scss'],
+  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }],
+  imports: [
+    MatButtonModule,
+    MatIconModule,
+    MatDialogContent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatOptionModule,
+    MatInputModule,
+    MatDialogClose,
+  ]
 })
 export class DepartmentsFormComponent {
   dialogRef = inject<MatDialogRef<DepartmentsFormComponent>>(MatDialogRef);

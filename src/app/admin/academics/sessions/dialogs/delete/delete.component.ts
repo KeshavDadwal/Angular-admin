@@ -10,7 +10,7 @@ import { SessionsService } from '../../sessions.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   sessionName: string;
 }
 

@@ -1,5 +1,5 @@
 export class LessonPlanning {
-  id: number;
+  id: string;
   topicName: string;
   lessonName: string;
   className: string;
@@ -10,18 +10,16 @@ export class LessonPlanning {
   objectives: string;
   teachingMethod: string;
 
-  constructor(lessonPlanning: LessonPlanning) {
-    {
-      this.id = lessonPlanning.id || 0;
-      this.topicName = lessonPlanning.topicName || '';
-      this.lessonName = lessonPlanning.lessonName || '';
-      this.className = lessonPlanning.className || '';
-      this.subjectName = lessonPlanning.subjectName || '';
-      this.teacherName = lessonPlanning.teacherName || '';
-      this.lessonDate = lessonPlanning.lessonDate || '';
-      this.status = lessonPlanning.status || '';
-      this.objectives = lessonPlanning.objectives || '';
-      this.teachingMethod = lessonPlanning.teachingMethod || '';
-    }
+  constructor(lessonPlanning: Partial<LessonPlanning> = {}) {
+    this.id = lessonPlanning.id || '';
+    this.topicName = lessonPlanning.topicName || '';
+    this.lessonName = lessonPlanning.lessonName || '';
+    this.className = lessonPlanning.className || '';
+    this.subjectName = lessonPlanning.subjectName || '';
+    this.teacherName = lessonPlanning.teacherName || '';
+    this.lessonDate = lessonPlanning.lessonDate || '';
+    this.status = lessonPlanning.status || 'Planned';
+    this.objectives = lessonPlanning.objectives || '';
+    this.teachingMethod = lessonPlanning.teachingMethod || '';
   }
 }

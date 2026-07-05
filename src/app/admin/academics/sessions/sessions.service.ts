@@ -1,54 +1,178 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
 import { Session } from './sessions.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SessionsService {
-  private sessions: Session[] = [
-    { id: 1, sessionName: 'Session 1', startDate: '2023-06-01', endDate: '2023-10-31', status: 'Active', instructor: 'John Doe', room: '101' },
-    { id: 2, sessionName: 'Session 2', startDate: '2023-11-01', endDate: '2024-03-31', status: 'Active', instructor: 'Jane Smith', room: '102' },
-    { id: 3, sessionName: 'Session 3', startDate: '2024-04-01', endDate: '2024-05-31', status: 'Active', instructor: 'Alice Brown', room: '103' },
-    { id: 4, sessionName: 'Session 4', startDate: '2022-06-01', endDate: '2022-10-31', status: 'Inactive', instructor: 'Bob White', room: '104' },
-    { id: 5, sessionName: 'Session 5', startDate: '2022-11-01', endDate: '2023-03-31', status: 'Inactive', instructor: 'Charlie Green', room: '105' },
-    { id: 6, sessionName: 'Session 6', startDate: '2023-04-01', endDate: '2023-05-31', status: 'Inactive', instructor: 'David Black', room: '106' },
-    { id: 7, sessionName: 'Session 7', startDate: '2021-06-01', endDate: '2021-10-31', status: 'Inactive', instructor: 'Emma Watson', room: '107' },
-    { id: 8, sessionName: 'Session 8', startDate: '2021-11-01', endDate: '2022-03-31', status: 'Inactive', instructor: 'Frank Miller', room: '108' },
-    { id: 9, sessionName: 'Session 9', startDate: '2022-04-01', endDate: '2022-05-31', status: 'Inactive', instructor: 'Grace Hopper', room: '109' },
-    { id: 10, sessionName: 'Session 10', startDate: '2020-06-01', endDate: '2020-10-31', status: 'Inactive', instructor: 'Henry Ford', room: '110' },
-    { id: 11, sessionName: 'Session 11', startDate: '2020-11-01', endDate: '2021-03-31', status: 'Inactive', instructor: 'Isabel Bloom', room: '111' },
-    { id: 12, sessionName: 'Session 12', startDate: '2021-04-01', endDate: '2021-05-31', status: 'Inactive', instructor: 'Jack Reacher', room: '112' },
-  ];
+  private httpClient = inject(HttpClient);
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
-  dataChange: BehaviorSubject<Session[]> = new BehaviorSubject<Session[]>(
-    []
-  );
+  dataChange: BehaviorSubject<Session[]> = new BehaviorSubject<Session[]>([]);
+  dialogData!: Session;
+
+  get data(): Session[] {
+    return this.dataChange.value;
+  }
+
+  getDialogData(): Session {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): Session {
+    return new Session({
+      id: item.id,
+      sessionName: item.sessionName || '',
+      startDate: item.startDate ? item.startDate.split('T')[0] : '',
+      endDate: item.endDate ? item.endDate.split('T')[0] : '',
+      status: item.status || 'Active',
+      instructor: item.instructor || '',
+      room: item.room || '',
+    });
+  }
 
   getAllSessions(): Observable<Session[]> {
-    this.dataChange.next(this.sessions);
-    return of(this.sessions);
+    const body = {
+      query: `
+        query GetSessionsList {
+          sessionsList {
+            id
+            sessionName
+            startDate
+            endDate
+            status
+            instructor
+            room
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch sessions');
+        }
+        const list = res.data.sessionsList || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   addSession(session: Session): Observable<Session> {
-    session.id = Math.max(...this.sessions.map(s => s.id), 0) + 1;
-    this.sessions.push(session);
-    this.dataChange.next(this.sessions);
-    return of(session);
+    const body = {
+      query: `
+        mutation CreateSession($input: CreateSessionCustomInput!) {
+          createSession(input: $input) {
+            id
+            sessionName
+            startDate
+            endDate
+            status
+            instructor
+            room
+          }
+        }
+      `,
+      variables: {
+        input: {
+          sessionName: session.sessionName,
+          startDate: session.startDate || '',
+          endDate: session.endDate || '',
+          status: session.status,
+          instructor: session.instructor || '',
+          room: session.room || '',
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create session');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createSession);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   updateSession(session: Session): Observable<Session> {
-    const index = this.sessions.findIndex(s => s.id === session.id);
-    if (index !== -1) {
-      this.sessions[index] = session;
-      this.dataChange.next(this.sessions);
-    }
-    return of(session);
+    const body = {
+      query: `
+        mutation UpdateSession($input: UpdateSessionCustomInput!) {
+          updateSession(input: $input) {
+            id
+            sessionName
+            startDate
+            endDate
+            status
+            instructor
+            room
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(session.id),
+          sessionName: session.sessionName,
+          startDate: session.startDate || '',
+          endDate: session.endDate || '',
+          status: session.status,
+          instructor: session.instructor || '',
+          room: session.room || '',
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update session');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateSession);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
-  deleteSession(id: number): Observable<number> {
-    this.sessions = this.sessions.filter(s => s.id !== id);
-    this.dataChange.next(this.sessions);
-    return of(id);
+  deleteSession(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteSession($id: String!) {
+          deleteSession(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete session');
+        }
+        return res.data.deleteSession;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

@@ -1,213 +1,196 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
-import { AcademicReport, IAcademicReport } from './academic-report.model';
+import { AcademicReport } from './academic-report.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AcademicReportService {
   private httpClient = inject(HttpClient);
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
-  dataChange: BehaviorSubject<AcademicReport[]> = new BehaviorSubject<
-    AcademicReport[]
-  >([]);
+  dataChange: BehaviorSubject<AcademicReport[]> = new BehaviorSubject<AcademicReport[]>([]);
+  dialogData!: AcademicReport;
 
-  private staticData: IAcademicReport[] = [
-    {
-      id: 1,
-      img: 'assets/images/user/user1.jpg',
-      reportType: 'Progress Report',
-      className: 'Class 10-A',
-      subject: 'Mathematics',
-      academicYear: '2024-25',
-      term: 'First Term',
-      generatedBy: 'John Doe',
-      date: '2024-12-20',
-      status: 'Completed',
-    },
-    {
-      id: 2,
-      img: 'assets/images/user/user2.jpg',
-      reportType: 'Performance Analysis',
-      className: 'Class 9-B',
-      subject: 'Science',
-      academicYear: '2024-25',
-      term: 'First Term',
-      generatedBy: 'Sarah Smith',
-      date: '2024-12-19',
-      status: 'Completed',
-    },
-    {
-      id: 3,
-      img: 'assets/images/user/user3.jpg',
-      reportType: 'Grade Summary',
-      className: 'Class 12-A',
-      subject: 'Physics',
-      academicYear: '2024-25',
-      term: 'Second Term',
-      generatedBy: 'Mike Johnson',
-      date: '2024-12-18',
-      status: 'Pending',
-    },
-    {
-      id: 4,
-      img: 'assets/images/user/user4.jpg',
-      reportType: 'Subject Wise Report',
-      className: 'Class 8-C',
-      subject: 'English',
-      academicYear: '2024-25',
-      term: 'First Term',
-      generatedBy: 'Emily Davis',
-      date: '2024-12-17',
-      status: 'Completed',
-    },
-    {
-      id: 5,
-      img: 'assets/images/user/user5.jpg',
-      reportType: 'Progress Report',
-      className: 'Class 11-B',
-      subject: 'Chemistry',
-      academicYear: '2024-25',
-      term: 'First Term',
-      generatedBy: 'David Wilson',
-      date: '2024-12-16',
-      status: 'Completed',
-    },
-    {
-      id: 6,
-      img: 'assets/images/user/user6.jpg',
-      reportType: 'Class Performance',
-      className: 'Class 7-A',
-      subject: 'History',
-      academicYear: '2024-25',
-      term: 'Second Term',
-      generatedBy: 'Lisa Brown',
-      date: '2024-12-15',
-      status: 'In Progress',
-    },
-    {
-      id: 7,
-      img: 'assets/images/user/user7.jpg',
-      reportType: 'Term Report',
-      className: 'Class 10-B',
-      subject: 'Biology',
-      academicYear: '2024-25',
-      term: 'First Term',
-      generatedBy: 'Robert Taylor',
-      date: '2024-12-14',
-      status: 'Completed',
-    },
-    {
-      id: 8,
-      img: 'assets/images/user/user8.jpg',
-      reportType: 'Progress Report',
-      className: 'Class 9-A',
-      subject: 'Computer Science',
-      academicYear: '2024-25',
-      term: 'First Term',
-      generatedBy: 'Jennifer White',
-      date: '2024-12-13',
-      status: 'Completed',
-    },
-    {
-      id: 9,
-      img: 'assets/images/user/user9.jpg',
-      reportType: 'Assessment Report',
-      className: 'Class 12-C',
-      subject: 'Economics',
-      academicYear: '2024-25',
-      term: 'Second Term',
-      generatedBy: 'William Clark',
-      date: '2024-12-12',
-      status: 'Pending',
-    },
-    {
-      id: 10,
-      img: 'assets/images/user/user10.jpg',
-      reportType: 'Grade Summary',
-      className: 'Class 8-A',
-      subject: 'Geography',
-      academicYear: '2024-25',
-      term: 'First Term',
-      generatedBy: 'Amanda Lee',
-      date: '2024-12-11',
-      status: 'Completed',
-    },
-    {
-      id: 11,
-      img: 'assets/images/user/user11.jpg',
-      reportType: 'Performance Analysis',
-      className: 'Class 11-C',
-      subject: 'Accounts',
-      academicYear: '2024-25',
-      term: 'First Term',
-      generatedBy: 'Chris Martin',
-      date: '2024-12-10',
-      status: 'Completed',
-    },
-    {
-      id: 12,
-      img: 'assets/images/user/user6.jpg',
-      reportType: 'Subject Wise Report',
-      className: 'Class 10-C',
-      subject: 'Business Studies',
-      academicYear: '2024-25',
-      term: 'Second Term',
-      generatedBy: 'Jessica King',
-      date: '2024-12-09',
-      status: 'In Progress',
-    },
-    {
-      id: 13,
-      img: 'assets/images/user/user1.jpg',
-      reportType: 'Progress Report',
-      className: 'Class 9-C',
-      subject: 'Political Science',
-      academicYear: '2024-25',
-      term: 'First Term',
-      generatedBy: 'Matthew Hall',
-      date: '2024-12-08',
-      status: 'Completed',
-    },
-  ];
+  get data(): AcademicReport[] {
+    return this.dataChange.value;
+  }
+
+  getDialogData(): AcademicReport {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): AcademicReport {
+    return new AcademicReport({
+      id: item.id,
+      img: item.img || 'assets/images/user/new.jpg',
+      reportType: item.reportType || '',
+      className: item.className || '',
+      subject: item.subject || '',
+      academicYear: item.academicYear || '',
+      term: item.term || '',
+      generatedBy: item.generatedBy || '',
+      date: item.date ? item.date.split('T')[0] : '',
+      status: item.status || '',
+    });
+  }
 
   getAllAcademicReports(): Observable<AcademicReport[]> {
-    return of(this.staticData as AcademicReport[]).pipe(
-      map((data) => {
-        this.dataChange.next(data);
-        return data;
+    const body = {
+      query: `
+        query GetAcademicReportsList {
+          academicReportsList {
+            id
+            img
+            reportType
+            className
+            subject
+            academicYear
+            term
+            generatedBy
+            date
+            status
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch academic reports');
+        }
+        const list = res.data.academicReportsList || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
       }),
       catchError(this.handleError)
     );
   }
 
   addAcademicReport(report: AcademicReport): Observable<AcademicReport> {
-    return of(report).pipe(
-      map((response) => response),
+    const body = {
+      query: `
+        mutation CreateAcademicReport($input: CreateAcademicReportCustomInput!) {
+          createAcademicReport(input: $input) {
+            id
+            img
+            reportType
+            className
+            subject
+            academicYear
+            term
+            generatedBy
+            date
+            status
+          }
+        }
+      `,
+      variables: {
+        input: {
+          img: report.img || 'assets/images/user/new.jpg',
+          reportType: report.reportType,
+          className: report.className,
+          subject: report.subject,
+          academicYear: report.academicYear,
+          term: report.term,
+          generatedBy: report.generatedBy,
+          date: report.date || '',
+          status: report.status,
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create academic report');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createAcademicReport);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
       catchError(this.handleError)
     );
   }
 
   updateAcademicReport(report: AcademicReport): Observable<AcademicReport> {
-    return of(report).pipe(
-      map((response) => response),
+    const body = {
+      query: `
+        mutation UpdateAcademicReport($input: UpdateAcademicReportCustomInput!) {
+          updateAcademicReport(input: $input) {
+            id
+            img
+            reportType
+            className
+            subject
+            academicYear
+            term
+            generatedBy
+            date
+            status
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(report.id),
+          img: report.img || 'assets/images/user/new.jpg',
+          reportType: report.reportType,
+          className: report.className,
+          subject: report.subject,
+          academicYear: report.academicYear,
+          term: report.term,
+          generatedBy: report.generatedBy,
+          date: report.date || '',
+          status: report.status,
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update academic report');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateAcademicReport);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
       catchError(this.handleError)
     );
   }
 
-  deleteAcademicReport(id: number): Observable<number> {
-    return of(id).pipe(
-      map((_response) => id),
+  deleteAcademicReport(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteAcademicReport($id: String!) {
+          deleteAcademicReport(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete academic report');
+        }
+        return res.data.deleteAcademicReport;
+      }),
       catchError(this.handleError)
     );
   }
 
-  private handleError(error: HttpErrorResponse) {
-    console.error('An error occurred:', error.message);
-    return throwError(
-      () => new Error('Something went wrong; please try again later.')
-    );
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

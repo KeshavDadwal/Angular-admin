@@ -4,7 +4,7 @@ import { ExamReportService } from '../../exam-report.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   examName: string;
   className: string;
 }

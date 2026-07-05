@@ -1,7 +1,5 @@
-import { formatDate } from '@angular/common';
-
 export class FeesType {
-  feeTypeId: number;
+  feeTypeId: string;
   feeTypeName: string;
   category: string;
   description: string;
@@ -14,7 +12,7 @@ export class FeesType {
   lastUpdated: string;
 
   constructor(feeTypeData: Partial<FeesType> = {}) {
-    this.feeTypeId = feeTypeData.feeTypeId || this.getRandomID();
+    this.feeTypeId = feeTypeData.feeTypeId || '';
     this.feeTypeName = feeTypeData.feeTypeName || '';
     this.category = feeTypeData.category || '';
     this.description = feeTypeData.description || '';
@@ -23,14 +21,7 @@ export class FeesType {
     this.frequency = feeTypeData.frequency || '';
     this.status = feeTypeData.status || 'Active';
     this.createdBy = feeTypeData.createdBy || '';
-    this.createdDate =
-      feeTypeData.createdDate || formatDate(new Date(), 'yyyy-MM-dd', 'en');
-    this.lastUpdated =
-      feeTypeData.lastUpdated || formatDate(new Date(), 'yyyy-MM-dd', 'en');
-  }
-
-  // Optional: Method to generate a random ID if needed
-  public getRandomID(): number {
-    return Math.floor(Math.random() * 1000000);
+    this.createdDate = feeTypeData.createdDate || '';
+    this.lastUpdated = feeTypeData.lastUpdated || '';
   }
 }

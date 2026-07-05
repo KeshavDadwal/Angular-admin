@@ -4,7 +4,7 @@ import { FeeReportService } from '../../fee-report.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   reportType: string;
   feeCategory: string;
 }

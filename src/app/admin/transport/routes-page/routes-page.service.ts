@@ -1,168 +1,184 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { TransportRoute } from './routes-page.model';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
+import { TransportRoute } from './routes-page.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TransportRouteService {
   private httpClient = inject(HttpClient);
-  private staticData: any[] = [
-    {
-      id: 1,
-      route_name: 'North Campus - Main Gate',
-      start_point: 'North Campus',
-      end_point: 'Main Gate',
-      distance: '5 km',
-      vehicle_no: 'VH-2021-001',
-      route_fees: '50',
-      status: 'Active',
-    },
-    {
-      id: 2,
-      route_name: 'City Center - South Block',
-      start_point: 'City Center',
-      end_point: 'South Block',
-      distance: '12 km',
-      vehicle_no: 'VH-2020-002',
-      route_fees: '120',
-      status: 'Active',
-    },
-    {
-      id: 3,
-      route_name: 'Airport Road - Science Wing',
-      start_point: 'Airport Road',
-      end_point: 'Science Wing',
-      distance: '15 km',
-      vehicle_no: 'VH-2019-003',
-      route_fees: '150',
-      status: 'Inactive',
-    },
-    {
-      id: 4,
-      route_name: 'Green Valley - Arts College',
-      start_point: 'Green Valley',
-      end_point: 'Arts College',
-      distance: '8 km',
-      vehicle_no: 'VH-2022-004',
-      route_fees: '80',
-      status: 'Active',
-    },
-    {
-      id: 5,
-      route_name: 'Railway Station - Hostel Block',
-      start_point: 'Railway Station',
-      end_point: 'Hostel Block',
-      distance: '10 km',
-      vehicle_no: 'VH-2021-005',
-      route_fees: '100',
-      status: 'Active',
-    },
-    {
-      id: 6,
-      route_name: 'East Suburb - Library',
-      start_point: 'East Suburb',
-      end_point: 'Library',
-      distance: '20 km',
-      vehicle_no: 'VH-2018-006',
-      route_fees: '200',
-      status: 'Active',
-    },
-    {
-      id: 7,
-      route_name: 'West End - Sports Complex',
-      start_point: 'West End',
-      end_point: 'Sports Complex',
-      distance: '18 km',
-      vehicle_no: 'VH-2023-007',
-      route_fees: '180',
-      status: 'Active',
-    },
-    {
-      id: 8,
-      route_name: 'Hill Top - Medical Center',
-      start_point: 'Hill Top',
-      end_point: 'Medical Center',
-      distance: '25 km',
-      vehicle_no: 'VH-2020-008',
-      route_fees: '250',
-      status: 'Active',
-    },
-    {
-      id: 9,
-      route_name: 'Market Square - Admin Block',
-      start_point: 'Market Square',
-      end_point: 'Admin Block',
-      distance: '6 km',
-      vehicle_no: 'VH-2017-009',
-      route_fees: '60',
-      status: 'Active',
-    },
-    {
-      id: 10,
-      route_name: 'Lake Side - Engineering Wing',
-      start_point: 'Lake Side',
-      end_point: 'Engineering Wing',
-      distance: '14 km',
-      vehicle_no: 'VH-2021-010',
-      route_fees: '140',
-      status: 'Active',
-    },
-    {
-      id: 11,
-      route_name: 'Central Plaza - IT Center',
-      start_point: 'Central Plaza',
-      end_point: 'IT Center',
-      distance: '7 km',
-      vehicle_no: 'VH-2022-011',
-      route_fees: '70',
-      status: 'Active',
-    },
-    {
-      id: 12,
-      route_name: 'Old Town - PG Hostel',
-      start_point: 'Old Town',
-      end_point: 'PG Hostel',
-      distance: '11 km',
-      vehicle_no: 'VH-2019-012',
-      route_fees: '110',
-      status: 'Active',
-    },
-  ];
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
   dataChange: BehaviorSubject<TransportRoute[]> = new BehaviorSubject<TransportRoute[]>([]);
+  dialogData!: TransportRoute;
 
   get data(): TransportRoute[] {
     return this.dataChange.value;
   }
 
+  getDialogData(): TransportRoute {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): TransportRoute {
+    return new TransportRoute({
+      id: item.id,
+      route_name: item.routeName || '',
+      start_point: item.startPoint || '',
+      end_point: item.endPoint || '',
+      distance: item.distance || '',
+      vehicle_no: item.vehicleNo || '',
+      route_fees: item.routeFees || '',
+      status: item.status || '',
+    });
+  }
+
   getRoutes(): Observable<TransportRoute[]> {
-    this.dataChange.next(this.staticData);
-    return of(this.staticData);
+    const body = {
+      query: `
+        query GetTransportRoutesList {
+          transportRoutesList {
+            id
+            routeName
+            startPoint
+            endPoint
+            distance
+            vehicleNo
+            routeFees
+            status
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch transport routes');
+        }
+        const list = res.data.transportRoutesList || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   addRoute(route: TransportRoute): Observable<TransportRoute> {
-    this.staticData.push(route);
-    this.dataChange.next(this.staticData);
-    return of(route);
+    const body = {
+      query: `
+        mutation CreateTransportRoute($input: CreateTransportRouteInput!) {
+          createTransportRoute(input: $input) {
+            id
+            routeName
+            startPoint
+            endPoint
+            distance
+            vehicleNo
+            routeFees
+            status
+          }
+        }
+      `,
+      variables: {
+        input: {
+          routeName: route.route_name,
+          startPoint: route.start_point,
+          endPoint: route.end_point,
+          distance: route.distance,
+          vehicleNo: route.vehicle_no,
+          routeFees: route.route_fees,
+          status: route.status,
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create transport route');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createTransportRoute);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   updateRoute(route: TransportRoute): Observable<TransportRoute> {
-    const index = this.staticData.findIndex((it) => it.id === route.id);
-    if (index !== -1) {
-      this.staticData[index] = route;
-      this.dataChange.next(this.staticData);
-    }
-    return of(route);
+    const body = {
+      query: `
+        mutation UpdateTransportRoute($input: UpdateTransportRouteInput!) {
+          updateTransportRoute(input: $input) {
+            id
+            routeName
+            startPoint
+            endPoint
+            distance
+            vehicleNo
+            routeFees
+            status
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(route.id),
+          routeName: route.route_name,
+          startPoint: route.start_point,
+          endPoint: route.end_point,
+          distance: route.distance,
+          vehicleNo: route.vehicle_no,
+          routeFees: route.route_fees,
+          status: route.status,
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update transport route');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateTransportRoute);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
-  deleteRoute(id: number): Observable<number> {
-    const index = this.staticData.findIndex((it) => it.id === id);
-    if (index !== -1) {
-      this.staticData.splice(index, 1);
-      this.dataChange.next(this.staticData);
-    }
-    return of(id);
+  deleteRoute(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteTransportRoute($id: String!) {
+          deleteTransportRoute(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete transport route');
+        }
+        return res.data.deleteTransportRoute;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

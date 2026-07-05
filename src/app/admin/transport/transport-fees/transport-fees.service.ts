@@ -1,194 +1,196 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { TransportFee } from './transport-fees.model';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
+import { TransportFee } from './transport-fees.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TransportFeeService {
   private httpClient = inject(HttpClient);
-  private staticData: any[] = [
-    {
-      id: 1,
-      student_name: 'Alice Johnson',
-      student_id: 'STU001',
-      class_section: '10-A',
-      route_name: 'North Campus - Main Gate',
-      amount: '500',
-      payment_date: '2023-09-01',
-      payment_method: 'Online',
-      status: 'Paid',
-      img: 'assets/images/user/user1.jpg',
-    },
-    {
-      id: 2,
-      student_name: 'Bob Smith',
-      student_id: 'STU002',
-      class_section: '9-B',
-      route_name: 'City Center - South Block',
-      amount: '1200',
-      payment_date: '2023-09-02',
-      payment_method: 'Cash',
-      status: 'Paid',
-      img: 'assets/images/user/user2.jpg',
-    },
-    {
-      id: 3,
-      student_name: 'Charlie Brown',
-      student_id: 'STU003',
-      class_section: '11-C',
-      route_name: 'Airport Road - Science Wing',
-      amount: '1500',
-      payment_date: '2023-09-03',
-      payment_method: 'Online',
-      status: 'Unpaid',
-      img: 'assets/images/user/user3.jpg',
-    },
-    {
-      id: 4,
-      student_name: 'Diana Prince',
-      student_id: 'STU004',
-      class_section: '8-A',
-      route_name: 'Green Valley - Arts College',
-      amount: '800',
-      payment_date: '2023-09-04',
-      payment_method: 'Card',
-      status: 'Paid',
-      img: 'assets/images/user/user4.jpg',
-    },
-    {
-      id: 5,
-      student_name: 'Ethan Hunt',
-      student_id: 'STU005',
-      class_section: '12-B',
-      route_name: 'Railway Station - Hostel Block',
-      amount: '1000',
-      payment_date: '2023-09-05',
-      payment_method: 'Online',
-      status: 'Paid',
-      img: 'assets/images/user/user5.jpg',
-    },
-    {
-      id: 6,
-      student_name: 'Fiona Gallagher',
-      student_id: 'STU006',
-      class_section: '10-B',
-      route_name: 'East Suburb - Library',
-      amount: '2000',
-      payment_date: '2023-09-06',
-      payment_method: 'Cash',
-      status: 'Paid',
-      img: 'assets/images/user/user6.jpg',
-    },
-    {
-      id: 7,
-      student_name: 'George Miller',
-      student_id: 'STU007',
-      class_section: '7-C',
-      route_name: 'West End - Sports Complex',
-      amount: '1800',
-      payment_date: '2023-09-07',
-      payment_method: 'Online',
-      status: 'Paid',
-      img: 'assets/images/user/user7.jpg',
-    },
-    {
-      id: 8,
-      student_name: 'Hannah Abbott',
-      student_id: 'STU008',
-      class_section: '11-A',
-      route_name: 'Hill Top - Medical Center',
-      amount: '2500',
-      payment_date: '2023-09-08',
-      payment_method: 'Card',
-      status: 'Paid',
-      img: 'assets/images/user/user8.jpg',
-    },
-    {
-      id: 9,
-      student_name: 'Ian Wright',
-      student_id: 'STU009',
-      class_section: '9-A',
-      route_name: 'Market Square - Admin Block',
-      amount: '600',
-      payment_date: '2023-09-09',
-      payment_method: 'Online',
-      status: 'Unpaid',
-      img: 'assets/images/user/user9.jpg',
-    },
-    {
-      id: 10,
-      student_name: 'Julia Roberts',
-      student_id: 'STU010',
-      class_section: '12-A',
-      route_name: 'Lake Side - Engineering Wing',
-      amount: '1400',
-      payment_date: '2023-09-10',
-      payment_method: 'Cash',
-      status: 'Paid',
-      img: 'assets/images/user/user10.jpg',
-    },
-    {
-      id: 11,
-      student_name: 'Kevin Hart',
-      student_id: 'STU011',
-      class_section: '8-B',
-      route_name: 'Central Plaza - IT Center',
-      amount: '700',
-      payment_date: '2023-09-11',
-      payment_method: 'Online',
-      status: 'Paid',
-      img: 'assets/images/user/user11.jpg',
-    },
-    {
-      id: 12,
-      student_name: 'Laura Palmer',
-      student_id: 'STU012',
-      class_section: '10-C',
-      route_name: 'Old Town - PG Hostel',
-      amount: '1100',
-      payment_date: '2023-09-12',
-      payment_method: 'Card',
-      status: 'Paid',
-      img: 'assets/images/user/user6.jpg',
-    },
-  ];
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
-  dataChange: BehaviorSubject<TransportFee[]> = new BehaviorSubject<
-    TransportFee[]
-  >([]);
+  dataChange: BehaviorSubject<TransportFee[]> = new BehaviorSubject<TransportFee[]>([]);
+  dialogData!: TransportFee;
 
   get data(): TransportFee[] {
     return this.dataChange.value;
   }
 
+  getDialogData(): TransportFee {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): TransportFee {
+    return new TransportFee({
+      id: item.id,
+      student_name: item.studentName || '',
+      student_id: item.studentId || '',
+      class_section: item.classSection || '',
+      route_name: item.routeName || '',
+      amount: item.amount || '',
+      payment_date: item.paymentDate || '',
+      payment_method: item.paymentMethod || '',
+      status: item.status || '',
+      img: item.img || 'assets/images/user/user1.jpg',
+    });
+  }
+
   getFees(): Observable<TransportFee[]> {
-    this.dataChange.next(this.staticData);
-    return of(this.staticData);
+    const body = {
+      query: `
+        query GetTransportFeesList {
+          transportFeesList {
+            id
+            studentName
+            studentId
+            classSection
+            routeName
+            amount
+            paymentDate
+            paymentMethod
+            status
+            img
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch transport fees');
+        }
+        const list = res.data.transportFeesList || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   addFee(fee: TransportFee): Observable<TransportFee> {
-    this.staticData.push(fee);
-    this.dataChange.next(this.staticData);
-    return of(fee);
+    const body = {
+      query: `
+        mutation CreateTransportFee($input: CreateTransportFeeInput!) {
+          createTransportFee(input: $input) {
+            id
+            studentName
+            studentId
+            classSection
+            routeName
+            amount
+            paymentDate
+            paymentMethod
+            status
+            img
+          }
+        }
+      `,
+      variables: {
+        input: {
+          studentName: fee.student_name,
+          studentId: fee.student_id,
+          classSection: fee.class_section,
+          routeName: fee.route_name,
+          amount: fee.amount,
+          paymentDate: fee.payment_date || '',
+          paymentMethod: fee.payment_method,
+          status: fee.status,
+          img: fee.img || 'assets/images/user/user1.jpg',
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create transport fee');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createTransportFee);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   updateFee(fee: TransportFee): Observable<TransportFee> {
-    const index = this.staticData.findIndex((it) => it.id === fee.id);
-    if (index !== -1) {
-      this.staticData[index] = fee;
-      this.dataChange.next(this.staticData);
-    }
-    return of(fee);
+    const body = {
+      query: `
+        mutation UpdateTransportFee($input: UpdateTransportFeeInput!) {
+          updateTransportFee(input: $input) {
+            id
+            studentName
+            studentId
+            classSection
+            routeName
+            amount
+            paymentDate
+            paymentMethod
+            status
+            img
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(fee.id),
+          studentName: fee.student_name,
+          studentId: fee.student_id,
+          classSection: fee.class_section,
+          routeName: fee.route_name,
+          amount: fee.amount,
+          paymentDate: fee.payment_date || '',
+          paymentMethod: fee.payment_method,
+          status: fee.status,
+          img: fee.img || 'assets/images/user/user1.jpg',
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update transport fee');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateTransportFee);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
+      catchError(this.handleError)
+    );
   }
 
-  deleteFee(id: number): Observable<number> {
-    const index = this.staticData.findIndex((it) => it.id === id);
-    if (index !== -1) {
-      this.staticData.splice(index, 1);
-      this.dataChange.next(this.staticData);
-    }
-    return of(id);
+  deleteFee(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteTransportFee($id: String!) {
+          deleteTransportFee(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete transport fee');
+        }
+        return res.data.deleteTransportFee;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

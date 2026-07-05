@@ -1,5 +1,5 @@
 export class Department {
-  id: number;
+  id: string;
   img: string;
   department_name: string;
   hod: string;
@@ -9,8 +9,8 @@ export class Department {
   establishedYear: string;
   totalFaculty: string;
 
-  constructor(department: Department) {
-    this.id = department.id || this.getRandomID();
+  constructor(department: Partial<Department> = {}) {
+    this.id = department.id || '';
     this.img = department.img || 'assets/images/user/new.jpg';
     this.department_name = department.department_name || '';
     this.hod = department.hod || '';
@@ -19,12 +19,5 @@ export class Department {
     this.student_capacity = department.student_capacity || '';
     this.establishedYear = department.establishedYear || '';
     this.totalFaculty = department.totalFaculty || '';
-  }
-
-  public getRandomID(): number {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
-    };
-    return S4() + S4();
   }
 }

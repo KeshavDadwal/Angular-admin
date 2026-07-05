@@ -1,83 +1,232 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { HostelRoomList } from './hostel-room-list.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HostelRoomListService {
   private httpClient = inject(HttpClient);
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
-  private readonly API_URL = 'assets/data/hostel-room-list.json';
-  dataChange: BehaviorSubject<HostelRoomList[]> = new BehaviorSubject<
-    HostelRoomList[]
-  >([]);
+  dataChange: BehaviorSubject<HostelRoomList[]> = new BehaviorSubject<HostelRoomList[]>([]);
+  dialogData!: HostelRoomList;
 
-  /** CRUD METHODS */
+  get data(): HostelRoomList[] {
+    return this.dataChange.value;
+  }
 
-  /** GET: Fetch all hostel rooms */
+  getDialogData(): HostelRoomList {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): HostelRoomList {
+    return new HostelRoomList({
+      roomId: item.roomId,
+      roomNumber: item.roomNumber || '',
+      roomType: item.roomType || '',
+      floor: item.floor || 0,
+      capacity: item.capacity || 1,
+      occupiedStatus: item.occupiedStatus || 'Vacant',
+      currentOccupants: item.currentOccupants || 0,
+      priceFees: item.priceFees || 0,
+      roomCondition: item.roomCondition || 'Good',
+      dateAssigned: item.dateAssigned ? item.dateAssigned.split('T')[0] : '',
+      roomSupervisorStaff: item.roomSupervisorStaff || '',
+      hostelBlock: item.hostelBlock || '',
+      checkInDate: item.checkInDate ? item.checkInDate.split('T')[0] : '',
+      checkOutDate: item.checkOutDate ? item.checkOutDate.split('T')[0] : '',
+      roomTypeCode: item.roomTypeCode || '',
+      roomDescription: item.roomDescription || '',
+    });
+  }
+
   getHostelRooms(): Observable<HostelRoomList[]> {
-    return this.httpClient.get<HostelRoomList[]>(this.API_URL).pipe(
-      map((data) => {
-        this.dataChange.next(data);
-        return data;
+    const body = {
+      query: `
+        query GetHostelRoomsList {
+          hostelRoomsList {
+            roomId
+            roomNumber
+            roomType
+            floor
+            capacity
+            occupiedStatus
+            currentOccupants
+            priceFees
+            roomCondition
+            dateAssigned
+            roomSupervisorStaff
+            hostelBlock
+            checkInDate
+            checkOutDate
+            roomTypeCode
+            roomDescription
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch hostel rooms');
+        }
+        const list = res.data.hostelRoomsList || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
       }),
       catchError(this.handleError)
     );
   }
 
-  /** POST: Add a new hostel room */
   addHostelRoom(hostelRoom: HostelRoomList): Observable<HostelRoomList> {
-    // Simulating the addition of a hostel room
-    return of(hostelRoom).pipe(
-      map(() => hostelRoom), // Return the added hostel room
+    const body = {
+      query: `
+        mutation CreateHostelRoom($input: CreateHostelRoomCustomInput!) {
+          createHostelRoom(input: $input) {
+            roomId
+            roomNumber
+            roomType
+            floor
+            capacity
+            occupiedStatus
+            currentOccupants
+            priceFees
+            roomCondition
+            dateAssigned
+            roomSupervisorStaff
+            hostelBlock
+            checkInDate
+            checkOutDate
+            roomTypeCode
+            roomDescription
+          }
+        }
+      `,
+      variables: {
+        input: {
+          roomNumber: hostelRoom.roomNumber,
+          roomType: hostelRoom.roomType,
+          floor: Number(hostelRoom.floor),
+          capacity: Number(hostelRoom.capacity),
+          occupiedStatus: hostelRoom.occupiedStatus,
+          currentOccupants: Number(hostelRoom.currentOccupants),
+          priceFees: Number(hostelRoom.priceFees),
+          roomCondition: hostelRoom.roomCondition,
+          dateAssigned: hostelRoom.dateAssigned || '',
+          roomSupervisorStaff: hostelRoom.roomSupervisorStaff || '',
+          hostelBlock: hostelRoom.hostelBlock || '',
+          checkInDate: hostelRoom.checkInDate || '',
+          checkOutDate: hostelRoom.checkOutDate || '',
+          roomTypeCode: hostelRoom.roomTypeCode || '',
+          roomDescription: hostelRoom.roomDescription || '',
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create hostel room');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createHostelRoom);
+        this.dialogData = newRecord;
+        return newRecord;
+      }),
       catchError(this.handleError)
     );
-
-    // Uncomment for real API call
-    // return this.httpClient.post<HostelRoomList>(this.API_URL, hostelRoom).pipe(
-    //   map(() => hostelRoom), // Return the added hostel room
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** PUT: Update an existing hostel room */
   updateHostelRoom(hostelRoom: HostelRoomList): Observable<HostelRoomList> {
-    // Simulating the update of a hostel room
-    return of(hostelRoom).pipe(
-      map(() => hostelRoom), // Return the updated hostel room
+    const body = {
+      query: `
+        mutation UpdateHostelRoom($input: UpdateHostelRoomCustomInput!) {
+          updateHostelRoom(input: $input) {
+            roomId
+            roomNumber
+            roomType
+            floor
+            capacity
+            occupiedStatus
+            currentOccupants
+            priceFees
+            roomCondition
+            dateAssigned
+            roomSupervisorStaff
+            hostelBlock
+            checkInDate
+            checkOutDate
+            roomTypeCode
+            roomDescription
+          }
+        }
+      `,
+      variables: {
+        input: {
+          roomId: String(hostelRoom.roomId),
+          roomNumber: hostelRoom.roomNumber,
+          roomType: hostelRoom.roomType,
+          floor: Number(hostelRoom.floor),
+          capacity: Number(hostelRoom.capacity),
+          occupiedStatus: hostelRoom.occupiedStatus,
+          currentOccupants: Number(hostelRoom.currentOccupants),
+          priceFees: Number(hostelRoom.priceFees),
+          roomCondition: hostelRoom.roomCondition,
+          dateAssigned: hostelRoom.dateAssigned || '',
+          roomSupervisorStaff: hostelRoom.roomSupervisorStaff || '',
+          hostelBlock: hostelRoom.hostelBlock || '',
+          checkInDate: hostelRoom.checkInDate || '',
+          checkOutDate: hostelRoom.checkOutDate || '',
+          roomTypeCode: hostelRoom.roomTypeCode || '',
+          roomDescription: hostelRoom.roomDescription || '',
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update hostel room');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateHostelRoom);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
+      }),
       catchError(this.handleError)
     );
-
-    // Uncomment for real API call
-    // return this.httpClient.put<HostelRoomList>(`${this.API_URL}`, hostelRoom).pipe(
-    //   map(() => hostelRoom), // Return the updated hostel room
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** DELETE: Remove a hostel room by ID */
-  deleteHostelRoom(id: number): Observable<number> {
-    // Simulating the deletion of a hostel room
-    return of(id).pipe(
-      map(() => id), // Return the ID of the deleted hostel room
+  deleteHostelRoom(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteHostelRoom($id: String!) {
+          deleteHostelRoom(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete hostel room');
+        }
+        return res.data.deleteHostelRoom;
+      }),
       catchError(this.handleError)
     );
-
-    // Uncomment for real API call
-    // return this.httpClient.delete<void>(`${this.API_URL}`).pipe(
-    //   map(() => id), // Return the ID of the deleted hostel room
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** Handle Http operation that failed */
-  private handleError(error: HttpErrorResponse) {
-    console.error('An error occurred:', error.message);
-    return throwError(
-      () => new Error('Something went wrong; please try again later.')
-    );
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

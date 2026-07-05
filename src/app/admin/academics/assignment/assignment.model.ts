@@ -1,5 +1,5 @@
 export class Assignment {
-  id: number;
+  id: string;
   className: string;
   subjectName: string;
   teacherName: string;
@@ -9,17 +9,15 @@ export class Assignment {
   deadline: string;
   details: string;
 
-  constructor(assignment: Assignment) {
-    {
-      this.id = assignment.id || 0;
-      this.className = assignment.className || '';
-      this.subjectName = assignment.subjectName || '';
-      this.teacherName = assignment.teacherName || '';
-      this.assignmentDate = assignment.assignmentDate || '';
-      this.status = assignment.status || '';
-      this.title = assignment.title || '';
-      this.deadline = assignment.deadline || '';
-      this.details = assignment.details || '';
-    }
+  constructor(assignment: Partial<Assignment> = {}) {
+    this.id = assignment.id || '';
+    this.className = assignment.className || '';
+    this.subjectName = assignment.subjectName || '';
+    this.teacherName = assignment.teacherName || '';
+    this.assignmentDate = assignment.assignmentDate || '';
+    this.status = assignment.status || 'Active';
+    this.title = assignment.title || '';
+    this.deadline = assignment.deadline || '';
+    this.details = assignment.details || '';
   }
 }

@@ -1,6 +1,6 @@
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogContent, MatDialogClose } from '@angular/material/dialog';
-import { Component, Inject, inject } from '@angular/core';
-import { UntypedFormControl, UntypedFormGroup, UntypedFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TransportRoute } from '../../routes-page.model';
 import { TransportRouteService } from '../../routes-page.service';
 import { MatInputModule } from '@angular/material/input';
@@ -10,7 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
   route: TransportRoute;
 }
@@ -33,24 +33,24 @@ export interface DialogData {
   ],
 })
 export class RoutesFormComponent {
+  dialogRef = inject<MatDialogRef<RoutesFormComponent>>(MatDialogRef);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+  routeService = inject(TransportRouteService);
+  private fb = inject(UntypedFormBuilder);
+
   action: string;
   dialogTitle: string;
   routeForm: UntypedFormGroup;
   route: TransportRoute;
-  routeService = inject(TransportRouteService);
-  private fb = inject(UntypedFormBuilder);
 
-  constructor(
-    public dialogRef: MatDialogRef<RoutesFormComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData
-  ) {
-    this.action = data.action;
+  constructor() {
+    this.action = this.data.action;
     if (this.action === 'edit') {
       this.dialogTitle = 'Edit Route';
-      this.route = data.route;
+      this.route = this.data.route;
     } else {
       this.dialogTitle = 'New Route';
-      this.route = new TransportRoute({} as TransportRoute);
+      this.route = new TransportRoute({});
     }
     this.routeForm = this.createContactForm();
   }
@@ -71,12 +71,22 @@ export class RoutesFormComponent {
   submit() {
     if (this.routeForm.valid) {
       if (this.action === 'edit') {
-        this.routeService.updateRoute(this.routeForm.getRawValue()).subscribe(() => {
-          this.dialogRef.close(1);
+        this.routeService.updateRoute(this.routeForm.getRawValue()).subscribe({
+          next: (response) => {
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            console.error('Update Error:', error);
+          },
         });
       } else {
-        this.routeService.addRoute(this.routeForm.getRawValue()).subscribe(() => {
-          this.dialogRef.close(1);
+        this.routeService.addRoute(this.routeForm.getRawValue()).subscribe({
+          next: (response) => {
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            console.error('Add Error:', error);
+          },
         });
       }
     }

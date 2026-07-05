@@ -1,87 +1,232 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { Fees } from './fees.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FeesService {
   private httpClient = inject(HttpClient);
+  private readonly GRAPHQL_URL = `${environment.apiUrl}/query`;
 
-  private readonly API_URL = 'assets/data/fees.json';
   dataChange: BehaviorSubject<Fees[]> = new BehaviorSubject<Fees[]>([]);
+  dialogData!: Fees;
 
-  /** CRUD METHODS */
+  get data(): Fees[] {
+    return this.dataChange.value;
+  }
 
-  /** GET: Fetch all fees */
+  getDialogData(): Fees {
+    return this.dialogData;
+  }
+
+  private mapGraphQLToModel(item: any): Fees {
+    return new Fees({
+      id: item.id,
+      rollNo: item.rollNo || '',
+      studentName: item.studentName || '',
+      class: item.class || 'N/A',
+      feesType: item.feesType || '',
+      invoiceNo: item.invoiceNo || '',
+      paymentDueDate: item.paymentDueDate ? item.paymentDueDate.split('T')[0] : '',
+      paymentDate: item.paymentDate ? item.paymentDate.split('T')[0] : '',
+      paymentType: item.paymentType || '',
+      status: item.status || '',
+      amount: item.amount || '',
+      lateFee: item.lateFee || '0$',
+      discount: item.discount || '0$',
+      createdAt: item.createdAt ? item.createdAt.split('T')[0] : '',
+      updatedAt: item.updatedAt ? item.updatedAt.split('T')[0] : '',
+      notes: item.notes || 'N/A',
+    });
+  }
+
   getAllFees(): Observable<Fees[]> {
-    return this.httpClient.get<Fees[]>(this.API_URL).pipe(
-      map((data) => {
-        this.dataChange.next(data);
-        return data;
+    const body = {
+      query: `
+        query GetAllFeesList {
+          allFeesList {
+            id
+            rollNo
+            studentName
+            class
+            feesType
+            invoiceNo
+            paymentDueDate
+            paymentDate
+            paymentType
+            status
+            amount
+            lateFee
+            discount
+            createdAt
+            updatedAt
+            notes
+          }
+        }
+      `
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to fetch all fees');
+        }
+        const list = res.data.allFeesList || [];
+        const mappedList = list.map((item: any) => this.mapGraphQLToModel(item));
+        this.dataChange.next(mappedList);
+        return mappedList;
       }),
       catchError(this.handleError)
     );
   }
 
-  /** POST: Add a new fee */
   addFees(fees: Fees): Observable<Fees> {
-    // Simulate adding the fee
-    return of(fees).pipe(
-      map((_response) => {
-        return _response; // Return the added fee
+    const body = {
+      query: `
+        mutation CreateFees($input: CreateFeesInput!) {
+          createFees(input: $input) {
+            id
+            rollNo
+            studentName
+            class
+            feesType
+            invoiceNo
+            paymentDueDate
+            paymentDate
+            paymentType
+            status
+            amount
+            lateFee
+            discount
+            createdAt
+            updatedAt
+            notes
+          }
+        }
+      `,
+      variables: {
+        input: {
+          rollNo: fees.rollNo,
+          studentName: fees.studentName,
+          class: fees.class || 'N/A',
+          feesType: fees.feesType,
+          invoiceNo: fees.invoiceNo,
+          paymentDueDate: fees.paymentDueDate || '',
+          paymentDate: fees.paymentDate || '',
+          paymentType: fees.paymentType || '',
+          status: fees.status,
+          amount: fees.amount,
+          lateFee: fees.lateFee || '0$',
+          discount: fees.discount || '0$',
+          createdAt: fees.createdAt || '',
+          updatedAt: fees.updatedAt || '',
+          notes: fees.notes || 'N/A',
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to create fees');
+        }
+        const newRecord = this.mapGraphQLToModel(res.data.createFees);
+        this.dialogData = newRecord;
+        return newRecord;
       }),
       catchError(this.handleError)
     );
-
-    // API call to add the fee
-    // return this.httpClient.post<Fees>(this.API_URL, fees).pipe(
-    //   map(() => fees), // Return the added fee
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** PUT: Update an existing fee */
   updateFees(fees: Fees): Observable<Fees> {
-    // Simulate updating the fee
-    return of(fees).pipe(
-      map((response) => {
-        return response; // Return the updated fee
+    const body = {
+      query: `
+        mutation UpdateFees($input: UpdateFeesInput!) {
+          updateFees(input: $input) {
+            id
+            rollNo
+            studentName
+            class
+            feesType
+            invoiceNo
+            paymentDueDate
+            paymentDate
+            paymentType
+            status
+            amount
+            lateFee
+            discount
+            createdAt
+            updatedAt
+            notes
+          }
+        }
+      `,
+      variables: {
+        input: {
+          id: String(fees.id),
+          rollNo: fees.rollNo,
+          studentName: fees.studentName,
+          class: fees.class || 'N/A',
+          feesType: fees.feesType,
+          invoiceNo: fees.invoiceNo,
+          paymentDueDate: fees.paymentDueDate || '',
+          paymentDate: fees.paymentDate || '',
+          paymentType: fees.paymentType || '',
+          status: fees.status,
+          amount: fees.amount,
+          lateFee: fees.lateFee || '0$',
+          discount: fees.discount || '0$',
+          createdAt: fees.createdAt || '',
+          updatedAt: fees.updatedAt || '',
+          notes: fees.notes || 'N/A',
+        }
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to update fees');
+        }
+        const updatedRecord = this.mapGraphQLToModel(res.data.updateFees);
+        this.dialogData = updatedRecord;
+        return updatedRecord;
       }),
       catchError(this.handleError)
     );
-
-    // API call to update the fee
-    // return this.httpClient.put<Fees>(`${this.API_URL}`, fees).pipe(
-    //   map(() => fees), // Return the updated fee
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** DELETE: Remove a fee by ID */
-  deleteFees(id: number): Observable<number> {
-    // Simulate deleting the fee by ID
-    return of(id).pipe(
-      map((_response) => {
-        return id; // Return the ID of the deleted fee
+  deleteFees(id: string | number): Observable<string> {
+    const body = {
+      query: `
+        mutation DeleteFees($id: String!) {
+          deleteFees(id: $id)
+        }
+      `,
+      variables: {
+        id: String(id)
+      }
+    };
+
+    return this.httpClient.post<any>(this.GRAPHQL_URL, body).pipe(
+      map((res: any) => {
+        if (res.errors && res.errors.length > 0) {
+          throw new Error(res.errors[0].message || 'Failed to delete fees');
+        }
+        return res.data.deleteFees;
       }),
       catchError(this.handleError)
     );
-
-    // API call to delete the fee
-    // return this.httpClient.delete<void>(`${this.API_URL}`).pipe(
-    //   map(() => id), // Return the ID of the deleted fee
-    //   catchError(this.handleError)
-    // );
   }
 
-  /** Handle Http operation that failed */
-  private handleError(error: HttpErrorResponse) {
-    console.error('An error occurred:', error.message);
-    return throwError(
-      () => new Error('Something went wrong; please try again later.')
-    );
+  private handleError(error: any) {
+    const errorMsg = error.message || 'Something went wrong; please try again later.';
+    console.error('An error occurred:', errorMsg);
+    return throwError(() => new Error(errorMsg));
   }
 }

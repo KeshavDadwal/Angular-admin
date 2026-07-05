@@ -1,5 +1,5 @@
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogContent, MatDialogClose, MatDialogActions, MatDialogTitle } from '@angular/material/dialog';
-import { Component, Inject, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TransportRouteService } from '../../routes-page.service';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -17,16 +17,18 @@ import { MatButtonModule } from '@angular/material/button';
   ],
 })
 export class RoutesDeleteComponent {
+  dialogRef = inject<MatDialogRef<RoutesDeleteComponent>>(MatDialogRef);
+  data = inject(MAT_DIALOG_DATA);
   routeService = inject(TransportRouteService);
 
-  constructor(
-    public dialogRef: MatDialogRef<RoutesDeleteComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
-
   confirmDelete(): void {
-    this.routeService.deleteRoute(this.data.id).subscribe(() => {
-      this.dialogRef.close(1);
+    this.routeService.deleteRoute(this.data.id).subscribe({
+      next: (response) => {
+        this.dialogRef.close(response);
+      },
+      error: (error) => {
+        console.error('Delete Error:', error);
+      },
     });
   }
 }
